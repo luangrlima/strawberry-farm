@@ -59,6 +59,12 @@ button {
   align-items: start;
 }
 
+.header-side {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   text-transform: uppercase;
@@ -93,6 +99,62 @@ h1 {
 .goal--won {
   background: #e6ffe8;
   color: #1c6a2b;
+}
+
+.helper-btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: rgba(75, 42, 26, 0.08);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.helper-btn--ghost {
+  background: transparent;
+  border: 1px solid rgba(137, 76, 51, 0.16);
+}
+
+.help-panel {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 249, 239, 0.9);
+  border: 1px solid rgba(137, 76, 51, 0.14);
+}
+
+.help-panel[hidden] {
+  display: none;
+}
+
+.help-panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.help-panel__eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.help-panel h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.help-steps {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
+.help-steps li + li {
+  margin-top: 8px;
 }
 
 .stats {
@@ -132,6 +194,66 @@ h1 {
 
 .status-bar p {
   margin: 0;
+}
+
+.milestone-toast {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(230, 255, 232, 0.95), rgba(170, 223, 180, 0.72));
+  border: 1px solid rgba(28, 106, 43, 0.18);
+}
+
+.milestone-toast__title,
+.milestone-toast__text {
+  margin: 0;
+}
+
+.milestone-toast__text {
+  margin-top: 4px;
+  color: #2a6532;
+}
+
+.progress-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.progress-card {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(137, 76, 51, 0.12);
+}
+
+.progress-card__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.progress-card__bar {
+  width: 100%;
+  height: 10px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: rgba(75, 42, 26, 0.08);
+  overflow: hidden;
+}
+
+.progress-card__fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #d95a79, #f19db0);
+}
+
+.progress-card__fill--ready {
+  background: linear-gradient(90deg, #45aa54, #8fe09b);
 }
 
 .meta-row {
@@ -239,6 +361,27 @@ h1 {
   font-weight: 700;
 }
 
+.event-banner__aside {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.event-banner__progress {
+  width: 160px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(75, 42, 26, 0.12);
+  overflow: hidden;
+}
+
+.event-banner__progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(75, 42, 26, 0.75), rgba(75, 42, 26, 0.28));
+}
+
 .farm-section {
   margin-top: 22px;
 }
@@ -313,6 +456,21 @@ h1 {
   font-size: 0.9rem;
 }
 
+.goal-item__bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(75, 42, 26, 0.08);
+  overflow: hidden;
+}
+
+.goal-item__fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #cf4e6e, #f3b4c2);
+}
+
 .farm-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -353,9 +511,25 @@ h1 {
   outline: none;
 }
 
+.plot--attention {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 3px rgba(255, 255, 255, 0.16);
+}
+
 .plot__emoji {
   font-size: 2.4rem;
   line-height: 1;
+}
+
+.plot__badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .plot__name,
@@ -402,9 +576,17 @@ h1 {
   background: linear-gradient(180deg, #4cae57, var(--sprout));
 }
 
+.plot--growing .plot__badge {
+  background: rgba(255, 255, 255, 0.24);
+}
+
 .plot--ready {
   background: linear-gradient(180deg, #f26a8d, var(--ready));
   animation: readyPulse 1s ease-in-out infinite alternate;
+}
+
+.plot--ready .plot__badge {
+  background: rgba(255, 255, 255, 0.28);
 }
 
 .upgrades {
@@ -513,8 +695,23 @@ h1 {
     width: 100%;
   }
 
+  .header-side {
+    width: 100%;
+    justify-items: stretch;
+  }
+
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .help-panel__header,
+  .progress-card__head {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .progress-strip {
+    grid-template-columns: 1fr;
   }
 
   .meta-row {
@@ -524,6 +721,14 @@ h1 {
 
   .event-banner {
     flex-direction: column;
+  }
+
+  .event-banner__aside {
+    justify-items: stretch;
+  }
+
+  .event-banner__progress {
+    width: 100%;
   }
 
   .legend {

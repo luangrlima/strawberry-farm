@@ -8,12 +8,22 @@ const elements = {
   growthTimeValue: document.querySelector("#growthTimeValue"),
   plotCountValue: document.querySelector("#plotCountValue"),
   goalStatus: document.querySelector("#goalStatus"),
+  helpPanel: document.querySelector("#helpPanel"),
+  helpToggleButton: document.querySelector("#helpToggleButton"),
+  helpDismissButton: document.querySelector("#helpDismissButton"),
   statusMessage: document.querySelector("#statusMessage"),
+  milestoneToast: document.querySelector("#milestoneToast"),
+  milestoneToastText: document.querySelector("#milestoneToastText"),
   saveStatus: document.querySelector("#saveStatus"),
+  moneyGoalProgressLabel: document.querySelector("#moneyGoalProgressLabel"),
+  moneyGoalProgressBar: document.querySelector("#moneyGoalProgressBar"),
+  readyPlotProgressLabel: document.querySelector("#readyPlotProgressLabel"),
+  readyPlotProgressBar: document.querySelector("#readyPlotProgressBar"),
   eventBanner: document.querySelector("#eventBanner"),
   eventTitle: document.querySelector("#eventTitle"),
   eventDescription: document.querySelector("#eventDescription"),
   eventTimer: document.querySelector("#eventTimer"),
+  eventProgressBar: document.querySelector("#eventProgressBar"),
   progressSummary: document.querySelector("#progressSummary"),
   goalList: document.querySelector("#goalList"),
   farmGrid: document.querySelector("#farmGrid"),
@@ -33,6 +43,9 @@ const plotElements = [];
 const debugState = {
   randomEventsEnabled: true,
 };
+const uiState = {
+  milestoneToast: null,
+};
 let state = loadState();
 let autosaveIntervalId = null;
 let dirty = false;
@@ -50,6 +63,8 @@ function attachEvents() {
   elements.fertilizerButton.addEventListener("click", buyFertilizerUpgrade);
   elements.marketButton.addEventListener("click", buyMarketUpgrade);
   elements.expandFarmButton.addEventListener("click", expandFarm);
+  elements.helpToggleButton.addEventListener("click", toggleHelpPanel);
+  elements.helpDismissButton.addEventListener("click", dismissHelpPanel);
   window.addEventListener("pagehide", flushAutosave);
   window.addEventListener("beforeunload", flushAutosave);
 }
@@ -74,6 +89,10 @@ function attachDebugHelpers() {
     setRandomEventsEnabled(enabled) {
       debugState.randomEventsEnabled = Boolean(enabled);
     },
+    forceMilestoneToast(message) {
+      showMilestoneToast(message);
+      render();
+    },
   };
 }
 
@@ -91,6 +110,9 @@ function createInitialState() {
     },
     progression: {
       completedGoalIds: [],
+    },
+    ui: {
+      helpOpen: true,
     },
     stats: {
       harvestedTotal: 0,
@@ -153,6 +175,9 @@ function hydrateState(savedState) {
       nextState.activeEvent = {
         id: eventDefinition.id,
         endsAt: savedState.activeEvent.endsAt,
+        durationMs: Number.isFinite(savedState.activeEvent.durationMs)
+          ? savedState.activeEvent.durationMs
+          : config.events.durationMs,
       };
     }
   }
@@ -166,6 +191,10 @@ function hydrateState(savedState) {
     nextState.progression.completedGoalIds = savedState.progression.completedGoalIds.filter((goalId) =>
       config.progressionGoals.some((goal) => goal.id === goalId),
     );
+  }
+
+  if (savedState.ui && typeof savedState.ui === "object") {
+    nextState.ui.helpOpen = typeof savedState.ui.helpOpen === "boolean" ? savedState.ui.helpOpen : nextState.ui.helpOpen;
   }
 
   if (savedState.stats && typeof savedState.stats === "object") {
@@ -405,6 +434,21 @@ function resetGame() {
   }
 
   state = createInitialState();
+  uiState.milestoneToast = null;
+  saveState();
+  render();
+}
+
+function toggleHelpPanel() {
+  state.ui.helpOpen = !state.ui.helpOpen;
+  dirty = true;
+  saveState();
+  render();
+}
+
+function dismissHelpPanel() {
+  state.ui.helpOpen = false;
+  dirty = true;
   saveState();
   render();
 }
@@ -479,6 +523,7 @@ function activateEvent(eventId, durationMs, isForced = false) {
   state.activeEvent = {
     id: eventDefinition.id,
     endsAt: Date.now() + durationMs,
+    durationMs,
   };
 
   if (eventDefinition.activePlotRemainingMultiplier) {
@@ -581,6 +626,7 @@ function commit() {
 
   if (goalRewards.length > 0) {
     setMessage(goalRewards.join(" "));
+    showMilestoneToast(goalRewards[goalRewards.length - 1]);
   }
 
   dirty = true;
@@ -659,6 +705,9 @@ function setMessage(message) {
 function render() {
   updateActiveEvent();
   updatePlotsByTime();
+  syncMilestoneToast();
+
+  const farmMetrics = getFarmMetrics();
 
   document.title = config.title;
   elements.moneyCount.textContent = String(state.money);
@@ -676,6 +725,17 @@ function render() {
     : `Meta: alcançar ${config.winMoney} moedas`;
   elements.goalStatus.classList.toggle("goal--won", hasWon);
 
+  renderPrimaryActions();
+  renderHelpPanel();
+  renderProgressIndicators(farmMetrics);
+  renderMilestoneToast();
+  renderUpgradeCards();
+  renderEventBanner();
+  renderFarmGrid(farmMetrics);
+  renderProgression();
+}
+
+function renderPrimaryActions() {
   const seedPrice = getSeedPrice();
   elements.buySeedButton.disabled = state.money < seedPrice;
   elements.buySeedButton.textContent = `Comprar semente (${seedPrice})`;
@@ -694,7 +754,9 @@ function render() {
   elements.expandFarmButton.textContent = state.hasExpandedFarm
     ? "Fazenda expandida"
     : `Expandir fazenda (${config.expansion.cost})`;
+}
 
+function renderUpgradeCards() {
   elements.fertilizerDescription.textContent = state.upgrades.fertilizer
     ? `Ativo: novos plantios levam ${formatSeconds(getGrowthTimeMs())}.`
     : config.upgrades.fertilizer.description;
@@ -704,10 +766,6 @@ function render() {
   elements.expansionDescription.textContent = state.hasExpandedFarm
     ? "Ativo: todos os 16 canteiros estão liberados."
     : config.expansion.description;
-
-  renderEventBanner();
-  renderFarmGrid();
-  renderProgression();
 }
 
 function renderEventBanner() {
@@ -719,16 +777,21 @@ function renderEventBanner() {
     elements.eventDescription.textContent =
       "Venda morangos para ter chance de ativar um evento curto.";
     elements.eventTimer.textContent = "Aguardando";
+    elements.eventProgressBar.style.width = "0%";
     return;
   }
 
+  const remainingMs = Math.max(0, state.activeEvent.endsAt - Date.now());
+  const totalDurationMs = getEventDurationMs(activeEvent);
+  const progressPercent = totalDurationMs > 0 ? (remainingMs / totalDurationMs) * 100 : 0;
   elements.eventBanner.className = `event-banner ${activeEvent.accentClass}`;
   elements.eventTitle.textContent = activeEvent.title;
   elements.eventDescription.textContent = activeEvent.description;
-  elements.eventTimer.textContent = `Termina em ${formatSeconds(state.activeEvent.endsAt - Date.now())}`;
+  elements.eventTimer.textContent = `Termina em ${formatSeconds(remainingMs)}`;
+  elements.eventProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
 }
 
-function renderFarmGrid() {
+function renderFarmGrid(farmMetrics) {
   if (plotElements.length !== state.unlockedPlotCount) {
     createFarmGrid();
   }
@@ -745,12 +808,14 @@ function renderFarmGrid() {
     const progress = getPlotProgress(plot);
     plotElement.button.className = `plot plot--${plot.state}`;
     plotElement.button.setAttribute("aria-label", getPlotLabel(plot, index));
+    plotElement.badge.textContent = getPlotBadge(plot);
     plotElement.emoji.textContent = getPlotEmoji(plot);
     plotElement.name.textContent = getPlotName(plot);
     plotElement.timer.textContent = getPlotTimerText(plot);
     plotElement.hint.textContent = getPlotHint(plot);
     plotElement.progressFill.style.width = `${progress}%`;
     plotElement.progressTrack.hidden = plot.state !== config.plotStates.growing;
+    plotElement.button.classList.toggle("plot--attention", plot.state === config.plotStates.ready && farmMetrics.readyPlots > 0);
   });
 }
 
@@ -766,6 +831,9 @@ function createFarmGrid() {
 
     const emoji = document.createElement("div");
     emoji.className = "plot__emoji";
+
+    const badge = document.createElement("div");
+    badge.className = "plot__badge";
 
     const name = document.createElement("div");
     name.className = "plot__name";
@@ -783,10 +851,11 @@ function createFarmGrid() {
     const hint = document.createElement("div");
     hint.className = "plot__hint";
 
-    plotButton.append(emoji, name, timer, progressTrack, hint);
+    plotButton.append(badge, emoji, name, timer, progressTrack, hint);
     elements.farmGrid.append(plotButton);
     plotElements.push({
       button: plotButton,
+      badge,
       emoji,
       name,
       timer,
@@ -819,9 +888,60 @@ function renderProgression() {
     meta.className = "goal-item__meta";
     meta.textContent = isDone ? "Concluída" : getGoalProgressText(goal);
 
-    item.append(title, description, meta);
+    const progressBar = document.createElement("div");
+    progressBar.className = "goal-item__bar";
+
+    const progressFill = document.createElement("div");
+    progressFill.className = "goal-item__fill";
+    progressFill.style.width = `${getGoalPercent(goal)}%`;
+    progressBar.append(progressFill);
+
+    item.append(title, description, meta, progressBar);
     elements.goalList.append(item);
   });
+}
+
+function renderHelpPanel() {
+  elements.helpPanel.hidden = !state.ui.helpOpen;
+  elements.helpToggleButton.textContent = state.ui.helpOpen ? "Ocultar ajuda" : "Ajuda rápida";
+  elements.helpToggleButton.setAttribute("aria-expanded", String(state.ui.helpOpen));
+}
+
+function renderProgressIndicators(farmMetrics) {
+  const moneyProgressPercent = (Math.min(state.money, config.winMoney) / config.winMoney) * 100;
+  const readyProgressPercent =
+    farmMetrics.unlockedPlots > 0 ? (farmMetrics.readyPlots / farmMetrics.unlockedPlots) * 100 : 0;
+
+  elements.moneyGoalProgressLabel.textContent = `${state.money} / ${config.winMoney} moedas`;
+  elements.moneyGoalProgressBar.style.width = `${Math.max(0, Math.min(100, moneyProgressPercent))}%`;
+  elements.readyPlotProgressLabel.textContent = `${farmMetrics.readyPlots} / ${farmMetrics.unlockedPlots}`;
+  elements.readyPlotProgressBar.style.width = `${Math.max(0, Math.min(100, readyProgressPercent))}%`;
+}
+
+function renderMilestoneToast() {
+  const toast = uiState.milestoneToast;
+  const isVisible = Boolean(toast && toast.visibleUntil > Date.now());
+
+  elements.milestoneToast.hidden = !isVisible;
+
+  if (!isVisible) {
+    return;
+  }
+
+  elements.milestoneToastText.textContent = toast.message;
+}
+
+function showMilestoneToast(message) {
+  uiState.milestoneToast = {
+    message,
+    visibleUntil: Date.now() + 5000,
+  };
+}
+
+function syncMilestoneToast() {
+  if (uiState.milestoneToast && uiState.milestoneToast.visibleUntil <= Date.now()) {
+    uiState.milestoneToast = null;
+  }
 }
 
 function getGoalProgressText(goal) {
@@ -866,6 +986,15 @@ function getGoalCurrentValue(goal) {
   return 0;
 }
 
+function getGoalPercent(goal) {
+  if (goal.targetType === "expandedFarm") {
+    return state.hasExpandedFarm ? 100 : 0;
+  }
+
+  const current = getGoalCurrentValue(goal);
+  return Math.max(0, Math.min(100, (current / goal.targetValue) * 100));
+}
+
 function getPlotEmoji(plot) {
   if (plot.state === config.plotStates.growing) {
     return "🌱";
@@ -890,6 +1019,18 @@ function getPlotName(plot) {
   return "Terreno vazio";
 }
 
+function getPlotBadge(plot) {
+  if (plot.state === config.plotStates.growing) {
+    return "Aguarde";
+  }
+
+  if (plot.state === config.plotStates.ready) {
+    return "Colher";
+  }
+
+  return "Plantar";
+}
+
 function getPlotTimerText(plot) {
   if (plot.state === config.plotStates.growing && Number.isFinite(plot.readyAt)) {
     const remainingMs = Math.max(0, plot.readyAt - Date.now());
@@ -909,10 +1050,10 @@ function getPlotHint(plot) {
   }
 
   if (plot.state === config.plotStates.ready) {
-    return "Colheita disponível";
+    return "Clique agora para colher";
   }
 
-  return "Aguardando semente";
+  return "Clique para plantar";
 }
 
 function getPlotProgress(plot) {
@@ -952,6 +1093,26 @@ function getSaveStatusText() {
   }
 
   return "Salvamento automático ativo.";
+}
+
+function getFarmMetrics() {
+  const visiblePlots = state.plots.slice(0, state.unlockedPlotCount);
+  const readyPlots = visiblePlots.filter((plot) => plot.state === config.plotStates.ready).length;
+  const growingPlots = visiblePlots.filter((plot) => plot.state === config.plotStates.growing).length;
+
+  return {
+    unlockedPlots: state.unlockedPlotCount,
+    readyPlots,
+    growingPlots,
+  };
+}
+
+function getEventDurationMs(eventDefinition) {
+  if (!state.activeEvent || !eventDefinition) {
+    return config.events.durationMs;
+  }
+
+  return state.activeEvent.durationMs || config.events.durationMs;
 }
 
 function formatClock(timestamp) {

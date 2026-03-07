@@ -160,6 +160,16 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#growthTimeValue")) === "10s", "Tempo de crescimento inicial incorreto.");
     assert((await textOf(page, "#progressSummary")) === "0 de 4 metas concluídas", "Resumo inicial de metas incorreto.");
     assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O banner de evento deveria iniciar vazio.");
+    assert(!(await page.locator("#helpPanel").isHidden()), "O painel de ajuda deveria iniciar visível.");
+
+    console.log("Cenário 1.1: ajuda rápida persistente");
+    await page.click("#helpDismissButton");
+    assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda não foi ocultado.");
+    await page.reload({ waitUntil: "load" });
+    await disableRandomEvents(page);
+    assert(await page.locator("#helpPanel").isHidden(), "O estado do painel de ajuda não persistiu após reload.");
+    await page.click("#helpToggleButton");
+    assert(!(await page.locator("#helpPanel").isHidden()), "O botão de ajuda não reabriu o painel.");
 
     console.log("Cenário 2: plantio e save/load base");
     const firstPlot = page.locator(".plot").nth(0);
@@ -189,6 +199,7 @@ async function reachMoneyTarget(page, target) {
     });
     assert((await page.locator(".plot").count()) === 16, "A expansão não liberou 16 canteiros.");
     assert((await textOf(page, "#plotCountValue")) === "16/16", "HUD não refletiu a fazenda expandida.");
+    assert(!(await page.locator("#milestoneToast").isHidden()), "A conclusão de meta deveria exibir feedback visual.");
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     assert((await page.locator(".plot").count()) === 16, "A expansão não persistiu após reload.");

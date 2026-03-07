@@ -15,8 +15,26 @@
             <h1>Fazenda de Morangos</h1>
             <p class="subtitle">Compre sementes, plante, espere, colha e venda.</p>
           </div>
-          <div class="goal" id="goalStatus" aria-live="polite">Meta: alcançar 35 moedas</div>
+          <div class="header-side">
+            <div class="goal" id="goalStatus" aria-live="polite">Meta: alcançar 35 moedas</div>
+            <button class="helper-btn" id="helpToggleButton" type="button" aria-expanded="true">Ajuda rápida</button>
+          </div>
         </div>
+
+        <section class="help-panel" id="helpPanel" aria-label="Ajuda inicial">
+          <div class="help-panel__header">
+            <div>
+              <p class="help-panel__eyebrow">Como jogar</p>
+              <h2>Comece em menos de 30 segundos</h2>
+            </div>
+            <button class="helper-btn helper-btn--ghost" id="helpDismissButton" type="button">Ocultar</button>
+          </div>
+          <ol class="help-steps">
+            <li>Compre sementes com moedas.</li>
+            <li>Clique em um terreno vazio para plantar.</li>
+            <li>Espere crescer, colha e venda para reinvestir.</li>
+          </ol>
+        </section>
 
         <section class="stats" aria-label="Recursos">
           <article class="stat">
@@ -49,6 +67,32 @@
           <p id="statusMessage" aria-live="polite">Plante seus primeiros morangos.</p>
         </section>
 
+        <section class="milestone-toast" id="milestoneToast" aria-live="polite" hidden>
+          <strong class="milestone-toast__title">Meta concluída</strong>
+          <p class="milestone-toast__text" id="milestoneToastText"></p>
+        </section>
+
+        <section class="progress-strip" aria-label="Indicadores de progresso">
+          <article class="progress-card">
+            <div class="progress-card__head">
+              <span>Meta final</span>
+              <strong id="moneyGoalProgressLabel">0 / 35 moedas</strong>
+            </div>
+            <div class="progress-card__bar">
+              <div class="progress-card__fill" id="moneyGoalProgressBar"></div>
+            </div>
+          </article>
+          <article class="progress-card">
+            <div class="progress-card__head">
+              <span>Canteiros prontos</span>
+              <strong id="readyPlotProgressLabel">0 / 9</strong>
+            </div>
+            <div class="progress-card__bar">
+              <div class="progress-card__fill progress-card__fill--ready" id="readyPlotProgressBar"></div>
+            </div>
+          </article>
+        </section>
+
         <section class="meta-row" aria-label="Status do jogo">
           <div class="save-status" id="saveStatus" aria-live="polite">Salvamento automático pendente.</div>
           <div class="legend" aria-label="Estados dos canteiros">
@@ -64,7 +108,12 @@
             <h2 id="eventTitle">Nenhum evento ativo</h2>
             <p class="event-banner__text" id="eventDescription">Venda morangos para ter chance de ativar um evento curto.</p>
           </div>
-          <div class="event-banner__timer" id="eventTimer">Aguardando</div>
+          <div class="event-banner__aside">
+            <div class="event-banner__timer" id="eventTimer">Aguardando</div>
+            <div class="event-banner__progress">
+              <div class="event-banner__progress-fill" id="eventProgressBar"></div>
+            </div>
+          </div>
         </section>
 
         <section class="farm-section">
