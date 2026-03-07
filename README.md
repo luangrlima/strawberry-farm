@@ -106,15 +106,15 @@ Esse teste valida:
 Exemplo de execução com o `playwright-skill`:
 
 ```bash
-cd /Users/wiser/.codex/skills/playwright-skill
-TARGET_URL='file:///Users/wiser/projects/strawberry-farm/index.html' node run.js /Users/wiser/projects/strawberry-farm/tests/playwright/strawberry-farm.e2e.js
+cd <caminho-do-playwright-skill>
+TARGET_URL="file://$(pwd)/index.html" node run.js "$(pwd)/tests/playwright/strawberry-farm.e2e.js"
 ```
 
 Se quiser apontar para outra URL:
 
 ```bash
-cd /Users/wiser/.codex/skills/playwright-skill
-TARGET_URL='http://localhost:4173' node run.js /Users/wiser/projects/strawberry-farm/tests/playwright/strawberry-farm.e2e.js
+cd <caminho-do-playwright-skill>
+TARGET_URL='http://localhost:4173' node run.js <caminho-absoluto-do-projeto>/tests/playwright/strawberry-farm.e2e.js
 ```
 
 ## Fora de escopo

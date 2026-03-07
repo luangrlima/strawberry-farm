@@ -1,8 +1,10 @@
+const path = require("path");
+const { pathToFileURL } = require("url");
 const { chromium } = require("playwright");
 
 const TARGET_URL =
   process.env.TARGET_URL ||
-  "file:///Users/wiser/projects/strawberry-farm/index.html";
+  pathToFileURL(path.resolve(__dirname, "../../index.html")).href;
 
 const STORAGE_KEY = "strawberry-farm-save";
 
