@@ -16,7 +16,7 @@ Construir um jogo pequeno de navegador sobre plantar, colher e vender morangos, 
 Comprar sementes -> plantar -> esperar -> colher -> vender -> reinvestir
 
 ## Estado atual do jogo
-- grade 3x3 de canteiros
+- fazenda que começa em 3x3 e pode ser expandida para 4x4
 - morango como única cultura
 - temporizador de crescimento
 - colheita por clique
@@ -27,8 +27,10 @@ Comprar sementes -> plantar -> esperar -> colher -> vender -> reinvestir
 - confirmação de reset
 - upgrade de adubo para reduzir o tempo de crescimento
 - upgrade de venda para aumentar o preço do morango
+- 3 eventos aleatórios simples com feedback visual
 - interface em português com feedback visual dos estados da planta
-- meta de progressão de `20` moedas
+- metas de progressão em tela única
+- meta de progressão final de `35` moedas
 
 ## Fora de escopo atual
 - backend

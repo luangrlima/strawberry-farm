@@ -1,4 +1,4 @@
-# Fazenda de Morangos MVP+
+# Fazenda de Morangos MVP+ com Expansão e Eventos
 
 ## Visão geral
 Este projeto é um jogo pequeno de navegador sobre plantar, colher e vender morangos.
@@ -21,7 +21,7 @@ O jogo já está funcional nos arquivos:
 - `config.js`
 
 Recursos implementados:
-- grade 3x3 de canteiros
+- fazenda expansível de `3x3` para `4x4`
 - morango como única cultura
 - plantio ao clicar em terreno vazio
 - temporizador simples de crescimento
@@ -37,25 +37,40 @@ Recursos implementados:
 - melhoria visual dos estados dos canteiros
 - upgrade de adubo para reduzir o tempo de crescimento
 - upgrade de venda para aumentar o valor do morango
+- expansão de fazenda para liberar `16` canteiros
+- 3 eventos aleatórios simples
+- banner visual para evento ativo com temporizador
 - interface em português
-- meta de progressão de `20` moedas
+- metas de progressão em tela única
+- meta de progressão final de `35` moedas
 - mensagem de vitória na mesma tela
 
 ## Regras atuais
 - O jogador começa com `6` moedas.
 - O jogador começa com `3` sementes.
 - O jogador começa com `0` morangos.
+- A fazenda começa com `9` canteiros.
+- A expansão custa `12` moedas e libera `16` canteiros.
 - Cada semente custa `2` moedas.
+- Durante o evento `Feira local`, cada semente custa `1` moeda.
 - Cada morango vendido vale `3` moedas.
 - Com upgrade de venda, cada morango vendido vale `5` moedas.
+- Durante o evento `Sol forte`, cada morango vendido recebe `+1` moeda.
 - Cada plantio consome `1` semente.
 - Cada colheita gera `1` morango.
 - O tempo de crescimento é de `10` segundos.
 - Com upgrade de adubo, novos plantios levam `8` segundos.
+- Durante o evento `Chuva leve`, as plantas atuais aceleram e os novos plantios crescem mais rápido.
 - Cada canteiro pode estar em um de três estados:
   - vazio
   - crescendo
   - pronto para colher
+- Os eventos são curtos e podem surgir ao vender morangos.
+- As metas atuais são:
+  - colher `4` morangos
+  - expandir a fazenda para `4x4`
+  - comprar `2` melhorias
+  - alcançar `35` moedas
 
 ## Interface atual
 Tela única com:
@@ -63,14 +78,20 @@ Tela única com:
 - contador de moedas
 - contador de sementes
 - contador de morangos
+- contador de preço atual de venda
+- contador de tempo atual de crescimento
+- contador de tamanho atual da fazenda
 - mensagem de status
 - status de autosave
 - legenda visual dos estados dos canteiros
-- grade 3x3 da fazenda
+- banner de evento ativo com temporizador
+- grade da fazenda que começa em `3x3` e pode virar `4x4`
 - barra de progresso durante o crescimento
 - destaque visual quando o morango está pronto
 - card de upgrade `Adubo rápido`
 - card de upgrade `Caixa premium`
+- card de expansão `Fazenda 4x4`
+- painel de metas de progressão
 - botão `Comprar semente`
 - botão `Vender morangos`
 - botão `Reiniciar jogo`
@@ -85,7 +106,7 @@ Tela única com:
 ## Checklist de implementação
 - [x] Criar layout de tela única
 - [x] Exibir título, moedas, sementes e morangos
-- [x] Renderizar grade 3x3
+- [x] Renderizar fazenda inicial 3x3
 - [x] Representar canteiros vazios, crescendo e prontos
 - [x] Permitir plantio em canteiros vazios
 - [x] Iniciar temporizador ao plantar
@@ -102,7 +123,11 @@ Tela única com:
 - [x] Melhorar feedback visual dos canteiros
 - [x] Adicionar upgrade de crescimento
 - [x] Adicionar upgrade de venda
-- [x] Exibir mensagem de vitória ao chegar em `20` moedas
+- [x] Adicionar expansão para 4x4
+- [x] Adicionar 3 eventos aleatórios simples
+- [x] Exibir banner visual de evento ativo
+- [x] Persistir expansão, eventos e progresso no save
+- [x] Exibir mensagem de vitória ao chegar em `35` moedas
 - [x] Manter constantes separadas em `config.js`
 - [x] Traduzir a interface para português
 
@@ -113,16 +138,13 @@ O projeto possui um teste principal de interface e fluxo em:
 
 Esse teste valida:
 - renderização inicial
-- compra de sementes
-- plantio
-- persistência
-- autosave
-- crescimento e colheita
-- venda
+- economia base
+- expansão da fazenda
+- eventos e timing
+- consistência de save/load
 - upgrade de crescimento
 - upgrade de venda
-- condição de vitória
-- cancelamento de reset
+- progressão final
 - reset do jogo
 
 ## Agentes

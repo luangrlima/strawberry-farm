@@ -11,11 +11,11 @@
       <section class="panel">
         <div class="panel__header">
           <div>
-            <p class="eyebrow">MVP+ de fazenda casual</p>
+            <p class="eyebrow">MVP+ com expansão e eventos</p>
             <h1>Fazenda de Morangos</h1>
             <p class="subtitle">Compre sementes, plante, espere, colha e venda.</p>
           </div>
-          <div class="goal" id="goalStatus" aria-live="polite">Meta: alcançar 20 moedas</div>
+          <div class="goal" id="goalStatus" aria-live="polite">Meta: alcançar 35 moedas</div>
         </div>
 
         <section class="stats" aria-label="Recursos">
@@ -39,6 +39,10 @@
             <span class="stat__label">Tempo atual</span>
             <strong class="stat__value" id="growthTimeValue">10s</strong>
           </article>
+          <article class="stat">
+            <span class="stat__label">Fazenda</span>
+            <strong class="stat__value" id="plotCountValue">9/16</strong>
+          </article>
         </section>
 
         <section class="status-bar">
@@ -52,6 +56,15 @@
             <span class="legend__item"><span class="legend__dot legend__dot--growing"></span>Crescendo</span>
             <span class="legend__item"><span class="legend__dot legend__dot--ready"></span>Pronto</span>
           </div>
+        </section>
+
+        <section class="event-banner event-banner--idle" id="eventBanner" aria-live="polite">
+          <div>
+            <p class="event-banner__eyebrow">Evento</p>
+            <h2 id="eventTitle">Nenhum evento ativo</h2>
+            <p class="event-banner__text" id="eventDescription">Venda morangos para ter chance de ativar um evento curto.</p>
+          </div>
+          <div class="event-banner__timer" id="eventTimer">Aguardando</div>
         </section>
 
         <section class="farm-section">
@@ -86,6 +99,15 @@
               Cada morango vendido rende +2 moedas.
             </p>
             <button class="action-btn" id="marketButton" type="button">Melhorar venda (15)</button>
+          </article>
+
+          <article class="upgrade-card">
+            <p class="upgrade-card__eyebrow">Expansão</p>
+            <h2>Fazenda 4x4</h2>
+            <p class="upgrade-card__text" id="expansionDescription">
+              Libera mais 7 canteiros e amplia a produção.
+            </p>
+            <button class="action-btn" id="expandFarmButton" type="button">Expandir fazenda (12)</button>
           </article>
         </section>
 

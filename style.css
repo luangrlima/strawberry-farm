@@ -43,7 +43,7 @@ button {
 }
 
 .panel {
-  width: min(100%, 760px);
+  width: min(100%, 980px);
   background: var(--panel);
   border: 1px solid var(--panel-border);
   border-radius: 28px;
@@ -97,7 +97,7 @@ h1 {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin-top: 24px;
 }
@@ -183,6 +183,62 @@ h1 {
   background: var(--ready);
 }
 
+.event-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(137, 76, 51, 0.12);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.event-banner--idle {
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.event-banner--sunshine {
+  background: linear-gradient(135deg, rgba(255, 241, 210, 0.95), rgba(243, 179, 71, 0.38));
+}
+
+.event-banner--drizzle {
+  background: linear-gradient(135deg, rgba(225, 244, 255, 0.95), rgba(106, 170, 209, 0.34));
+}
+
+.event-banner--market {
+  background: linear-gradient(135deg, rgba(255, 243, 228, 0.95), rgba(227, 129, 81, 0.32));
+}
+
+.event-banner__eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.event-banner h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.event-banner__text {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.event-banner__timer {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(75, 42, 26, 0.08);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
 .farm-section {
   margin-top: 22px;
 }
@@ -261,6 +317,10 @@ h1 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+}
+
+.farm-grid--expanded {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .plot {
@@ -349,7 +409,7 @@ h1 {
 
 .upgrades {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   margin-top: 22px;
 }
@@ -462,6 +522,10 @@ h1 {
     align-items: stretch;
   }
 
+  .event-banner {
+    flex-direction: column;
+  }
+
   .legend {
     justify-content: start;
   }
@@ -495,5 +559,10 @@ h1 {
 @media (max-width: 420px) {
   .stats {
     grid-template-columns: 1fr;
+  }
+
+  .farm-grid,
+  .farm-grid--expanded {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
