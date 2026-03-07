@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fazenda de Morangos</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">MVP de fim de semana</p>
+            <h1>Fazenda de Morangos</h1>
+            <p class="subtitle">Compre sementes, plante, espere, colha e venda.</p>
+          </div>
+          <div class="goal" id="goalStatus" aria-live="polite">Meta: alcançar 20 moedas</div>
+        </div>
+
+        <section class="stats" aria-label="Recursos">
+          <article class="stat">
+            <span class="stat__label">Moedas</span>
+            <strong class="stat__value" id="moneyCount">0</strong>
+          </article>
+          <article class="stat">
+            <span class="stat__label">Sementes</span>
+            <strong class="stat__value" id="seedCount">0</strong>
+          </article>
+          <article class="stat">
+            <span class="stat__label">Morangos</span>
+            <strong class="stat__value" id="berryCount">0</strong>
+          </article>
+        </section>
+
+        <section class="status-bar">
+          <p id="statusMessage" aria-live="polite">Plante seus primeiros morangos.</p>
+        </section>
+
+        <section class="farm-section">
+          <div class="farm-grid" id="farmGrid" aria-label="Grade da fazenda"></div>
+        </section>
+
+        <section class="actions" aria-label="Ações">
+          <button class="action-btn" id="buySeedButton" type="button">Comprar semente (2)</button>
+          <button class="action-btn" id="sellButton" type="button">Vender morangos</button>
+          <button class="action-btn action-btn--ghost" id="resetButton" type="button">Reiniciar jogo</button>
+        </section>
+      </section>
+    </main>
+
+    <script src="config.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
