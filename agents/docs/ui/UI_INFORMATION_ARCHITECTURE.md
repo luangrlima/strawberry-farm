@@ -1,6 +1,6 @@
 # UI Information Architecture
 
-## Hierarquia desktop-first
+## Hierarquia com foco em desktop
 
 ### Zona esquerda
 - meta principal

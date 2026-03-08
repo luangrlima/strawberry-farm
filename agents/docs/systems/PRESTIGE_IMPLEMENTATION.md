@@ -1,10 +1,23 @@
-# Prestige Implementation
+# Implementação do Prestígio
+
+## Status do documento
+Este é um documento histórico do Sprint 7.
+
+Na época da implementação, o runtime ainda estava concentrado na raiz. Depois do Sprint 9, os equivalentes atuais passaram a ser:
+- `src/config/gameConfig.js`
+- `public/index.html`
+- `public/style.css`
+- `src/main.js`
+- `src/systems/prestige.js`
+- `src/ui/render.js`
 
 ## Arquivos afetados
-- `config.js`
-- `index.html`
-- `style.css`
-- `game.js`
+- `src/config/gameConfig.js`
+- `public/index.html`
+- `public/style.css`
+- `src/main.js`
+- `src/systems/prestige.js`
+- `src/ui/render.js`
 - `README.md`
 - `tests/playwright/strawberry-farm.e2e.js`
 

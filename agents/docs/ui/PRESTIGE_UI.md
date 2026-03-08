@@ -1,4 +1,4 @@
-# Prestige UI
+# UI do Prestígio
 
 ## Elementos necessários
 - card de status do conhecimento

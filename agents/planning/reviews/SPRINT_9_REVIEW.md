@@ -1,4 +1,4 @@
-# Sprint 9 Review
+# Revisão do Sprint 9
 
 ## A estrutura do repositório ficou mais clara?
 Sim. O runtime foi isolado em `public/` e `src/`, enquanto prompts, planos, docs de processo e testes agora vivem em áreas próprias.

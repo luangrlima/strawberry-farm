@@ -1,4 +1,4 @@
-# QA Report Sprint 8
+# Relatório de QA: Sprint 8
 
 ## Escopo do QA
 - Verificar se o layout ficou mais horizontal no desktop.

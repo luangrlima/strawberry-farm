@@ -1,4 +1,4 @@
-# Code Split Plan
+# Plano de Divisão do Código
 
 ## Objetivo
 Reduzir a responsabilidade concentrada no antigo `game.js` e deixar a navegação do runtime mais previsível.
@@ -35,7 +35,7 @@ Reduzir a responsabilidade concentrada no antigo `game.js` e deixar a navegaçã
 - `src/utils/format.js`
 - `src/main.js`
 
-## Ownership do estado
+## State ownership
 - `src/state/*`
   - criação do shape base
   - save/load

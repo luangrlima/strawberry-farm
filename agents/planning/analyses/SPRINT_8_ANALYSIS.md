@@ -1,4 +1,7 @@
-# Sprint 8 Analysis
+# Análise do Sprint 8
+
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
 
 ## Blocos críticos
 - grade da fazenda

@@ -1,4 +1,7 @@
-# Sprint 6 Review
+# Revisão do Sprint 6
+
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
 
 ## O objetivo foi alcançado?
 Sim. O sprint entregou uma automação leve com o `Farm Helper`, visível na UI, persistente no save e integrada ao loop atual sem exigir sistemas complexos.

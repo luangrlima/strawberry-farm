@@ -1,6 +1,6 @@
-# Automation Design
+# Design da Automação
 
-## Feature name
+## Nome da feature
 Farm Helper
 
 ## Papel no jogo

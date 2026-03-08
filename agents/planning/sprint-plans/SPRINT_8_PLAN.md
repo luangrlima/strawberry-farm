@@ -1,9 +1,12 @@
-# Sprint 8 Plan
+# Plano do Sprint 8
 
-## Sprint goal
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
+
+## Objetivo do sprint
 Reorganizar a arquitetura da interface para que o jogo fique mais jogável em uma única tela no desktop, com a fazenda no centro e menos necessidade de scroll.
 
-## In-scope changes
+## Escopo incluído
 - nova estrutura horizontal em 3 zonas para desktop
 - HUD compacto na coluna esquerda
 - fazenda centralizada na coluna do meio
@@ -12,27 +15,27 @@ Reorganizar a arquitetura da interface para que o jogo fique mais jogável em um
 - ajuda recolhida por padrão
 - redução de espaçamentos verticais e densidade maior de informação útil
 
-## Out-of-scope changes
+## Fora de escopo
 - mudanças nas regras do jogo
 - novos sistemas de gameplay
 - novo conteúdo de progressão
 - redesign visual complexo
 - animações ou decoração extra
 
-## UI restructuring tasks
+## Tarefas de reestruturação da UI
 - reestruturar HTML em zonas esquerda, centro e direita
 - compactar módulos de status
 - preservar clareza de leitura
 - manter bom comportamento no mobile com empilhamento vertical
 
-## Implementation tasks
+## Tarefas de implementação
 - refatorar layout principal em `index.html`
 - atualizar CSS responsivo para grid de 3 colunas no desktop
 - reduzir alturas, paddings e margens
-- manter IDs e hooks do `game.js`
+- manter IDs e hooks do runtime do jogo
 - ajustar estado inicial da ajuda para recolhida
 
-## QA focus
+## Foco de QA
 - visibilidade acima da dobra em desktop
 - fácil acesso às ações principais
 - fazenda visualmente central

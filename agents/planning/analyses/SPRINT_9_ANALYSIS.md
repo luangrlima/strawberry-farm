@@ -1,4 +1,4 @@
-# Sprint 9 Analysis
+# Análise do Sprint 9
 
 ## Leitura completa do repositório
 - O runtime do jogo estava concentrado em quatro arquivos na raiz: `index.html`, `style.css`, `config.js` e `game.js`.
@@ -16,7 +16,8 @@
   - prompts em `agents/`
 - Testes:
   - automação em `tests/playwright`
-  - cenários e relatórios em `tests/docs`
+  - cenários em `tests/manual`
+  - relatórios em `tests/reports`
 
 ## Problemas arquiteturais encontrados
 

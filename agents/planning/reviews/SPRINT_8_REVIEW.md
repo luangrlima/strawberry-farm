@@ -1,4 +1,7 @@
-# Sprint 8 Review
+# Revisão do Sprint 8
+
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
 
 ## Resultado geral
 Sim. O objetivo do sprint foi alcançado.

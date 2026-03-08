@@ -1,4 +1,4 @@
-# QA Report Sprint 9
+# Relatório de QA: Sprint 9
 
 ## Escopo validado
 - carregamento do jogo após migração arquitetural

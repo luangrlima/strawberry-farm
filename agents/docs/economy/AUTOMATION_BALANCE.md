@@ -1,4 +1,4 @@
-# Automation Balance
+# Balanceamento da Automação
 
 ## Compra do helper
 - Preço: 18 moedas

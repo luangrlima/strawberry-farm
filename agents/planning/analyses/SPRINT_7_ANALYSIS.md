@@ -1,4 +1,7 @@
-# Sprint 7 Analysis
+# Análise do Sprint 7
+
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
 
 ## Leitura do build atual
 - O loop principal está sólido e já comporta decisões curtas com mercado, eventos, combo e helper.

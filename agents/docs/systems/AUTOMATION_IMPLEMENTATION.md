@@ -1,10 +1,23 @@
-# Automation Implementation
+# Implementação da Automação
+
+## Status do documento
+Este é um documento histórico do Sprint 6.
+
+Na época da implementação, o runtime ainda estava concentrado na raiz. Depois do Sprint 9, os equivalentes atuais passaram a ser:
+- `src/config/gameConfig.js`
+- `public/index.html`
+- `public/style.css`
+- `src/main.js`
+- `src/systems/helper.js`
+- `src/ui/render.js`
 
 ## Arquivos afetados
-- `config.js`
-- `index.html`
-- `style.css`
-- `game.js`
+- `src/config/gameConfig.js`
+- `public/index.html`
+- `public/style.css`
+- `src/main.js`
+- `src/systems/helper.js`
+- `src/ui/render.js`
 - `README.md`
 - `tests/playwright/strawberry-farm.e2e.js`
 
@@ -15,7 +28,7 @@
 - evitar timers paralelos ou workers
 
 ## Mudanças planejadas
-- adicionar configuração do helper no `config.js`
+- adicionar configuração do helper em `src/config/gameConfig.js`
 - adicionar botão/card de compra e HUD de automação
 - persistir:
   - helper comprado
@@ -25,7 +38,7 @@
   - respeitar o intervalo
   - colher no máximo 1 canteiro pronto por ciclo
   - avançar o próximo ciclo
-- adaptar `harvestPlot()` para aceitar origem manual ou automática
+- adaptar a lógica de colheita para aceitar origem manual ou automática
 
 ## Critérios técnicos
 - helper não deve quebrar combo

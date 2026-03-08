@@ -1,4 +1,4 @@
-# Prestige Balance
+# Balanceamento do Prestígio
 
 ## Requisito de prestígio
 - Requisito base: `120` moedas

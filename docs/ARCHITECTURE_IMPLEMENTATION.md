@@ -1,4 +1,4 @@
-# Architecture Implementation
+# Implementação da Arquitetura
 
 ## Resumo
 O Sprint 9 converteu o projeto de um runtime concentrado na raiz para uma estrutura separada por domínio, mantendo HTML/CSS/JS puros e o comportamento do jogo.

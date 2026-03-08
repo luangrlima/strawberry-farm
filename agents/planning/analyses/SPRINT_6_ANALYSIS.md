@@ -1,4 +1,7 @@
-# Sprint 6 Analysis
+# Análise do Sprint 6
+
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
 
 ## Leitura do estado atual
 - O loop principal continua estável: comprar sementes, plantar, esperar, colher, vender e reinvestir.

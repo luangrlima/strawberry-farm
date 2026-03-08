@@ -1,4 +1,7 @@
-# Sprint 7 Review
+# Revisão do Sprint 7
+
+## Status do documento
+Documento histórico, escrito antes da refatoração arquitetural do Sprint 9.
 
 ## O sistema de prestígio foi implementado com sucesso?
 Sim. `Strawberry Knowledge` entrou como uma camada permanente simples, integrada ao save/load, ao loop de venda e à interface principal sem adicionar infraestrutura nova.

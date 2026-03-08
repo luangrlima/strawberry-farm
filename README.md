@@ -69,4 +69,4 @@ Relatório mais recente:
 ## Execução do jogo
 Abra [public/index.html](/Users/wiser/projects/strawberry-farm/public/index.html) no navegador.
 
-Se preferir, [index.html](/Users/wiser/projects/strawberry-farm/index.html) também funciona como ponto de entrada compatível.
+Se preferir, [index.html](/Users/wiser/projects/strawberry-farm/index.html) também funciona como entrypoint compatível.

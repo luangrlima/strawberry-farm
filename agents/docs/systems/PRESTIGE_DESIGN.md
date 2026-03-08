@@ -1,6 +1,6 @@
-# Prestige Design
+# Design do Prestígio
 
-## Feature name
+## Nome da feature
 Strawberry Knowledge
 
 ## Conceito

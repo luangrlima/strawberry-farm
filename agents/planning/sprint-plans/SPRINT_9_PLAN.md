@@ -1,16 +1,16 @@
-# Sprint 9 Plan
+# Plano do Sprint 9
 
-## Sprint goal
+## Objetivo do sprint
 Refatorar a arquitetura e a organização do repositório para melhorar clareza, manutenção e descoberta do código sem alterar a experiência de gameplay.
 
-## Migration strategy
+## Estratégia de migração
 - mover o entrypoint visual para `public/`
 - dividir o runtime em módulos funcionais simples dentro de `src/`
 - reorganizar prompts, planos e reviews em `agents/`
 - separar testes manuais e relatórios dentro de `tests/`
 - manter um `index.html` de compatibilidade na raiz
 
-## Architectural changes
+## Mudanças arquiteturais
 - `public/`
   - HTML e CSS do jogo
 - `src/config/`
@@ -34,20 +34,20 @@ Refatorar a arquitetura e a organização do repositório para melhorar clareza,
 - `tests/manual/` e `tests/reports/`
   - cenários e relatórios
 
-## Features included
+## Escopo incluído
 - code split do runtime atual
 - reorganização do repositório
 - atualização de caminhos, documentação e testes
 - validação de regressão
 
-## Features excluded
+## Fora de escopo
 - novas mecânicas
 - novos upgrades
 - mudanças de economia
 - redesign de interface
 - qualquer alteração de regra de gameplay
 
-## Risks and mitigations
+## Riscos e mitigação
 - risco: quebra de carregamento em `file://`
   - mitigação: scripts clássicos, sem ES modules
 - risco: save incompatível
@@ -57,7 +57,7 @@ Refatorar a arquitetura e a organização do repositório para melhorar clareza,
 - risco: refatoração concentrar demais em outro arquivo
   - mitigação: separar runtime em módulos temáticos
 
-## Agent responsibilities
+## Responsabilidades dos agentes
 - Diretor de Produto
   - confirmar escopo estritamente arquitetural
   - manter a raiz limpa e o projeto pequeno
@@ -72,7 +72,7 @@ Refatorar a arquitetura e a organização do repositório para melhorar clareza,
 - Agente de QA e Playtest
   - rodar regressão funcional completa
 
-## QA focus
+## Foco de QA
 - carregamento inicial
 - grid e plantio
 - colheita e combo

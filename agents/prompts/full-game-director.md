@@ -15,12 +15,16 @@ O jogo atualmente inclui:
 - plantio de morangos
 - temporizadores de crescimento
 - colheita
+- combo de colheita
 - venda de morangos
+- mercado dinâmico
 - expansão da fazenda
 - upgrades
-- mercado dinâmico
 - eventos aleatórios
+- automação com `Farm Helper`
+- sistema de prestígio `Strawberry Knowledge`
 - sistema de save/load
+- HUD single-page com feedback compacto
 
 ## Abordagem de desenvolvimento
 O projeto é desenvolvido em sprints iterativos usando múltiplos agentes especializados.

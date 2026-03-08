@@ -1,57 +1,62 @@
-# Architecture Proposal — Strawberry Farm
+# Proposta de Arquitetura — Strawberry Farm
 
-## Objective
+## Objetivo
 
-Refactor the current project into a clearer and more maintainable structure, without overengineering.
+Refatorar o projeto para uma estrutura mais clara e mais fácil de manter, sem overengineering.
 
-This proposal aims to:
+Esta proposta busca:
 
-- keep the project simple
-- preserve the current gameplay behavior
-- improve code discoverability
-- reduce the size and responsibility concentration of the current main game file
-- clearly separate game runtime code from agent workflow artifacts
-- keep deployment simple
+- manter o projeto simples
+- preservar o comportamento atual do gameplay
+- melhorar a descoberta do código
+- reduzir o tamanho e a concentração de responsabilidades do antigo arquivo principal
+- separar com clareza o runtime do jogo dos artefatos do workflow com agentes
+- manter o deploy simples
 
----
+## Observação de contexto
+Este documento registra a proposta usada como base para o Sprint 9.
 
-## Current Problems
-
-### 1. Runtime logic is too concentrated
-The current game logic has grown enough that keeping everything in a single main file now increases maintenance cost.
-
-### 2. Repository root is too noisy
-Gameplay files, planning artifacts, reports, and agent-related materials feel mixed together.
-
-### 3. Runtime code and agent workflow are conceptually different
-The browser game is the product.  
-Prompts, sprint plans, QA reports, and design artifacts are development workflow assets.
-
-These should not live mixed together as the project grows.
+A implementação final não seguiu cada pasta exatamente como desenhado abaixo. O estado real do projeto está descrito em [ARCHITECTURE_IMPLEMENTATION.md](/Users/wiser/projects/strawberry-farm/docs/ARCHITECTURE_IMPLEMENTATION.md), [CODE_SPLIT_PLAN.md](/Users/wiser/projects/strawberry-farm/docs/CODE_SPLIT_PLAN.md) e [REPO_ORGANIZATION_PLAN.md](/Users/wiser/projects/strawberry-farm/docs/REPO_ORGANIZATION_PLAN.md).
 
 ---
 
-## Refactor Principles
+## Problemas identificados
 
-### Keep it simple
-Do not introduce frameworks, bundlers, or complex abstractions.
+### 1. A lógica de runtime estava concentrada demais
+A lógica do jogo cresceu a ponto de manter tudo em um único arquivo principal aumentar o custo de manutenção.
 
-### Prefer functional modules
-Use small plain JavaScript modules grouped by responsibility.
+### 2. A raiz do repositório estava ruidosa
+Arquivos de gameplay, planejamento, relatórios e materiais de agentes estavam misturados.
 
-### Preserve behavior
-This refactor is architectural, not product expansion.
+### 3. Runtime e workflow de agentes são domínios diferentes
+O jogo de navegador é o produto.  
+Prompts, planos de sprint, relatórios de QA e artefatos de design são ativos de processo.
 
-### Separate runtime from process
-Everything that runs in the browser should be easy to find immediately.  
-Everything related to agents, sprint planning, and internal process should live in its own area.
-
-### Optimize for the current stage
-This is still a small browser game, not a large production system.
+Essas áreas não deveriam continuar misturadas conforme o projeto cresce.
 
 ---
 
-## Proposed Folder Structure
+## Princípios da refatoração
+
+### Manter simplicidade
+Não introduzir frameworks, bundlers ou abstrações complexas.
+
+### Preferir módulos funcionais
+Usar módulos pequenos em JavaScript puro, agrupados por responsabilidade.
+
+### Preservar comportamento
+Esta refatoração é arquitetural, não uma expansão de produto.
+
+### Separar runtime de processo
+Tudo que roda no navegador deve ser fácil de localizar imediatamente.  
+Tudo que pertence a agentes, planejamento de sprint e processo interno deve ficar em área própria.
+
+### Otimizar para o estágio atual
+Este ainda é um jogo pequeno de navegador, não um sistema de produção de grande porte.
+
+---
+
+## Estrutura de pastas proposta
 
 ```text
 strawberry-farm/
