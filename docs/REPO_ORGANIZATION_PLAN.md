@@ -21,6 +21,7 @@
 ## Onde os artefatos de sprint ficam
 - `agents/planning/analyses/*`
 - `agents/planning/sprint-plans/*`
+- `agents/planning/implementation-notes/*`
 - `agents/planning/reviews/*`
 - `agents/planning/acceptance/*`
 
@@ -37,6 +38,13 @@
 - `tests/manual/*`
 - `tests/reports/*`
 - `tests/artifacts/*`
+
+## Regra para entregáveis de sprint
+- plano: `agents/planning/sprint-plans/SPRINT_<N>_PLAN.md`
+- notas de implementação: `agents/planning/implementation-notes/SPRINT_<N>_IMPLEMENTATION_NOTES.md`
+- review: `agents/planning/reviews/SPRINT_<N>_REVIEW.md`
+- QA versionado: `tests/reports/QA_REPORT_SPRINT_<N>.md`
+- QA vigente: `tests/reports/QA_REPORT.md`
 
 ## Regra de separação
 - produto jogável: `public/` + `src/`

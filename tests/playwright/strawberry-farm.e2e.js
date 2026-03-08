@@ -197,7 +197,7 @@ async function preparePostPrestigeProgression(page) {
   await page.waitForFunction(() => {
     const money = Number(document.querySelector("#moneyCount")?.textContent || "0");
     const completed = document.querySelector("#progressSummary")?.textContent || "";
-    return money === 80 && completed.includes("1 de 4");
+    return money === 80 && completed.includes("1/4");
   }, { timeout: 5000 });
 }
 
@@ -312,11 +312,11 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#plotCountValue")) === "9/16", "HUD inicial da fazenda incorreto.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "Preço de venda inicial incorreto.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "Tempo de crescimento inicial incorreto.");
-    assert((await textOf(page, "#helperStatusValue")) === "Desligado", "O helper deveria iniciar desligado.");
+    assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 0", "O prestígio deveria iniciar no nível 0.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+0%"), "O bônus inicial de prestígio deveria ser 0%.");
-    assert((await textOf(page, "#progressSummary")) === "0 de 4 metas concluídas", "Resumo inicial de metas incorreto.");
-    assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O banner de evento deveria iniciar vazio.");
+    assert((await textOf(page, "#progressSummary")) === "0/4 metas", "Resumo inicial de metas incorreto.");
+    assert((await textOf(page, "#eventTitle")) === "Sem evento", "O banner de evento deveria iniciar vazio.");
     assert((await textOf(page, "#marketHeadline")).includes("Preço estável"), "O banner de mercado deveria iniciar estável.");
     assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda deveria iniciar recolhido.");
     const desktopLayoutCheck = await page.evaluate(() => {
@@ -362,16 +362,13 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#marketChangeIndicator")).includes("+1"), "O indicador de mercado deveria mostrar a alta.");
     await waitForText(page, "#marketPriceValue", "5 moedas", 4000);
     assert((await textOf(page, "#marketHeadline")).includes("alta"), "O banner deveria sinalizar mercado em alta.");
-    assert(
-      (await textOf(page, "#marketSummary")).includes("ótimo momento para vender"),
-      "A UI deveria orientar o jogador quando o preço estiver no topo.",
-    );
+    assert((await textOf(page, "#marketSummary")).includes("Bom momento"), "A UI deveria orientar o jogador quando o preço estiver no topo.");
     await setMarketState(page, { currentPrice: 5, previousPrice: 4, nextUpdateInMs: 30000 });
 
     console.log("Cenário 2: plantio e save/load base");
     const firstPlot = page.locator(".plot").nth(0);
     await firstPlot.click();
-    await waitForText(page, "#statusMessage", "Semente plantada");
+    await waitForText(page, "#statusMessage", "Plantado.");
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     await page.waitForFunction(() => {
@@ -406,7 +403,7 @@ async function reachMoneyTarget(page, target) {
       return (
         expansionButton &&
         expansionButton.textContent &&
-        expansionButton.textContent.includes("Fazenda expandida") &&
+        expansionButton.textContent.includes("4x4 ativa") &&
         plotCount &&
         plotCount.textContent === "16/16"
       );
@@ -421,11 +418,8 @@ async function reachMoneyTarget(page, target) {
     console.log("Cenário 4: evento Feira local e economia de sementes");
     await forceEvent(page, "market-day", 5000);
     await waitForText(page, "#eventTitle", "Feira local");
-    assert((await textOf(page, "#buySeedButton")) === "Comprar semente (1)", "A Feira local não reduziu o preço da semente.");
-    assert(
-      (await textOf(page, "#eventEffect")).includes("sementes por 1 moeda"),
-      "O efeito textual da Feira local não ficou claro.",
-    );
+    assert((await textOf(page, "#buySeedButton")) === "Semente (1)", "A Feira local não reduziu o preço da semente.");
+    assert((await textOf(page, "#eventEffect")).includes("Semente por 1"), "O efeito textual da Feira local não ficou claro.");
     assert(
       (await textOf(page, "#eventBanner")).includes("Afeta compra de sementes"),
       "O banner do evento deveria destacar a ação afetada.",
@@ -439,12 +433,12 @@ async function reachMoneyTarget(page, target) {
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     await waitForText(page, "#eventTitle", "Feira local");
-    assert((await textOf(page, "#buySeedButton")) === "Comprar semente (1)", "O evento ativo não persistiu após reload.");
+    assert((await textOf(page, "#buySeedButton")) === "Semente (1)", "O evento ativo não persistiu após reload.");
     await page.waitForFunction(() => {
       const title = document.querySelector("#eventTitle");
-      return title && title.textContent === "Nenhum evento ativo";
+      return title && title.textContent === "Sem evento";
     }, { timeout: 8000 });
-    assert((await textOf(page, "#buySeedButton")) === "Comprar semente (2)", "O preço da semente não voltou ao normal após o evento.");
+    assert((await textOf(page, "#buySeedButton")) === "Semente (2)", "O preço da semente não voltou ao normal após o evento.");
 
     console.log("Cenário 5: upgrade de crescimento e timing da chuva");
     await reachMoneyTarget(page, 10);
@@ -478,7 +472,7 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const title = document.querySelector("#eventTitle");
       const growth = document.querySelector("#growthTimeValue");
-      return title && title.textContent === "Nenhum evento ativo" && growth && growth.textContent === "8s";
+      return title && title.textContent === "Sem evento" && growth && growth.textContent === "8s";
     }, { timeout: 9000 });
 
     console.log("Cenário 6: upgrade de venda e economia do evento Sol forte");
@@ -488,7 +482,7 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const button = document.querySelector("#marketButton");
       const sellValue = document.querySelector("#sellPriceValue");
-      return button && button.textContent.includes("Venda melhorada") && sellValue.textContent === "7 moedas";
+      return button && button.textContent.includes("Venda melhor") && sellValue.textContent === "7 moedas";
     });
     await ensureAtLeastOneSeed(page);
     await plantAllAvailableSeeds(page);
@@ -499,7 +493,7 @@ async function reachMoneyTarget(page, target) {
     await waitForText(page, "#eventTitle", "Sol forte");
     assert((await textOf(page, "#sellPriceValue")) === "8 moedas", "O Sol forte não aumentou o preço de venda sobre o mercado atual.");
     assert(
-      (await textOf(page, "#eventEffect")).includes("+1 moeda"),
+      (await textOf(page, "#eventEffect")).includes("+1 por morango"),
       "O efeito textual do Sol forte não ficou claro.",
     );
     assert(
@@ -514,7 +508,7 @@ async function reachMoneyTarget(page, target) {
       "A venda durante o Sol forte não respeitou o cálculo de mercado + upgrade + evento.",
     );
     await clearEvent(page);
-    assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O evento não foi limpo corretamente no modo de teste.");
+    assert((await textOf(page, "#eventTitle")) === "Sem evento", "O evento não foi limpo corretamente no modo de teste.");
 
     console.log("Cenário 7: Farm Helper, eventos e persistência");
     await reachMoneyTarget(page, 18);
@@ -522,7 +516,7 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const button = document.querySelector("#helperButton");
       const status = document.querySelector("#helperStatusValue");
-      return button && button.textContent.includes("Farm Helper ativo") && status && status.textContent === "Ativo";
+      return button && button.textContent.includes("Helper ativo") && status && status.textContent === "On";
     });
     assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper deveria aparecer quando ativo.");
     await resetComboState(page);
@@ -550,7 +544,7 @@ async function reachMoneyTarget(page, target) {
 
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
-    assert((await textOf(page, "#helperStatusValue")) === "Ativo", "O estado do helper não persistiu após reload.");
+    assert((await textOf(page, "#helperStatusValue")) === "On", "O estado do helper não persistiu após reload.");
     assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper não persistiu após reload.");
 
     await resetComboState(page);
@@ -574,12 +568,12 @@ async function reachMoneyTarget(page, target) {
     await clearEvent(page);
     await preparePrestigeAvailability(page, 120);
     assert(
-      (await textOf(page, "#prestigeThresholdText")).includes("Disponível agora"),
+      (await textOf(page, "#prestigeThresholdText")).includes("Disponível com"),
       "O painel de prestígio deveria indicar disponibilidade ao atingir o requisito.",
     );
     assert(
       (await textOf(page, "#milestoneToast")).includes("Strawberry Knowledge") ||
-        (await textOf(page, "#prestigePanelDescription")).includes("Prestígio disponível"),
+        (await textOf(page, "#prestigePanelDescription")).includes("Disponível:"),
       "A UI deveria deixar claro que o prestígio foi desbloqueado.",
     );
     assert(!(await page.locator("#prestigeButton").isDisabled()), "O botão de prestígio deveria ficar ativo.");
@@ -587,11 +581,11 @@ async function reachMoneyTarget(page, target) {
       dialog.accept().catch(() => {});
     });
     await page.click("#prestigeButton");
-    await waitForText(page, "#statusMessage", "Strawberry Knowledge nível 1");
+    await waitForText(page, "#statusMessage", "Conhecimento nível 1");
     assert((await textOf(page, "#moneyCount")) === "6", "O prestígio deveria reiniciar o dinheiro.");
     assert((await textOf(page, "#seedCount")) === "3", "O prestígio deveria reiniciar as sementes.");
     assert((await textOf(page, "#plotCountValue")) === "9/16", "O prestígio deveria reiniciar a fazenda para 3x3.");
-    assert((await textOf(page, "#helperStatusValue")) === "Desligado", "O prestígio deveria remover o helper.");
+    assert((await textOf(page, "#helperStatusValue")) === "Off", "O prestígio deveria remover o helper.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 1", "O nível de prestígio não subiu após o reset.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+20%"), "O bônus permanente não foi aplicado após o prestígio.");
     assert((await textOf(page, "#prestigeThresholdText")).includes("240"), "O próximo requisito de prestígio deveria escalar após o nível 1.");
@@ -618,23 +612,23 @@ async function reachMoneyTarget(page, target) {
     await page.click("#fertilizerButton");
     await page.click("#marketButton");
     assert(
-      (await textOf(page, "#goalStatus")) === "Você construiu uma pequena fazenda de morangos!",
+      (await textOf(page, "#goalStatus")) === "Meta concluída",
       "A mensagem final de vitória não apareceu ao alcançar 35 moedas.",
     );
-    assert((await textOf(page, "#progressSummary")) === "4 de 4 metas concluídas", "As metas finais não foram concluídas.");
+    assert((await textOf(page, "#progressSummary")) === "4/4 metas", "As metas finais não foram concluídas.");
 
     console.log("Cenário 10: reset e restauração completa");
     page.once("dialog", (dialog) => {
       dialog.accept().catch(() => {});
     });
     await page.click("#resetButton");
-    await waitForText(page, "#statusMessage", "Plante seus primeiros morangos.");
+    await waitForText(page, "#statusMessage", "Comece plantando.");
     assert((await page.locator(".plot").count()) === 9, "O reset não voltou a fazenda para 3x3.");
     assert((await textOf(page, "#plotCountValue")) === "9/16", "O HUD não restaurou o tamanho inicial da fazenda.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O reset não restaurou o preço base de venda.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "O reset não restaurou o tempo base.");
-    assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O reset não limpou o evento ativo.");
-    assert((await textOf(page, "#progressSummary")) === "0 de 4 metas concluídas", "O reset não limpou as metas.");
+    assert((await textOf(page, "#eventTitle")) === "Sem evento", "O reset não limpou o evento ativo.");
+    assert((await textOf(page, "#progressSummary")) === "0/4 metas", "O reset não limpou as metas.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 0", "O reset total deveria limpar o prestígio.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+0%"), "O reset total deveria limpar o bônus permanente.");
 

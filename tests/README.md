@@ -7,7 +7,7 @@
 - `artifacts/`: screenshots versionadas
 
 Relatório mais recente:
-- `reports/QA_REPORT_SPRINT_9.md`
+- `reports/QA_REPORT.md`
 
 ## Execução
 Exemplo com `playwright-skill`:

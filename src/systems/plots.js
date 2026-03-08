@@ -60,7 +60,7 @@
 
   function plantPlot(game, plot) {
     if (game.state.seeds <= 0) {
-      game.setMessage("Você precisa de sementes para plantar.");
+      game.setMessage("Sem sementes.");
       SF.render.render(game);
       return;
     }
@@ -72,7 +72,7 @@
     plot.readyAt = now + growthDurationMs;
     plot.growthDurationMs = growthDurationMs;
     game.state.seeds -= 1;
-    game.setMessage("Semente plantada. Volte em alguns segundos.");
+    game.setMessage("Plantado.");
     game.commit();
   }
 
@@ -95,11 +95,11 @@
       SF.helper.noteHelperHarvest(game, plot.id);
     } else if (comboSummary.bonusMoney > 0) {
       game.state.money += comboSummary.bonusMoney;
-      game.setMessage(`Você colheu 1 morango. Combo x${comboSummary.count}: +${comboSummary.bonusMoney} moeda bônus.`);
+      game.setMessage(`Colheita. Combo x${comboSummary.count}: +${comboSummary.bonusMoney}.`);
     } else if (comboSummary.count >= 2) {
-      game.setMessage(`Você colheu 1 morango. Combo x${comboSummary.count} ativo.`);
+      game.setMessage(`Colheita. Combo x${comboSummary.count}.`);
     } else {
-      game.setMessage("Você colheu 1 morango.");
+      game.setMessage("Colheita.");
     }
 
     game.commit();

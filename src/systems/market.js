@@ -79,18 +79,17 @@
   function getSellPriceHint(game) {
     const marketBasePrice = getMarketBasePrice(game);
     const direction = game.state.systems.market.direction;
-    const prestigeText =
-      game.state.prestige.level > 0 ? ` Conhecimento: +${SF.prestige.getPrestigeBonusPercent(game)}% no total.` : "";
+    const prestigeText = game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%` : "";
 
     if (direction === "up") {
-      return `Mercado subiu para ${marketBasePrice}.${prestigeText}`;
+      return `Alta: ${marketBasePrice}${prestigeText}`;
     }
 
     if (direction === "down") {
-      return `Mercado caiu para ${marketBasePrice}.${prestigeText}`;
+      return `Baixa: ${marketBasePrice}${prestigeText}`;
     }
 
-    return `Mercado em ${marketBasePrice} moedas.${prestigeText}`;
+    return `Estável: ${marketBasePrice}${prestigeText}`;
   }
 
   function getMarketHeadline(game) {
@@ -112,14 +111,14 @@
     const marketBasePrice = getMarketBasePrice(game);
 
     if (marketBasePrice === SF.config.market.maxPrice) {
-      return "Este é um ótimo momento para vender e converter estoque em moedas.";
+      return "Bom momento para vender.";
     }
 
     if (marketBasePrice === SF.config.market.minPrice) {
-      return "O mercado está fraco. Você pode esperar alguns segundos antes de vender.";
+      return "Preço baixo. Vale esperar.";
     }
 
-    return "O mercado muda sozinho com o tempo. Venda no melhor momento.";
+    return "Preço muda com o tempo.";
   }
 
   function getMarketChangeText(game) {
@@ -127,14 +126,14 @@
     const difference = market.currentPrice - market.previousPrice;
 
     if (difference > 0) {
-      return `▲ +${difference} desde a última virada`;
+      return `▲ +${difference}`;
     }
 
     if (difference < 0) {
-      return `▼ ${difference} desde a última virada`;
+      return `▼ ${difference}`;
     }
 
-    return "• Sem mudança na última virada";
+    return "• Sem mudança";
   }
 
   function getMarketUpdateMessage(game) {

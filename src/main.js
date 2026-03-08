@@ -31,7 +31,7 @@
         game.setMessage(goalRewards.join(" "));
         SF.render.showMilestoneToast(game, goalRewards[goalRewards.length - 1]);
       } else if (prestigeUnlocked) {
-        game.setMessage(`Strawberry Knowledge disponível. Prestigie com ${SF.prestige.getPrestigeThreshold(game)} moedas.`);
+        game.setMessage(`Prestígio liberado em ${SF.prestige.getPrestigeThreshold(game)} moedas.`);
       }
 
       game.dirty = true;
@@ -55,7 +55,7 @@
         return;
       }
 
-      game.setMessage("Esse morango ainda esta crescendo.");
+      game.setMessage("Ainda crescendo.");
       SF.render.render(game);
     },
   };
@@ -144,20 +144,20 @@
     const seedPrice = SF.plots.getSeedPrice(game);
 
     if (game.state.money < seedPrice) {
-      game.setMessage("Você não tem moedas suficientes para comprar uma semente.");
+      game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
 
     game.state.money -= seedPrice;
     game.state.seeds += 1;
-    game.setMessage("Você comprou 1 semente.");
+    game.setMessage("1 semente comprada.");
     game.commit();
   }
 
   function sellStrawberries() {
     if (game.state.strawberries <= 0) {
-      game.setMessage("Você não tem morangos para vender.");
+      game.setMessage("Sem morangos.");
       SF.render.render(game);
       return;
     }
@@ -173,8 +173,8 @@
     game.state.stats.soldTotal += quantity;
     game.setMessage(
       prestigeBonus > 0
-        ? `Você vendeu ${quantity} morango${quantity > 1 ? "s" : ""} por ${earnedMoney} moedas. Mercado base: ${marketBasePrice}. Conhecimento: +${prestigeBonus}.`
-        : `Você vendeu ${quantity} morango${quantity > 1 ? "s" : ""} por ${earnedMoney} moedas. Mercado base: ${marketBasePrice}.`,
+        ? `Venda: ${quantity} por ${earnedMoney}. Base ${marketBasePrice}, bônus ${prestigeBonus}.`
+        : `Venda: ${quantity} por ${earnedMoney}. Base ${marketBasePrice}.`,
     );
     maybeTriggerRandomEvent();
     game.commit();
@@ -184,13 +184,13 @@
     const upgrade = SF.config.upgrades.fertilizer;
 
     if (game.state.upgrades.fertilizer) {
-      game.setMessage("O adubo rápido já está ativo.");
+      game.setMessage("Adubo já ativo.");
       SF.render.render(game);
       return;
     }
 
     if (game.state.money < upgrade.cost) {
-      game.setMessage("Você ainda não tem moedas suficientes para comprar o adubo rápido.");
+      game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
@@ -198,7 +198,7 @@
     game.state.money -= upgrade.cost;
     game.state.upgrades.fertilizer = true;
     game.state.stats.upgradesPurchased += 1;
-    game.setMessage("Adubo rápido comprado. Novos plantios crescem mais rápido.");
+    game.setMessage("Adubo comprado.");
     game.commit();
   }
 
@@ -206,13 +206,13 @@
     const upgrade = SF.config.upgrades.market;
 
     if (game.state.upgrades.market) {
-      game.setMessage("A caixa premium já está ativa.");
+      game.setMessage("Caixa premium já ativa.");
       SF.render.render(game);
       return;
     }
 
     if (game.state.money < upgrade.cost) {
-      game.setMessage("Você ainda não tem moedas suficientes para melhorar a venda.");
+      game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
@@ -220,7 +220,7 @@
     game.state.money -= upgrade.cost;
     game.state.upgrades.market = true;
     game.state.stats.upgradesPurchased += 1;
-    game.setMessage("Caixa premium comprada. Cada morango vendido vale mais.");
+    game.setMessage("Venda melhorada.");
     game.commit();
   }
 
@@ -228,13 +228,13 @@
     const upgrade = SF.config.upgrades.helper;
 
     if (game.state.upgrades.helper) {
-      game.setMessage("O Farm Helper já está ativo.");
+      game.setMessage("Helper já ativo.");
       SF.render.render(game);
       return;
     }
 
     if (game.state.money < upgrade.cost) {
-      game.setMessage("Você ainda não tem moedas suficientes para comprar o Farm Helper.");
+      game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
@@ -244,20 +244,20 @@
     game.state.stats.upgradesPurchased += 1;
     game.state.systems.helper.nextHarvestAt = Date.now() + upgrade.harvestIntervalMs;
     game.state.systems.helper.lastActionAt = Date.now();
-    game.state.systems.helper.lastActionText = "Farm Helper ativado. Ele vai colher plantas prontas automaticamente.";
-    game.setMessage("Farm Helper comprado. Agora ele ajuda a colher canteiros prontos.");
+    game.state.systems.helper.lastActionText = "Helper ativado.";
+    game.setMessage("Helper comprado.");
     game.commit();
   }
 
   function expandFarm() {
     if (game.state.hasExpandedFarm) {
-      game.setMessage("Sua fazenda já está no tamanho máximo desta versão.");
+      game.setMessage("Fazenda já expandida.");
       SF.render.render(game);
       return;
     }
 
     if (game.state.money < SF.config.expansion.cost) {
-      game.setMessage("Você ainda não tem moedas suficientes para expandir a fazenda.");
+      game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
@@ -265,13 +265,13 @@
     game.state.money -= SF.config.expansion.cost;
     game.state.unlockedPlotCount = SF.config.maxPlotCount;
     game.state.hasExpandedFarm = true;
-    game.setMessage("Fazenda expandida. Agora voce tem 16 canteiros.");
+    game.setMessage("Fazenda 4x4 liberada.");
     game.commit();
   }
 
   function prestigeFarm() {
     if (!SF.prestige.isPrestigeAvailable(game)) {
-      game.setMessage(`Você precisa de ${SF.prestige.getPrestigeThreshold(game)} moedas para prestigiar.`);
+      game.setMessage(`Precisa de ${SF.prestige.getPrestigeThreshold(game)} moedas.`);
       SF.render.render(game);
       return;
     }
@@ -283,7 +283,7 @@
     );
 
     if (!shouldPrestige) {
-      game.setMessage("O prestígio foi cancelado.");
+      game.setMessage("Prestígio cancelado.");
       SF.render.render(game);
       return;
     }
@@ -296,9 +296,9 @@
     game.state = SF.state.createInitialState();
     game.state.prestige = nextPrestigeState;
     game.state.systems.prestige.unlockShownForLevel = -1;
-    game.state.message = `Strawberry Knowledge nível ${nextLevel} desbloqueado. Suas vendas agora têm +${nextBonusPercent}% permanente.`;
+    game.state.message = `Conhecimento nível ${nextLevel}: +${nextBonusPercent}% venda.`;
     game.uiState.milestoneToast = null;
-    SF.render.showMilestoneToast(game, `Prestígio realizado. Conhecimento nível ${nextLevel} ativo.`);
+    SF.render.showMilestoneToast(game, `Prestígio ativo. Nível ${nextLevel}.`);
     SF.state.saveState(game);
     SF.render.render(game);
   }
@@ -309,7 +309,7 @@
     );
 
     if (!shouldReset) {
-      game.setMessage("O progresso foi mantido.");
+      game.setMessage("Reset cancelado.");
       SF.render.render(game);
       return;
     }
@@ -344,7 +344,7 @@
       SF.plots.syncHarvestEffects(game);
 
       if (eventEnded) {
-        game.setMessage("O evento terminou.");
+        game.setMessage("Evento encerrado.");
         game.dirty = true;
         SF.render.render(game);
         return;
@@ -367,7 +367,7 @@
       }
 
       if (plotsReady) {
-        game.setMessage("Um morango está pronto para colher.");
+        game.setMessage("Há morangos prontos.");
         game.dirty = true;
         SF.render.render(game);
         return;

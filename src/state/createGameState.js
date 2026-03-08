@@ -66,7 +66,7 @@
         },
         lastSavedAt: null,
       },
-      message: "Plante seus primeiros morangos.",
+      message: "Comece plantando.",
       plots: Array.from({ length: config.maxPlotCount }, (_, index) => ({
         id: index,
         state: config.plotStates.empty,

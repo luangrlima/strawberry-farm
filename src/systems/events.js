@@ -101,18 +101,18 @@
 
   function getEventEffectText(game, activeEvent) {
     if (activeEvent.sellPriceBonus) {
-      return `Efeito: +${activeEvent.sellPriceBonus} moeda por morango vendido.`;
+      return `+${activeEvent.sellPriceBonus} por morango.`;
     }
 
     if (activeEvent.seedPriceDiscount) {
-      return `Efeito: sementes por ${SF.plots.getSeedPrice(game)} moeda.`;
+      return `Semente por ${SF.plots.getSeedPrice(game)}.`;
     }
 
     if (activeEvent.growthMultiplier) {
-      return `Efeito: crescimento atual em ${SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game))}.`;
+      return `Crescimento em ${SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game))}.`;
     }
 
-    return "Sem bônus ativo no momento.";
+    return "Sem bônus.";
   }
 
   SF.events = {

@@ -13,14 +13,14 @@
           <div>
             <p class="eyebrow">MVP+ com economia e prestígio</p>
             <h1>Fazenda de Morangos</h1>
-            <p class="subtitle">Compre sementes, plante, espere, colha e venda.</p>
+            <p class="subtitle">Plante, colha e venda.</p>
           </div>
-          <button class="helper-btn" id="helpToggleButton" type="button" aria-expanded="false">Ajuda rápida</button>
+          <button class="helper-btn" id="helpToggleButton" type="button" aria-expanded="false">Ajuda</button>
         </div>
 
         <section class="game-shell">
           <aside class="zone zone--left">
-            <div class="goal" id="goalStatus" aria-live="polite">Meta: alcançar 35 moedas</div>
+            <div class="goal" id="goalStatus" aria-live="polite">Meta 35 moedas</div>
 
             <section class="stats stats--compact" aria-label="Recursos">
               <article class="stat" id="moneyCard">
@@ -36,50 +36,53 @@
                 <strong class="stat__value" id="berryCount">0</strong>
               </article>
               <article class="stat" id="sellPriceCard">
-                <span class="stat__label">Venda agora</span>
+                <span class="stat__label">Venda</span>
                 <strong class="stat__value stat__value--small" id="sellPriceValue">3 moedas</strong>
-                <span class="stat__hint" id="sellPriceHint">Mercado estável.</span>
-              </article>
-              <article class="stat" id="growthTimeCard">
-                <span class="stat__label">Tempo atual</span>
-                <strong class="stat__value stat__value--small" id="growthTimeValue">10s</strong>
-              </article>
-              <article class="stat" id="plotCountCard">
-                <span class="stat__label">Fazenda</span>
-                <strong class="stat__value stat__value--small" id="plotCountValue">9/16</strong>
-              </article>
-              <article class="stat" id="helperCard">
-                <span class="stat__label">Farm Helper</span>
-                <strong class="stat__value stat__value--small" id="helperStatusValue">Desligado</strong>
-                <span class="stat__hint" id="helperStatusHint">Compre para colher 1 canteiro pronto automaticamente.</span>
-              </article>
-              <article class="stat" id="prestigeCard">
-                <span class="stat__label">Conhecimento</span>
-                <strong class="stat__value stat__value--small" id="prestigeLevelValue">Nível 0</strong>
-                <span class="stat__hint" id="prestigeBonusHint">Bônus permanente: +0% nas vendas.</span>
+                <span class="stat__hint" id="sellPriceHint">Estável</span>
               </article>
             </section>
 
-            <section class="actions actions--stack" aria-label="Ações">
-              <button class="action-btn" id="buySeedButton" type="button">Comprar semente (2)</button>
-              <button class="action-btn" id="sellButton" type="button">Vender morangos</button>
-              <button class="action-btn action-btn--ghost" id="resetButton" type="button">Reiniciar jogo</button>
+            <section class="quick-status" aria-label="Status compactos">
+              <article class="mini-stat" id="growthTimeCard">
+                <span class="mini-stat__label">Tempo</span>
+                <strong class="mini-stat__value" id="growthTimeValue">10s</strong>
+              </article>
+              <article class="mini-stat" id="plotCountCard">
+                <span class="mini-stat__label">Fazenda</span>
+                <strong class="mini-stat__value" id="plotCountValue">9/16</strong>
+              </article>
+              <article class="mini-stat" id="helperCard">
+                <span class="mini-stat__label">Helper</span>
+                <strong class="mini-stat__value" id="helperStatusValue">Off</strong>
+                <span class="mini-stat__hint" id="helperStatusHint">Inativo</span>
+              </article>
+              <article class="mini-stat" id="prestigeCard">
+                <span class="mini-stat__label">Conhecimento</span>
+                <strong class="mini-stat__value" id="prestigeLevelValue">Nível 0</strong>
+                <span class="mini-stat__hint" id="prestigeBonusHint">+0% venda</span>
+              </article>
+            </section>
+
+            <section class="actions actions--compact" aria-label="Ações">
+              <button class="action-btn" id="buySeedButton" type="button">Semente (2)</button>
+              <button class="action-btn" id="sellButton" type="button">Vender</button>
+              <button class="action-btn action-btn--ghost action-btn--compact" id="resetButton" type="button">Reset</button>
             </section>
 
             <section class="status-stack" aria-label="Status rápidos">
               <section class="status-module status-module--message">
-                <p id="statusMessage" aria-live="polite">Plante seus primeiros morangos.</p>
+                <p id="statusMessage" aria-live="polite">Comece plantando.</p>
               </section>
 
               <section class="status-module status-module--save">
-                <div class="save-status" id="saveStatus" aria-live="polite">Salvamento automático pendente.</div>
+                <div class="save-status" id="saveStatus" aria-live="polite">Auto-save pendente</div>
               </section>
 
               <section class="combo-strip status-module" id="comboStrip" aria-live="polite" hidden>
                 <div>
                   <p class="combo-strip__eyebrow">Combo</p>
                   <strong class="combo-strip__title" id="comboTitle">Combo x2</strong>
-                  <p class="combo-strip__text" id="comboText">Colha em sequência para bônus.</p>
+                  <p class="combo-strip__text" id="comboText">Colha rápido para bônus.</p>
                 </div>
                 <div class="combo-strip__aside">
                   <div class="combo-strip__timer" id="comboTimer">1s</div>
@@ -92,22 +95,22 @@
               <section class="helper-strip status-module" id="helperStrip" aria-live="polite" hidden>
                 <div>
                   <p class="helper-strip__eyebrow">Farm Helper</p>
-                  <strong class="helper-strip__title">Colheita automática</strong>
-                  <p class="helper-strip__text" id="helperStripText">O helper está monitorando a fazenda.</p>
+                  <strong class="helper-strip__title">Auto-colheita</strong>
+                  <p class="helper-strip__text" id="helperStripText">Monitorando a fazenda.</p>
                 </div>
-                <div class="helper-strip__timer" id="helperStripTimer">Próxima verificação em 3s</div>
+                <div class="helper-strip__timer" id="helperStripTimer">3s</div>
               </section>
 
               <section class="event-banner event-banner--idle status-module" id="eventBanner" aria-live="polite">
                 <div>
                   <p class="event-banner__eyebrow">Evento</p>
-                  <h2 id="eventTitle">Nenhum evento ativo</h2>
-                  <p class="event-banner__text" id="eventDescription">Venda morangos para ativar um evento curto.</p>
-                  <p class="event-banner__effect" id="eventEffect">Sem bônus ativo no momento.</p>
+                  <h2 id="eventTitle">Sem evento</h2>
+                  <p class="event-banner__text" id="eventDescription">Pode surgir ao vender.</p>
+                  <p class="event-banner__effect" id="eventEffect">Sem bônus.</p>
                   <div class="event-banner__tags" id="eventTags" hidden></div>
                 </div>
                 <div class="event-banner__aside">
-                  <div class="event-banner__timer" id="eventTimer">Aguardando</div>
+                  <div class="event-banner__timer" id="eventTimer">Em espera</div>
                   <div class="event-banner__progress">
                     <div class="event-banner__progress-fill" id="eventProgressBar"></div>
                   </div>
@@ -120,7 +123,7 @@
             <section class="progress-strip progress-strip--compact" aria-label="Indicadores de progresso">
               <article class="progress-card">
                 <div class="progress-card__head">
-                  <span>Meta final</span>
+                  <span>Meta</span>
                   <strong id="moneyGoalProgressLabel">0 / 35 moedas</strong>
                 </div>
                 <div class="progress-card__bar">
@@ -129,7 +132,7 @@
               </article>
               <article class="progress-card">
                 <div class="progress-card__head">
-                  <span>Canteiros prontos</span>
+                  <span>Prontos</span>
                   <strong id="readyPlotProgressLabel">0 / 9</strong>
                 </div>
                 <div class="progress-card__bar">
@@ -150,7 +153,7 @@
             <section class="meta-row meta-row--center" aria-label="Legenda e leitura rápida">
               <div class="legend" aria-label="Estados dos canteiros">
                 <span class="legend__item"><span class="legend__dot legend__dot--empty"></span>Vazio</span>
-                <span class="legend__item"><span class="legend__dot legend__dot--growing"></span>Crescendo</span>
+                <span class="legend__item"><span class="legend__dot legend__dot--growing"></span>Cresce</span>
                 <span class="legend__item"><span class="legend__dot legend__dot--ready"></span>Pronto</span>
               </div>
             </section>
@@ -159,37 +162,33 @@
           <aside class="zone zone--right">
             <section class="market-banner market-banner--steady" id="marketBanner" aria-live="polite">
               <div>
-                <p class="market-banner__eyebrow">Mercado do morango</p>
+                <p class="market-banner__eyebrow">Mercado</p>
                 <h2 id="marketHeadline">Preço estável</h2>
-                <p class="market-banner__text" id="marketSummary">
-                  O mercado muda sozinho com o tempo. Venda no melhor momento.
-                </p>
-                <p class="market-banner__effect" id="marketEffect">Preço base atual: 3 moedas por morango.</p>
+                <p class="market-banner__text" id="marketSummary">Varia sozinho ao longo da partida.</p>
+                <p class="market-banner__effect" id="marketEffect">Base: 3 moedas.</p>
               </div>
               <div class="market-banner__aside">
                 <div class="market-banner__price" id="marketPriceValue">3 moedas</div>
                 <div class="market-banner__change" id="marketChangeIndicator">Sem mudança</div>
-                <div class="market-banner__timer" id="marketTimer">Atualiza em 12s</div>
+                <div class="market-banner__timer" id="marketTimer">12s</div>
               </div>
             </section>
 
             <section class="prestige-panel" id="prestigePanel" aria-live="polite">
               <div>
-                <p class="prestige-panel__eyebrow">Progressão permanente</p>
+                <p class="prestige-panel__eyebrow">Prestígio</p>
                 <h2 id="prestigePanelTitle">Strawberry Knowledge</h2>
-                <p class="prestige-panel__text" id="prestigePanelDescription">
-                  Alcance o requisito de moedas para reiniciar a fazenda e ganhar bônus permanente nas vendas.
-                </p>
-                <p class="prestige-panel__meta" id="prestigeThresholdText">Próximo prestígio em 120 moedas.</p>
+                <p class="prestige-panel__text" id="prestigePanelDescription">Reinicie para ganhar bônus permanente.</p>
+                <p class="prestige-panel__meta" id="prestigeThresholdText">Próximo em 120 moedas.</p>
               </div>
-              <button class="action-btn action-btn--ghost" id="prestigeButton" type="button">Prestigiar fazenda</button>
+              <button class="action-btn action-btn--ghost" id="prestigeButton" type="button">Prestigiar</button>
             </section>
 
             <section class="progression" aria-label="Progresso">
               <div class="progression__header">
                 <div>
                   <p class="progression__eyebrow">Progressão</p>
-                  <h2>Próximos passos</h2>
+                  <h2>Metas</h2>
                 </div>
                 <div class="progression__summary" id="progressSummary">0 de 4 metas concluídas</div>
               </div>
@@ -200,36 +199,28 @@
               <article class="upgrade-card">
                 <p class="upgrade-card__eyebrow">Melhoria</p>
                 <h2>Adubo rápido</h2>
-                <p class="upgrade-card__text" id="fertilizerDescription">
-                  Reduz o tempo de crescimento em 25%.
-                </p>
+                <p class="upgrade-card__text" id="fertilizerDescription">-25% no tempo.</p>
                 <button class="action-btn" id="fertilizerButton" type="button">Comprar adubo (10)</button>
               </article>
 
               <article class="upgrade-card">
                 <p class="upgrade-card__eyebrow">Melhoria</p>
                 <h2>Caixa premium</h2>
-                <p class="upgrade-card__text" id="marketDescription">
-                  Cada morango vendido rende +2 moedas.
-                </p>
+                <p class="upgrade-card__text" id="marketDescription">+2 moedas por venda.</p>
                 <button class="action-btn" id="marketButton" type="button">Melhorar venda (14)</button>
               </article>
 
               <article class="upgrade-card">
                 <p class="upgrade-card__eyebrow">Expansão</p>
                 <h2>Fazenda 4x4</h2>
-                <p class="upgrade-card__text" id="expansionDescription">
-                  Libera mais 7 canteiros e amplia a produção.
-                </p>
+                <p class="upgrade-card__text" id="expansionDescription">+7 canteiros.</p>
                 <button class="action-btn" id="expandFarmButton" type="button">Expandir fazenda (10)</button>
               </article>
 
               <article class="upgrade-card">
                 <p class="upgrade-card__eyebrow">Automação leve</p>
                 <h2>Farm Helper</h2>
-                <p class="upgrade-card__text" id="helperDescription">
-                  Colhe automaticamente 1 canteiro pronto a cada poucos segundos.
-                </p>
+                <p class="upgrade-card__text" id="helperDescription">Colhe 1 pronto por ciclo.</p>
                 <button class="action-btn" id="helperButton" type="button">Comprar helper (18)</button>
               </article>
             </section>
@@ -238,14 +229,14 @@
               <div class="help-panel__header">
                 <div>
                   <p class="help-panel__eyebrow">Como jogar</p>
-                  <h2>Comece em menos de 30 segundos</h2>
+                  <h2>Loop rápido</h2>
                 </div>
                 <button class="helper-btn helper-btn--ghost" id="helpDismissButton" type="button">Ocultar</button>
               </div>
               <ol class="help-steps">
-                <li>Compre sementes com moedas.</li>
-                <li>Clique em um terreno vazio para plantar.</li>
-                <li>Espere crescer, colha e venda para reinvestir.</li>
+                <li>Compre sementes.</li>
+                <li>Plante nos vazios.</li>
+                <li>Colha e venda.</li>
               </ol>
             </section>
           </aside>

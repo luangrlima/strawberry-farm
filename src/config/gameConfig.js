@@ -11,7 +11,7 @@ window.StrawberryFarm.config = {
     label: "Strawberry Knowledge",
     baseThresholdMoney: 120,
     sellBonusPerLevel: 0.2,
-    description: "Reinicie a fazenda para ganhar +20% permanente no valor total das vendas por nível.",
+    description: "Reinicie para ganhar +20% permanente nas vendas por nível.",
   },
   market: {
     basePrice: 3,
@@ -39,25 +39,25 @@ window.StrawberryFarm.config = {
       label: "Adubo rápido",
       cost: 10,
       growthMultiplier: 0.75,
-      description: "Reduz o tempo de crescimento em 25%.",
+      description: "-25% no tempo.",
     },
     market: {
       label: "Caixa premium",
       cost: 14,
       sellPriceBonus: 2,
-      description: "Cada morango vendido rende +2 moedas.",
+      description: "+2 moedas por venda.",
     },
     helper: {
       label: "Farm Helper",
       cost: 18,
       harvestIntervalMs: 3500,
-      description: "Colhe automaticamente 1 canteiro pronto a cada poucos segundos.",
+      description: "Colhe 1 pronto por ciclo.",
     },
   },
   expansion: {
     cost: 10,
     label: "Expandir fazenda",
-    description: "Libera mais 7 canteiros e transforma a fazenda em 4x4.",
+    description: "+7 canteiros.",
   },
   events: {
     durationMs: 12000,
@@ -66,7 +66,7 @@ window.StrawberryFarm.config = {
       {
         id: "sunshine",
         title: "Sol forte",
-        description: "As vendas rendem +1 moeda por morango por alguns segundos.",
+        description: "+1 moeda por venda.",
         type: "sellBonus",
         sellPriceBonus: 1,
         accentClass: "event-banner--sunshine",
@@ -74,7 +74,7 @@ window.StrawberryFarm.config = {
       {
         id: "drizzle",
         title: "Chuva leve",
-        description: "As plantas aceleram e os plantios novos crescem mais rápido.",
+        description: "Crescimento acelerado.",
         type: "growthBoost",
         growthMultiplier: 0.8,
         activePlotRemainingMultiplier: 0.8,
@@ -83,7 +83,7 @@ window.StrawberryFarm.config = {
       {
         id: "market-day",
         title: "Feira local",
-        description: "Sementes custam 1 moeda a menos durante o evento.",
+        description: "Sementes com desconto.",
         type: "seedDiscount",
         seedPriceDiscount: 1,
         accentClass: "event-banner--market",

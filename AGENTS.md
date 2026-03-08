@@ -85,6 +85,7 @@ Testa loops de gameplay e detecta regressões.
 - runtime do jogo em `public/` e `src/`
 - prompts dos agentes em `agents/prompts/`
 - artefatos de planejamento em `agents/planning/`
+- notas de implementação em `agents/planning/implementation-notes/`
 - documentação estável em `docs/`
 - documentação de apoio por sistema em `agents/docs/`
 - testes, relatórios e evidências em `tests/`
@@ -122,18 +123,26 @@ Sempre que um sprint for executado:
 
 8. Se o sprint misturar mais de um tipo, o `Diretor Geral do Jogo` deve escolher o tipo dominante e manter o restante apenas como suporte, sem expandir o escopo.
 
-9. O template escolhido define a estrutura de saída do sprint usando `sprint_template.md`.
+9. O template escolhido define a estrutura lógica de saída do sprint usando `sprint_template.md`, mas os arquivos finais devem respeitar a arquitetura do repositório.
 
 ## Saídas obrigatórias de sprint
 
 Cada sprint deve gerar, no mínimo:
 
-- `SPRINT_PLAN.md`
-- `IMPLEMENTATION_NOTES.md`
-- `QA_REPORT.md`
-- `SPRINT_REVIEW.md`
+- `agents/planning/sprint-plans/SPRINT_<N>_PLAN.md`
+- `agents/planning/implementation-notes/SPRINT_<N>_IMPLEMENTATION_NOTES.md`
+- `tests/reports/QA_REPORT_SPRINT_<N>.md`
+- `agents/planning/reviews/SPRINT_<N>_REVIEW.md`
 
 Quando útil, o sprint pode gerar documentos complementares, mas esses quatro artefatos são o contrato mínimo.
+
+### Regra de naming e localização
+
+- nunca gerar artefatos de sprint na raiz do repositório
+- usar sempre o número ou nome oficial do sprint no filename
+- `SPRINT_PLAN`, `IMPLEMENTATION_NOTES` e `SPRINT_REVIEW` pertencem a `agents/planning/`
+- `QA_REPORT` pertence a `tests/reports/`
+- `tests/reports/QA_REPORT.md` é apenas a referência do QA vigente e deve apontar para o relatório mais recente, sem substituir o arquivo versionado do sprint
 
 ## Como localizar o QA mais recente
 

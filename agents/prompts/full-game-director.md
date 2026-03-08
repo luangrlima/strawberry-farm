@@ -131,15 +131,18 @@ Exemplos:
 Usar sempre `sprint_template.md` como estrutura base.
 
 Gerar obrigatoriamente:
-- `SPRINT_PLAN.md`
-- `IMPLEMENTATION_NOTES.md`
-- `QA_REPORT.md`
-- `SPRINT_REVIEW.md`
+- `agents/planning/sprint-plans/SPRINT_<N>_PLAN.md`
+- `agents/planning/implementation-notes/SPRINT_<N>_IMPLEMENTATION_NOTES.md`
+- `tests/reports/QA_REPORT_SPRINT_<N>.md`
+- `agents/planning/reviews/SPRINT_<N>_REVIEW.md`
 
-Documentos complementares podem existir quando úteis, mas não substituem esse conjunto mínimo.
+Também atualizar:
+- `tests/reports/QA_REPORT.md` como referência para o QA vigente
+
+Documentos complementares podem existir quando úteis, mas não substituem esse conjunto mínimo nem podem ser gerados na raiz do repositório.
 
 ### Etapa 8 — Após a implementação
-Avaliar os resultados e concluir o `SPRINT_REVIEW.md`.
+Avaliar os resultados e concluir o review do sprint no diretório correto.
 
 O review deve incluir:
 - o que funcionou

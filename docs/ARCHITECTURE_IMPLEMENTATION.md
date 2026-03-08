@@ -9,7 +9,7 @@ O Sprint 9 converteu o projeto de um runtime concentrado na raiz para uma estrut
 - o CSS runtime foi movido para `public/style.css`
 - o JavaScript runtime foi dividido entre `src/config`, `src/state`, `src/systems`, `src/ui` e `src/utils`
 - prompts foram movidos para `agents/prompts`
-- planos, análises e reviews foram movidos para `agents/planning`
+- planos, notas de implementação, análises e reviews foram movidos para `agents/planning`
 - documentos de sistema/economia/UI foram movidos para `agents/docs`
 - cenários manuais e relatórios foram reorganizados para `tests/manual` e `tests/reports`
 - a proposta arquitetural foi movida para `docs/ARCHITECTURE_PROPOSAL.md`

@@ -13,7 +13,7 @@ O jogo atual inclui:
 - `Farm Helper`
 - prestígio `Strawberry Knowledge`
 - save/load com `localStorage`
-- HUD em tela única
+- HUD compacto em tela única
 
 ## Runtime
 O runtime jogável agora está separado da documentação e do workflow:
@@ -32,7 +32,7 @@ O arquivo [index.html](/Users/wiser/projects/strawberry-farm/index.html) na raiz
 - `public/`: arquivos estáticos do jogo
 - `src/`: runtime JavaScript
 - `agents/prompts/`: prompts dos agentes
-- `agents/planning/`: análises, planos e reviews de sprint
+- `agents/planning/`: análises, planos, notas de implementação e reviews de sprint
 - `agents/docs/`: documentação de sistemas, economia e UI
 - `docs/`: documentação arquitetural estável
 - `tests/`: automação, cenários manuais, relatórios e evidências
@@ -54,6 +54,11 @@ Prompts e material de coordenação do projeto:
 - [agents/prompts/ui-ux-developer.md](/Users/wiser/projects/strawberry-farm/agents/prompts/ui-ux-developer.md)
 - [agents/prompts/qa-playtest-agent.md](/Users/wiser/projects/strawberry-farm/agents/prompts/qa-playtest-agent.md)
 
+Artefatos de sprint:
+- `agents/planning/sprint-plans/`: planos por sprint
+- `agents/planning/implementation-notes/`: notas de implementação por sprint
+- `agents/planning/reviews/`: reviews por sprint
+
 ## Testes
 Visão geral em [tests/README.md](/Users/wiser/projects/strawberry-farm/tests/README.md).
 
@@ -64,7 +69,11 @@ Arquivos principais:
 - [tests/artifacts/](/Users/wiser/projects/strawberry-farm/tests/artifacts)
 
 Relatório mais recente:
-- [tests/reports/QA_REPORT_SPRINT_9.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT_SPRINT_9.md)
+- [tests/reports/QA_REPORT.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT.md)
+
+Regra:
+- `tests/reports/QA_REPORT_SPRINT_<N>.md` é o artefato versionado do sprint
+- `tests/reports/QA_REPORT.md` aponta para o QA vigente
 
 ## Execução do jogo
 Abra [public/index.html](/Users/wiser/projects/strawberry-farm/public/index.html) no navegador.
