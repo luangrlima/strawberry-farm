@@ -72,6 +72,9 @@ Recursos implementados:
 - feedback visual de conclusão de meta
 - combo de colheita curto com bônus leve
 - mercado dinâmico simples
+- layout desktop em 3 zonas com fazenda central
+- módulos compactos de status para evento, combo, helper e autosave
+- ajuda rápida recolhida por padrão
 - indicador do `Farm Helper` no HUD
 - colheita automática visual pelo `Farm Helper`
 - progresso permanente por prestígio
@@ -115,7 +118,13 @@ Recursos implementados:
   - alcançar `35` moedas
 
 ## Interface atual
-Tela única com:
+Tela única com foco desktop-first:
+- zona esquerda com HUD compacto, ações principais e módulos de status
+- zona central com grade da fazenda e feedback principal
+- zona direita com progressão, upgrades, expansão, prestígio e ajuda rápida
+- layout mobile empilhado quando a largura não comporta as 3 zonas
+
+Módulos presentes:
 - título do jogo
 - botão e painel de ajuda rápida
 - contador de moedas
@@ -164,6 +173,7 @@ Tela única com:
 - `tests/docs/QA_REPORT_MARKET.md`: relatório de QA do sistema de mercado
 - `tests/docs/QA_REPORT_SPRINT_6.md`: relatório de QA do helper de automação
 - `tests/docs/QA_REPORT_SPRINT_7.md`: relatório de QA do sistema de prestígio
+- `tests/docs/QA_REPORT_SPRINT_8.md`: relatório de QA do redesenho horizontal da interface
 - `tests/artifacts/`: evidências geradas pelos testes
 
 ## Checklist de implementação
@@ -222,6 +232,7 @@ Esse teste valida:
 - helper automático e persistência do helper
 - helper sem combo automático
 - prestígio, persistência e bônus permanente
+- layout desktop acima da dobra e mobile razoável
 - progressão final
 - reset do jogo
 

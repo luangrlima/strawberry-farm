@@ -7,6 +7,7 @@
 - `docs/QA_REPORT_V2.md`: relatório de QA após o sprint de estabilidade
 - `docs/QA_REPORT_MARKET.md`: relatório de QA do sistema de mercado
 - `docs/QA_REPORT_SPRINT_7.md`: relatório de QA do sistema de prestígio
+- `docs/QA_REPORT_SPRINT_8.md`: relatório de QA do redesenho horizontal da interface
 - `artifacts/`: screenshots e evidências geradas pelos testes
 
 ## Objetivo

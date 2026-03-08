@@ -144,6 +144,63 @@ async function setHelperNextHarvestIn(page, durationMs) {
   }, durationMs);
 }
 
+async function preparePrestigeAvailability(page, targetMoney) {
+  await page.evaluate((moneyTarget) => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    currentState.money = moneyTarget;
+    window.__strawberryFarmDebug.setState(currentState);
+  }, targetMoney);
+
+  await page.waitForFunction(
+    (moneyTarget) => {
+      const money = Number(document.querySelector("#moneyCount")?.textContent || "0");
+      const button = document.querySelector("#prestigeButton");
+      return money >= moneyTarget && button && !button.disabled;
+    },
+    targetMoney,
+    { timeout: 5000 },
+  );
+}
+
+async function preparePostPrestigeProgression(page) {
+  await page.evaluate(() => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    currentState.money = 80;
+    currentState.seeds = 3;
+    currentState.strawberries = 0;
+    currentState.hasExpandedFarm = false;
+    currentState.unlockedPlotCount = 9;
+    currentState.stats.harvestedTotal = 4;
+    currentState.stats.upgradesPurchased = 0;
+    currentState.progression.completedGoalIds = ["harvest-3"];
+    currentState.upgrades.fertilizer = false;
+    currentState.upgrades.market = false;
+    currentState.upgrades.helper = false;
+    currentState.systems.helper = {
+      nextHarvestAt: null,
+      lastHarvestAt: null,
+      lastPlotId: null,
+      lastActionAt: null,
+      lastActionText: "",
+    };
+    currentState.plots = currentState.plots.map((plot, index) => ({
+      ...plot,
+      id: index,
+      state: "empty",
+      plantedAt: null,
+      readyAt: null,
+      growthDurationMs: null,
+    }));
+    window.__strawberryFarmDebug.setState(currentState);
+  });
+
+  await page.waitForFunction(() => {
+    const money = Number(document.querySelector("#moneyCount")?.textContent || "0");
+    const completed = document.querySelector("#progressSummary")?.textContent || "";
+    return money === 80 && completed.includes("1 de 4");
+  }, { timeout: 5000 });
+}
+
 async function getComboSnapshot(page) {
   return page.evaluate(() => {
     const currentState = window.__strawberryFarmDebug.getState();
@@ -229,7 +286,7 @@ async function reachMoneyTarget(page, target) {
 
 (async () => {
   const browser = await chromium.launch({ headless: false, slowMo: 100 });
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+  const page = await browser.newPage({ viewport: { width: 1366, height: 860 } });
 
   try {
     page.on("console", (message) => {
@@ -261,16 +318,43 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#progressSummary")) === "0 de 4 metas concluídas", "Resumo inicial de metas incorreto.");
     assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O banner de evento deveria iniciar vazio.");
     assert((await textOf(page, "#marketHeadline")).includes("Preço estável"), "O banner de mercado deveria iniciar estável.");
-    assert(!(await page.locator("#helpPanel").isHidden()), "O painel de ajuda deveria iniciar visível.");
+    assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda deveria iniciar recolhido.");
+    const desktopLayoutCheck = await page.evaluate(() => {
+      const viewportHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const goal = document.querySelector("#goalStatus")?.getBoundingClientRect();
+      const buySeed = document.querySelector("#buySeedButton")?.getBoundingClientRect();
+      const farm = document.querySelector("#farmGrid")?.getBoundingClientRect();
+      const market = document.querySelector("#marketBanner")?.getBoundingClientRect();
+
+      return {
+        docHeight,
+        viewportHeight,
+        goalBottom: goal?.bottom || 0,
+        buySeedBottom: buySeed?.bottom || 0,
+        farmTop: farm?.top || 0,
+        farmBottom: farm?.bottom || 0,
+        marketBottom: market?.bottom || 0,
+      };
+    });
+    assert(
+      desktopLayoutCheck.docHeight <= desktopLayoutCheck.viewportHeight + 40,
+      "A tela desktop ainda está exigindo scroll vertical demais.",
+    );
+    assert(desktopLayoutCheck.goalBottom < desktopLayoutCheck.viewportHeight, "A meta principal saiu da área visível.");
+    assert(desktopLayoutCheck.buySeedBottom < desktopLayoutCheck.viewportHeight, "As ações principais saíram da área visível.");
+    assert(desktopLayoutCheck.farmTop < desktopLayoutCheck.viewportHeight * 0.45, "A fazenda não ficou visualmente central o bastante.");
+    assert(desktopLayoutCheck.farmBottom < desktopLayoutCheck.viewportHeight, "A fazenda inicial não coube acima da dobra.");
+    assert(desktopLayoutCheck.marketBottom < desktopLayoutCheck.viewportHeight, "A coluna de apoio ainda está longa demais no desktop.");
 
     console.log("Cenário 1.1: ajuda rápida persistente");
+    await page.click("#helpToggleButton");
+    assert(!(await page.locator("#helpPanel").isHidden()), "O botão de ajuda não abriu o painel.");
     await page.click("#helpDismissButton");
     assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda não foi ocultado.");
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     assert(await page.locator("#helpPanel").isHidden(), "O estado do painel de ajuda não persistiu após reload.");
-    await page.click("#helpToggleButton");
-    assert(!(await page.locator("#helpPanel").isHidden()), "O botão de ajuda não reabriu o painel.");
 
     console.log("Cenário 1.2: mercado dinâmico e clareza de preço");
     await setMarketState(page, { currentPrice: 4, previousPrice: 3, nextUpdateInMs: 700, forcedSteps: [1] });
@@ -488,7 +572,7 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 8: Strawberry Knowledge, reset opcional e persistência");
     await clearEvent(page);
-    await reachMoneyTarget(page, 120);
+    await preparePrestigeAvailability(page, 120);
     assert(
       (await textOf(page, "#prestigeThresholdText")).includes("Disponível agora"),
       "O painel de prestígio deveria indicar disponibilidade ao atingir o requisito.",
@@ -529,7 +613,7 @@ async function reachMoneyTarget(page, target) {
     );
 
     console.log("Cenário 9: progressão após prestígio");
-    await reachMoneyTarget(page, 35);
+    await preparePostPrestigeProgression(page);
     await page.click("#expandFarmButton");
     await page.click("#fertilizerButton");
     await page.click("#marketButton");
@@ -554,12 +638,20 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 0", "O reset total deveria limpar o prestígio.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+0%"), "O reset total deveria limpar o bônus permanente.");
 
+    console.log("Cenário 11: layout mobile razoável");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload({ waitUntil: "load" });
+    await disableRandomEvents(page);
+    assert((await page.locator(".plot").count()) === 9, "O mobile deveria continuar exibindo a fazenda.");
+    assert(await page.locator("#buySeedButton").isVisible(), "A ação de comprar semente deveria continuar visível no mobile.");
+    assert(await page.locator("#goalStatus").isVisible(), "A meta principal deveria continuar visível no mobile.");
+
     await page.screenshot({
       path: SUCCESS_SCREENSHOT_PATH,
       fullPage: true,
     });
 
-    console.log("✅ QA principal passou para economia, helper, prestígio, combo, eventos e save/load.");
+    console.log("✅ QA principal passou para layout, economia, helper, prestígio, combo, eventos e save/load.");
     console.log(`📸 Screenshot salva em ${SUCCESS_SCREENSHOT_PATH}`);
   } catch (error) {
     console.error("❌ Falha no teste:", error.message);

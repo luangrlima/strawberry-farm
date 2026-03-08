@@ -167,7 +167,7 @@ function createInitialState() {
       completedGoalIds: [],
     },
     ui: {
-      helpOpen: true,
+      helpOpen: false,
     },
     stats: {
       harvestedTotal: 0,
