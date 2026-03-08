@@ -14,6 +14,9 @@ const elements = {
   growthTimeCard: document.querySelector("#growthTimeCard"),
   plotCountValue: document.querySelector("#plotCountValue"),
   plotCountCard: document.querySelector("#plotCountCard"),
+  helperCard: document.querySelector("#helperCard"),
+  helperStatusValue: document.querySelector("#helperStatusValue"),
+  helperStatusHint: document.querySelector("#helperStatusHint"),
   goalStatus: document.querySelector("#goalStatus"),
   helpPanel: document.querySelector("#helpPanel"),
   helpToggleButton: document.querySelector("#helpToggleButton"),
@@ -24,6 +27,9 @@ const elements = {
   comboText: document.querySelector("#comboText"),
   comboTimer: document.querySelector("#comboTimer"),
   comboProgressBar: document.querySelector("#comboProgressBar"),
+  helperStrip: document.querySelector("#helperStrip"),
+  helperStripText: document.querySelector("#helperStripText"),
+  helperStripTimer: document.querySelector("#helperStripTimer"),
   milestoneToast: document.querySelector("#milestoneToast"),
   milestoneToastText: document.querySelector("#milestoneToastText"),
   saveStatus: document.querySelector("#saveStatus"),
@@ -54,9 +60,11 @@ const elements = {
   fertilizerButton: document.querySelector("#fertilizerButton"),
   marketButton: document.querySelector("#marketButton"),
   expandFarmButton: document.querySelector("#expandFarmButton"),
+  helperButton: document.querySelector("#helperButton"),
   fertilizerDescription: document.querySelector("#fertilizerDescription"),
   marketDescription: document.querySelector("#marketDescription"),
   expansionDescription: document.querySelector("#expansionDescription"),
+  helperDescription: document.querySelector("#helperDescription"),
 };
 
 const storage = createStorageAdapter();
@@ -86,6 +94,7 @@ function attachEvents() {
   elements.fertilizerButton.addEventListener("click", buyFertilizerUpgrade);
   elements.marketButton.addEventListener("click", buyMarketUpgrade);
   elements.expandFarmButton.addEventListener("click", expandFarm);
+  elements.helperButton.addEventListener("click", buyHelperUpgrade);
   elements.helpToggleButton.addEventListener("click", toggleHelpPanel);
   elements.helpDismissButton.addEventListener("click", dismissHelpPanel);
   window.addEventListener("pagehide", flushAutosave);
@@ -143,6 +152,7 @@ function createInitialState() {
     upgrades: {
       fertilizer: false,
       market: false,
+      helper: false,
     },
     progression: {
       completedGoalIds: [],
@@ -171,6 +181,7 @@ function createInitialState() {
         lastRewardedThreshold: 0,
         rewardMoney: 0,
       },
+      helper: getInitialHelperState(),
       lastSavedAt: null,
     },
     message: "Plante seus primeiros morangos.",
@@ -181,6 +192,16 @@ function createInitialState() {
       readyAt: null,
       growthDurationMs: null,
     })),
+  };
+}
+
+function getInitialHelperState() {
+  return {
+    nextHarvestAt: null,
+    lastHarvestAt: null,
+    lastPlotId: null,
+    lastActionAt: null,
+    lastActionText: "",
   };
 }
 
@@ -271,6 +292,7 @@ function hydrateState(savedState) {
   if (savedState.upgrades && typeof savedState.upgrades === "object") {
     nextState.upgrades.fertilizer = Boolean(savedState.upgrades.fertilizer);
     nextState.upgrades.market = Boolean(savedState.upgrades.market);
+    nextState.upgrades.helper = Boolean(savedState.upgrades.helper);
   }
 
   if (savedState.progression && Array.isArray(savedState.progression.completedGoalIds)) {
@@ -298,6 +320,25 @@ function hydrateState(savedState) {
       : nextState.stats.eventsTriggered;
   }
 
+  const savedHelper = savedSystems?.helper || savedState.helper;
+
+  if (savedHelper && typeof savedHelper === "object") {
+    nextState.systems.helper.nextHarvestAt = Number.isFinite(savedHelper.nextHarvestAt)
+      ? savedHelper.nextHarvestAt
+      : null;
+    nextState.systems.helper.lastHarvestAt = Number.isFinite(savedHelper.lastHarvestAt)
+      ? savedHelper.lastHarvestAt
+      : null;
+    nextState.systems.helper.lastPlotId = Number.isFinite(savedHelper.lastPlotId)
+      ? savedHelper.lastPlotId
+      : null;
+    nextState.systems.helper.lastActionAt = Number.isFinite(savedHelper.lastActionAt)
+      ? savedHelper.lastActionAt
+      : null;
+    nextState.systems.helper.lastActionText =
+      typeof savedHelper.lastActionText === "string" ? savedHelper.lastActionText : "";
+  }
+
   if (Array.isArray(savedState.plots)) {
     nextState.plots = nextState.plots.map((plot, index) => {
       const savedPlot = savedState.plots[index];
@@ -323,6 +364,7 @@ function hydrateState(savedState) {
   updateActiveEvent(nextState);
   updateMarketState(nextState);
   updateComboState(nextState);
+  updateHelperState(nextState);
   updatePlotsByTime(nextState);
   return nextState;
 }
@@ -558,6 +600,31 @@ function buyMarketUpgrade() {
   commit();
 }
 
+function buyHelperUpgrade() {
+  const upgrade = config.upgrades.helper;
+
+  if (state.upgrades.helper) {
+    setMessage("O Farm Helper já está ativo.");
+    render();
+    return;
+  }
+
+  if (state.money < upgrade.cost) {
+    setMessage("Você ainda não tem moedas suficientes para comprar o Farm Helper.");
+    render();
+    return;
+  }
+
+  state.money -= upgrade.cost;
+  state.upgrades.helper = true;
+  state.stats.upgradesPurchased += 1;
+  state.systems.helper.nextHarvestAt = Date.now() + upgrade.harvestIntervalMs;
+  state.systems.helper.lastActionAt = Date.now();
+  state.systems.helper.lastActionText = "Farm Helper ativado. Ele vai colher plantas prontas automaticamente.";
+  setMessage("Farm Helper comprado. Agora ele ajuda a colher canteiros prontos.");
+  commit();
+}
+
 function expandFarm() {
   if (state.hasExpandedFarm) {
     setMessage("Sua fazenda já está no tamanho máximo desta versão.");
@@ -649,16 +716,23 @@ function plantPlot(plot) {
 }
 
 function harvestPlot(plot) {
-  const comboSummary = applyHarvestCombo();
+  harvestPlotWithSource(plot, "manual");
+}
+
+function harvestPlotWithSource(plot, source) {
+  const isHelperHarvest = source === "helper";
+  const comboSummary = isHelperHarvest ? { count: 0, bonusMoney: 0 } : applyHarvestCombo();
   plot.state = config.plotStates.empty;
   plot.plantedAt = null;
   plot.readyAt = null;
   plot.growthDurationMs = null;
   state.strawberries += config.crop.harvestYield;
   state.stats.harvestedTotal += config.crop.harvestYield;
-  markPlotHarvested(plot.id);
+  markPlotHarvested(plot.id, source);
 
-  if (comboSummary.bonusMoney > 0) {
+  if (isHelperHarvest) {
+    noteHelperHarvest(plot.id);
+  } else if (comboSummary.bonusMoney > 0) {
     state.money += comboSummary.bonusMoney;
     setMessage(`Você colheu 1 morango. Combo x${comboSummary.count}: +${comboSummary.bonusMoney} moeda bônus.`);
   } else if (comboSummary.count >= 2) {
@@ -710,15 +784,25 @@ function getUnlockedComboThreshold(count, lastRewardedThreshold) {
   );
 }
 
-function markPlotHarvested(plotId) {
-  uiState.harvestedPlots[plotId] = Date.now() + 450;
+function noteHelperHarvest(plotId) {
+  state.systems.helper.lastHarvestAt = Date.now();
+  state.systems.helper.lastPlotId = plotId;
+  state.systems.helper.lastActionAt = Date.now();
+  state.systems.helper.lastActionText = `Farm Helper colheu o canteiro ${plotId + 1}.`;
+}
+
+function markPlotHarvested(plotId, source = "manual") {
+  uiState.harvestedPlots[plotId] = {
+    until: Date.now() + 450,
+    source,
+  };
 }
 
 function syncHarvestEffects() {
   const now = Date.now();
 
   Object.keys(uiState.harvestedPlots).forEach((plotId) => {
-    if (uiState.harvestedPlots[plotId] <= now) {
+    if (uiState.harvestedPlots[plotId].until <= now) {
       delete uiState.harvestedPlots[plotId];
     }
   });
@@ -811,6 +895,26 @@ function updateComboState(targetState = state) {
   return true;
 }
 
+function updateHelperState(targetState = state) {
+  const helper = targetState.systems.helper;
+
+  if (!helper) {
+    return false;
+  }
+
+  if (!targetState.upgrades.helper) {
+    targetState.systems.helper = getInitialHelperState();
+    return false;
+  }
+
+  if (!Number.isFinite(helper.nextHarvestAt)) {
+    helper.nextHarvestAt = Date.now() + config.upgrades.helper.harvestIntervalMs;
+    return true;
+  }
+
+  return false;
+}
+
 function resetCombo(targetState = state) {
   targetState.systems.combo = {
     count: 0,
@@ -844,6 +948,7 @@ function startTicker() {
     const marketChanged = updateMarketState();
     const comboExpired = updateComboState();
     const plotsReady = updatePlotsByTime();
+    const helperHarvested = runFarmHelper();
     syncHarvestEffects();
 
     if (eventEnded) {
@@ -857,6 +962,10 @@ function startTicker() {
       setMessage(getMarketUpdateMessage());
       dirty = true;
       render();
+      return;
+    }
+
+    if (helperHarvested) {
       return;
     }
 
@@ -899,6 +1008,7 @@ function commit() {
   updateActiveEvent();
   updateMarketState();
   updateComboState();
+  updateHelperState();
   updatePlotsByTime();
   const goalRewards = applyProgressionGoals();
 
@@ -1006,6 +1116,7 @@ function renderStaticState(farmMetrics = getFarmMetrics()) {
   renderGoalStatus();
   renderStatHighlights();
   renderPrimaryActions();
+  renderHelperCard();
   renderHelpPanel();
   renderUpgradeCards();
   renderProgression();
@@ -1014,8 +1125,10 @@ function renderStaticState(farmMetrics = getFarmMetrics()) {
 function renderLiveState(farmMetrics = getFarmMetrics()) {
   syncHarvestEffects();
   syncMilestoneToast();
+  renderHelperCard();
   renderProgressIndicators(farmMetrics);
   renderComboStrip();
+  renderHelperStrip();
   renderMilestoneToast();
   renderEventBanner();
   renderMarketBanner();
@@ -1045,6 +1158,7 @@ function renderPrimaryActions() {
     state.upgrades.fertilizer || state.money < config.upgrades.fertilizer.cost;
   elements.marketButton.disabled = state.upgrades.market || state.money < config.upgrades.market.cost;
   elements.expandFarmButton.disabled = state.hasExpandedFarm || state.money < config.expansion.cost;
+  elements.helperButton.disabled = state.upgrades.helper || state.money < config.upgrades.helper.cost;
 
   elements.fertilizerButton.textContent = state.upgrades.fertilizer
     ? "Adubo ativo"
@@ -1055,6 +1169,9 @@ function renderPrimaryActions() {
   elements.expandFarmButton.textContent = state.hasExpandedFarm
     ? "Fazenda expandida"
     : `Expandir fazenda (${config.expansion.cost})`;
+  elements.helperButton.textContent = state.upgrades.helper
+    ? "Farm Helper ativo"
+    : `Comprar helper (${config.upgrades.helper.cost})`;
 
   elements.buySeedButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.seedPriceDiscount));
   elements.sellButton.classList.toggle(
@@ -1062,6 +1179,7 @@ function renderPrimaryActions() {
     Boolean(activeEvent?.sellPriceBonus) || marketBasePrice >= config.market.maxPrice,
   );
   elements.fertilizerButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.growthMultiplier));
+  elements.helperButton.classList.toggle("action-btn--highlight", state.upgrades.helper);
 }
 
 function renderUpgradeCards() {
@@ -1074,6 +1192,9 @@ function renderUpgradeCards() {
   elements.expansionDescription.textContent = state.hasExpandedFarm
     ? "Ativo: todos os 16 canteiros estão liberados."
     : config.expansion.description;
+  elements.helperDescription.textContent = state.upgrades.helper
+    ? `Ativo: colhe 1 canteiro pronto a cada ${formatSeconds(config.upgrades.helper.harvestIntervalMs)} sem usar combo.`
+    : config.upgrades.helper.description;
 }
 
 function renderEventBanner() {
@@ -1148,7 +1269,8 @@ function renderFarmGrid(farmMetrics) {
     plotElement.progressFill.style.width = `${progress}%`;
     plotElement.progressTrack.hidden = plot.state !== config.plotStates.growing;
     plotElement.button.classList.toggle("plot--attention", plot.state === config.plotStates.ready && farmMetrics.readyPlots > 0);
-    plotElement.button.classList.toggle("plot--harvested", Boolean(uiState.harvestedPlots[plot.id]));
+    plotElement.button.classList.toggle("plot--harvested", uiState.harvestedPlots[plot.id]?.source === "manual");
+    plotElement.button.classList.toggle("plot--harvested-auto", uiState.harvestedPlots[plot.id]?.source === "helper");
   });
 }
 
@@ -1224,6 +1346,39 @@ function renderComboStrip() {
     : "Combo máximo deste sprint alcançado.";
   elements.comboTimer.textContent = `Expira em ${formatSeconds(remainingMs)}`;
   elements.comboProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+}
+
+function renderHelperCard() {
+  const isActive = state.upgrades.helper;
+  const nextHarvestAt = state.systems.helper.nextHarvestAt;
+
+  elements.helperStatusValue.textContent = isActive ? "Ativo" : "Desligado";
+  elements.helperStatusHint.textContent =
+    isActive && Number.isFinite(nextHarvestAt)
+      ? `Próxima verificação em ${formatSeconds(Math.max(0, nextHarvestAt - Date.now()))}.`
+      : "Compre para colher 1 canteiro pronto automaticamente.";
+  elements.helperCard.classList.toggle("stat--highlight", isActive);
+}
+
+function renderHelperStrip() {
+  const isActive = state.upgrades.helper;
+  elements.helperStrip.hidden = !isActive;
+
+  if (!isActive) {
+    return;
+  }
+
+  const helper = state.systems.helper;
+  const nextHarvestAt = Number.isFinite(helper.nextHarvestAt)
+    ? Math.max(0, helper.nextHarvestAt - Date.now())
+    : config.upgrades.helper.harvestIntervalMs;
+  const recentAction = Number.isFinite(helper.lastActionAt) && Date.now() - helper.lastActionAt < 2800;
+
+  elements.helperStripText.textContent =
+    recentAction && helper.lastActionText
+      ? helper.lastActionText
+      : "Ativo: colhe 1 canteiro pronto por ciclo e não gera combo.";
+  elements.helperStripTimer.textContent = `Próxima verificação em ${formatSeconds(nextHarvestAt)}`;
 }
 
 function renderEventTags(activeEvent) {
@@ -1518,6 +1673,31 @@ function getFarmMetrics() {
   };
 }
 
+function runFarmHelper() {
+  if (!state.upgrades.helper) {
+    return false;
+  }
+
+  updateHelperState();
+
+  const helper = state.systems.helper;
+
+  if (!Number.isFinite(helper.nextHarvestAt) || Date.now() < helper.nextHarvestAt) {
+    return false;
+  }
+
+  helper.nextHarvestAt = Date.now() + config.upgrades.helper.harvestIntervalMs;
+
+  const readyPlot = getVisiblePlots().find((plot) => plot.state === config.plotStates.ready);
+
+  if (!readyPlot) {
+    return false;
+  }
+
+  harvestPlotWithSource(readyPlot, "helper");
+  return true;
+}
+
 function renderStatHighlights() {
   clearStatHighlights();
 
@@ -1550,6 +1730,7 @@ function clearStatHighlights() {
     elements.sellPriceCard,
     elements.growthTimeCard,
     elements.plotCountCard,
+    elements.helperCard,
   ].forEach((element) => element.classList.remove("stat--highlight"));
 }
 

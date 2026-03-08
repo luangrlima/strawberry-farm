@@ -159,7 +159,7 @@ h1 {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   gap: 12px;
   margin-top: 24px;
 }
@@ -187,6 +187,10 @@ h1 {
   display: block;
   margin-top: 8px;
   font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.stat__value--small {
+  font-size: clamp(1.1rem, 2.4vw, 1.45rem);
 }
 
 .stat__hint {
@@ -237,6 +241,46 @@ h1 {
   border-radius: 18px;
   background: linear-gradient(135deg, rgba(255, 244, 216, 0.96), rgba(255, 211, 138, 0.48));
   border: 1px solid rgba(243, 179, 71, 0.28);
+}
+
+.helper-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(240, 246, 255, 0.96), rgba(169, 203, 244, 0.42));
+  border: 1px solid rgba(84, 123, 201, 0.24);
+}
+
+.helper-strip__eyebrow {
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  color: #35578a;
+}
+
+.helper-strip__title,
+.helper-strip__text {
+  margin: 0;
+}
+
+.helper-strip__text {
+  margin-top: 4px;
+  color: #3a5c8b;
+}
+
+.helper-strip__timer {
+  flex-shrink: 0;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(53, 87, 138, 0.1);
+  color: #35578a;
+  font-size: 0.84rem;
+  font-weight: 700;
 }
 
 .combo-strip__eyebrow {
@@ -777,9 +821,13 @@ h1 {
   animation: harvestFlash 420ms ease-out;
 }
 
+.plot--harvested-auto {
+  animation: harvestFlashAuto 560ms ease-out;
+}
+
 .upgrades {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   margin-top: 22px;
 }
@@ -833,6 +881,20 @@ h1 {
   100% {
     transform: scale(1);
     filter: brightness(1);
+  }
+}
+
+@keyframes harvestFlashAuto {
+  0% {
+    transform: scale(0.97);
+    filter: brightness(1.2) saturate(1.15);
+    box-shadow: 0 0 0 rgba(112, 162, 255, 0.1);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+    box-shadow: 0 14px 28px rgba(84, 123, 201, 0.18);
   }
 }
 
@@ -933,6 +995,11 @@ h1 {
 
   .combo-strip {
     flex-direction: column;
+  }
+
+  .helper-strip {
+    flex-direction: column;
+    align-items: start;
   }
 
   .event-banner__aside {

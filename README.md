@@ -51,6 +51,7 @@ Recursos implementados:
 - venda de todos os morangos colhidos
 - compra de sementes
 - sistema de moedas
+- helper de automação leve para colheita
 - salvamento e carregamento com `localStorage`
 - salvamento automático com status visível
 - retomada do crescimento após recarregar a página
@@ -68,6 +69,10 @@ Recursos implementados:
 - metas de progressão em tela única
 - indicadores de progresso para meta final e canteiros prontos
 - feedback visual de conclusão de meta
+- combo de colheita curto com bônus leve
+- mercado dinâmico simples
+- indicador do `Farm Helper` no HUD
+- colheita automática visual pelo `Farm Helper`
 - meta de progressão final de `35` moedas
 - mensagem de vitória na mesma tela
 
@@ -89,6 +94,9 @@ Recursos implementados:
 - Durante o evento `Chuva leve`, as plantas atuais aceleram e os novos plantios crescem mais rápido.
 - O upgrade `Adubo rápido` custa `10` moedas.
 - O upgrade `Caixa premium` custa `14` moedas.
+- O `Farm Helper` custa `18` moedas.
+- O `Farm Helper` colhe `1` canteiro pronto a cada `3.5` segundos.
+- O `Farm Helper` não planta, não vende e não ativa combo.
 - Cada canteiro pode estar em um de três estados:
   - vazio
   - crescendo
@@ -110,8 +118,10 @@ Tela única com:
 - contador de preço atual de venda
 - contador de tempo atual de crescimento
 - contador de tamanho atual da fazenda
+- contador de status do `Farm Helper`
 - mensagem de status
 - status de autosave
+- faixa de atividade do `Farm Helper`
 - toast visual para meta concluída
 - barra de progresso da meta final
 - barra de progresso de canteiros prontos
@@ -126,6 +136,7 @@ Tela única com:
 - card de upgrade `Adubo rápido`
 - card de upgrade `Caixa premium`
 - card de expansão `Fazenda 4x4`
+- card de upgrade `Farm Helper`
 - painel de metas de progressão
 - botão `Comprar semente`
 - botão `Vender morangos`
@@ -142,6 +153,7 @@ Tela única com:
 - `tests/docs/QA_REPORT.md`: primeiro relatório de QA
 - `tests/docs/QA_REPORT_V2.md`: relatório de QA após o sprint de estabilidade
 - `tests/docs/QA_REPORT_MARKET.md`: relatório de QA do sistema de mercado
+- `tests/docs/QA_REPORT_SPRINT_6.md`: relatório de QA do helper de automação
 - `tests/artifacts/`: evidências geradas pelos testes
 
 ## Checklist de implementação
@@ -166,6 +178,7 @@ Tela única com:
 - [x] Adicionar indicadores de progresso úteis
 - [x] Adicionar upgrade de crescimento
 - [x] Adicionar upgrade de venda
+- [x] Adicionar helper de colheita automática
 - [x] Adicionar expansão para 4x4
 - [x] Adicionar 3 eventos aleatórios simples
 - [x] Exibir banner visual de evento ativo
@@ -195,6 +208,8 @@ Esse teste valida:
 - consistência de save/load
 - upgrade de crescimento
 - upgrade de venda
+- helper automático e persistência do helper
+- helper sem combo automático
 - progressão final
 - reset do jogo
 

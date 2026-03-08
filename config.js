@@ -39,6 +39,12 @@ window.STRAWBERRY_CONFIG = {
       sellPriceBonus: 2,
       description: "Cada morango vendido rende +2 moedas.",
     },
+    helper: {
+      label: "Farm Helper",
+      cost: 18,
+      harvestIntervalMs: 3500,
+      description: "Colhe automaticamente 1 canteiro pronto a cada poucos segundos.",
+    },
   },
   expansion: {
     cost: 10,

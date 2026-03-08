@@ -1,19 +1,34 @@
 const path = require("path");
 const fs = require("fs");
-const { pathToFileURL } = require("url");
+const { pathToFileURL, fileURLToPath } = require("url");
 const { chromium } = require("playwright");
 
-const TARGET_URL =
-  process.env.TARGET_URL ||
-  pathToFileURL(path.resolve(__dirname, "../../index.html")).href;
+const PROJECT_ROOT = resolveProjectRoot();
+const TARGET_URL = process.env.TARGET_URL || pathToFileURL(path.resolve(PROJECT_ROOT, "index.html")).href;
 
 const STORAGE_KEY = "strawberry-farm-save";
-const ARTIFACTS_DIR = path.resolve(__dirname, "../artifacts");
+const ARTIFACTS_DIR = path.resolve(PROJECT_ROOT, "tests/artifacts");
 const RUN_ID = createRunId();
 const SUCCESS_SCREENSHOT_PATH = path.join(ARTIFACTS_DIR, `strawberry-farm-test-${RUN_ID}.png`);
 const ERROR_SCREENSHOT_PATH = path.join(ARTIFACTS_DIR, `strawberry-farm-test-error-${RUN_ID}.png`);
 
 fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
+
+function resolveProjectRoot() {
+  if (process.env.PROJECT_ROOT) {
+    return path.resolve(process.env.PROJECT_ROOT);
+  }
+
+  if (process.env.TARGET_URL && process.env.TARGET_URL.startsWith("file:")) {
+    try {
+      return path.dirname(fileURLToPath(process.env.TARGET_URL));
+    } catch {
+      return path.resolve(__dirname, "../..");
+    }
+  }
+
+  return path.resolve(__dirname, "../..");
+}
 
 function createRunId() {
   const now = new Date();
@@ -100,6 +115,40 @@ async function extendComboWindow(page, durationMs) {
       window.__strawberryFarmDebug.setState(currentState);
     }
   }, durationMs);
+}
+
+async function resetComboState(page) {
+  await page.evaluate(() => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    currentState.systems.combo = {
+      count: 0,
+      lastHarvestAt: null,
+      expiresAt: null,
+      lastRewardedThreshold: 0,
+      rewardMoney: 0,
+    };
+    window.__strawberryFarmDebug.setState(currentState);
+  });
+
+  await page.waitForFunction(() => {
+    const comboStrip = document.querySelector("#comboStrip");
+    return !comboStrip || comboStrip.hidden;
+  });
+}
+
+async function setHelperNextHarvestIn(page, durationMs) {
+  await page.evaluate((duration) => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    currentState.systems.helper.nextHarvestAt = Date.now() + duration;
+    window.__strawberryFarmDebug.setState(currentState);
+  }, durationMs);
+}
+
+async function getComboSnapshot(page) {
+  return page.evaluate(() => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    return currentState.systems.combo;
+  });
 }
 
 async function buySeedsUntilFull(page) {
@@ -206,6 +255,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#plotCountValue")) === "9/16", "HUD inicial da fazenda incorreto.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "Preço de venda inicial incorreto.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "Tempo de crescimento inicial incorreto.");
+    assert((await textOf(page, "#helperStatusValue")) === "Desligado", "O helper deveria iniciar desligado.");
     assert((await textOf(page, "#progressSummary")) === "0 de 4 metas concluídas", "Resumo inicial de metas incorreto.");
     assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O banner de evento deveria iniciar vazio.");
     assert((await textOf(page, "#marketHeadline")).includes("Preço estável"), "O banner de mercado deveria iniciar estável.");
@@ -380,7 +430,61 @@ async function reachMoneyTarget(page, target) {
     await clearEvent(page);
     assert((await textOf(page, "#eventTitle")) === "Nenhum evento ativo", "O evento não foi limpo corretamente no modo de teste.");
 
-    console.log("Cenário 7: progressão final e consistência geral");
+    console.log("Cenário 7: Farm Helper, eventos e persistência");
+    await reachMoneyTarget(page, 18);
+    await page.click("#helperButton");
+    await page.waitForFunction(() => {
+      const button = document.querySelector("#helperButton");
+      const status = document.querySelector("#helperStatusValue");
+      return button && button.textContent.includes("Farm Helper ativo") && status && status.textContent === "Ativo";
+    });
+    assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper deveria aparecer quando ativo.");
+    await resetComboState(page);
+    const comboBeforeHelper = await getComboSnapshot(page);
+    assert(comboBeforeHelper.count === 0, "O combo deveria estar zerado antes do helper colher.");
+
+    await forceEvent(page, "drizzle", 9000);
+    await waitForText(page, "#eventTitle", "Chuva leve");
+    await ensureAtLeastOneSeed(page);
+    await plantAllAvailableSeeds(page);
+    await waitForAnyReadyPlot(page, 12000);
+    const berriesBeforeHelperHarvest = await numberOf(page, "#berryCount");
+    await setHelperNextHarvestIn(page, 200);
+    await page.waitForFunction(
+      (currentBerries) => Number(document.querySelector("#berryCount")?.textContent || "0") === currentBerries + 1,
+      berriesBeforeHelperHarvest,
+      { timeout: 5000 },
+    );
+    assert(
+      (await textOf(page, "#helperStripText")).includes("colheu o canteiro"),
+      "A UI do helper deveria notificar a colheita automática.",
+    );
+    const comboAfterHelper = await getComboSnapshot(page);
+    assert(comboAfterHelper.count === 0, "O helper não deveria ativar combo automático.");
+
+    await page.reload({ waitUntil: "load" });
+    await disableRandomEvents(page);
+    assert((await textOf(page, "#helperStatusValue")) === "Ativo", "O estado do helper não persistiu após reload.");
+    assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper não persistiu após reload.");
+
+    await resetComboState(page);
+    await clearEvent(page);
+    await ensureAtLeastOneSeed(page);
+    await plantAllAvailableSeeds(page);
+    await waitForAnyReadyPlot(page, 12000);
+    const berriesBeforeHelperReloadHarvest = await numberOf(page, "#berryCount");
+    await setHelperNextHarvestIn(page, 200);
+    await page.reload({ waitUntil: "load" });
+    await disableRandomEvents(page);
+    await page.waitForFunction(
+      (currentBerries) => Number(document.querySelector("#berryCount")?.textContent || "0") >= currentBerries + 1,
+      berriesBeforeHelperReloadHarvest,
+      { timeout: 5000 },
+    );
+    const comboAfterHelperReload = await getComboSnapshot(page);
+    assert(comboAfterHelperReload.count === 0, "O helper não deveria recriar combo após reload.");
+
+    console.log("Cenário 8: progressão final e consistência geral");
     await reachMoneyTarget(page, 35);
     assert(
       (await textOf(page, "#goalStatus")) === "Você construiu uma pequena fazenda de morangos!",
@@ -388,7 +492,7 @@ async function reachMoneyTarget(page, target) {
     );
     assert((await textOf(page, "#progressSummary")) === "4 de 4 metas concluídas", "As metas finais não foram concluídas.");
 
-    console.log("Cenário 8: reset e restauração completa");
+    console.log("Cenário 9: reset e restauração completa");
     page.once("dialog", (dialog) => {
       dialog.accept().catch(() => {});
     });
@@ -406,7 +510,7 @@ async function reachMoneyTarget(page, target) {
       fullPage: true,
     });
 
-    console.log("✅ QA principal passou para economia, combo, eventos e save/load.");
+    console.log("✅ QA principal passou para economia, helper, combo, eventos e save/load.");
     console.log(`📸 Screenshot salva em ${SUCCESS_SCREENSHOT_PATH}`);
   } catch (error) {
     console.error("❌ Falha no teste:", error.message);
