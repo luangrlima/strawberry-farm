@@ -184,7 +184,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#plotCountValue")) === "9/16", "O save/load corrompeu o tamanho base da fazenda.");
 
     console.log("Cenário 3: expansão da fazenda para 4x4");
-    await reachMoneyTarget(page, 12);
+    await reachMoneyTarget(page, 10);
     await page.click("#expandFarmButton");
     await page.waitForFunction(() => {
       const expansionButton = document.querySelector("#expandFarmButton");
@@ -208,6 +208,10 @@ async function reachMoneyTarget(page, target) {
     await forceEvent(page, "market-day", 5000);
     await waitForText(page, "#eventTitle", "Feira local");
     assert((await textOf(page, "#buySeedButton")) === "Comprar semente (1)", "A Feira local não reduziu o preço da semente.");
+    assert(
+      (await textOf(page, "#eventEffect")).includes("sementes por 1 moeda"),
+      "O efeito textual da Feira local não ficou claro.",
+    );
     const moneyBeforeDiscountSeed = await numberOf(page, "#moneyCount");
     await page.click("#buySeedButton");
     assert(
@@ -225,7 +229,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#buySeedButton")) === "Comprar semente (2)", "O preço da semente não voltou ao normal após o evento.");
 
     console.log("Cenário 5: upgrade de crescimento e timing da chuva");
-    await reachMoneyTarget(page, 12);
+    await reachMoneyTarget(page, 10);
     await page.click("#fertilizerButton");
     await page.waitForFunction(() => {
       const button = document.querySelector("#fertilizerButton");
@@ -235,6 +239,10 @@ async function reachMoneyTarget(page, target) {
     await forceEvent(page, "drizzle", 4000);
     await waitForText(page, "#eventTitle", "Chuva leve");
     assert((await textOf(page, "#growthTimeValue")) === "6s", "A Chuva leve não acelerou o tempo junto com o adubo.");
+    assert(
+      (await textOf(page, "#eventEffect")).includes("6s"),
+      "O efeito textual da Chuva leve não refletiu o novo tempo.",
+    );
     await ensureAtLeastOneSeed(page);
     await page.locator(".plot").nth(0).click();
     await page.waitForFunction(() => {
@@ -252,7 +260,7 @@ async function reachMoneyTarget(page, target) {
     }, { timeout: 9000 });
 
     console.log("Cenário 6: upgrade de venda e economia do evento Sol forte");
-    await reachMoneyTarget(page, 15);
+    await reachMoneyTarget(page, 14);
     await page.click("#marketButton");
     await page.waitForFunction(() => {
       const button = document.querySelector("#marketButton");
@@ -267,6 +275,10 @@ async function reachMoneyTarget(page, target) {
     await forceEvent(page, "sunshine", 5000);
     await waitForText(page, "#eventTitle", "Sol forte");
     assert((await textOf(page, "#sellPriceValue")) === "6 moedas", "O Sol forte não aumentou o preço de venda.");
+    assert(
+      (await textOf(page, "#eventEffect")).includes("+1 moeda"),
+      "O efeito textual do Sol forte não ficou claro.",
+    );
     const moneyBeforeSunnySale = await numberOf(page, "#moneyCount");
     await page.click("#sellButton");
     assert(

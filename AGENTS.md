@@ -36,15 +36,19 @@ Entregar um MVP+ com:
 - HUD mais claro
 - sistema de save mais forte
 - metas de marco
+- onboarding curto
+- feedback de progresso e conclusão mais claro
 
 ## Estado atual do jogo
 - loop principal com morango como única cultura
 - a fazenda começa em `3x3` e pode expandir para `4x4`
 - 2 upgrades simples
 - 3 eventos aleatórios simples
-- HUD em tela única com progressão e feedback de evento
+- painel de ajuda rápida com persistência
+- HUD em tela única com progressão, feedback de evento e indicadores visuais
 - autosave e load com `localStorage`
 - metas de marco e meta final de moedas
+- feedback visual de meta concluída
 
 ## Fora de escopo
 - multiplayer

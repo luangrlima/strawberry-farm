@@ -31,6 +31,8 @@ Entregar um MVP+ com:
 - HUD mais claro
 - save/load mais forte
 - metas de marco
+- onboarding curto
+- feedback de progresso mais claro
 
 ## Estado atual
 O jogo já está funcional nos arquivos:
@@ -42,6 +44,7 @@ O jogo já está funcional nos arquivos:
 Recursos implementados:
 - fazenda expansível de `3x3` para `4x4`
 - morango como única cultura
+- painel de onboarding e ajuda rápida
 - plantio ao clicar em terreno vazio
 - temporizador simples de crescimento
 - colheita ao clicar em planta pronta
@@ -59,8 +62,12 @@ Recursos implementados:
 - expansão de fazenda para liberar `16` canteiros
 - 3 eventos aleatórios simples
 - banner visual para evento ativo com temporizador
+- barra de progresso do evento ativo
+- texto de efeito prático do evento ativo
 - interface em português
 - metas de progressão em tela única
+- indicadores de progresso para meta final e canteiros prontos
+- feedback visual de conclusão de meta
 - meta de progressão final de `35` moedas
 - mensagem de vitória na mesma tela
 
@@ -69,7 +76,7 @@ Recursos implementados:
 - O jogador começa com `3` sementes.
 - O jogador começa com `0` morangos.
 - A fazenda começa com `9` canteiros.
-- A expansão custa `12` moedas e libera `16` canteiros.
+- A expansão custa `10` moedas e libera `16` canteiros.
 - Cada semente custa `2` moedas.
 - Durante o evento `Feira local`, cada semente custa `1` moeda.
 - Cada morango vendido vale `3` moedas.
@@ -80,11 +87,13 @@ Recursos implementados:
 - O tempo de crescimento é de `10` segundos.
 - Com upgrade de adubo, novos plantios levam `8` segundos.
 - Durante o evento `Chuva leve`, as plantas atuais aceleram e os novos plantios crescem mais rápido.
+- O upgrade `Adubo rápido` custa `10` moedas.
+- O upgrade `Caixa premium` custa `14` moedas.
 - Cada canteiro pode estar em um de três estados:
   - vazio
   - crescendo
   - pronto para colher
-- Os eventos são curtos e podem surgir ao vender morangos.
+- Os eventos duram cerca de `12` segundos e podem surgir ao vender morangos.
 - As metas atuais são:
   - colher `4` morangos
   - expandir a fazenda para `4x4`
@@ -94,6 +103,7 @@ Recursos implementados:
 ## Interface atual
 Tela única com:
 - título do jogo
+- botão e painel de ajuda rápida
 - contador de moedas
 - contador de sementes
 - contador de morangos
@@ -102,10 +112,16 @@ Tela única com:
 - contador de tamanho atual da fazenda
 - mensagem de status
 - status de autosave
+- toast visual para meta concluída
+- barra de progresso da meta final
+- barra de progresso de canteiros prontos
 - legenda visual dos estados dos canteiros
 - banner de evento ativo com temporizador
+- texto de efeito prático do evento ativo
+- barra de duração do evento
 - grade da fazenda que começa em `3x3` e pode virar `4x4`
 - barra de progresso durante o crescimento
+- badge visual de ação em cada canteiro
 - destaque visual quando o morango está pronto
 - card de upgrade `Adubo rápido`
 - card de upgrade `Caixa premium`
@@ -139,12 +155,16 @@ Tela única com:
 - [x] Carregar estado salvo ao abrir
 - [x] Continuar crescimento após recarga usando timestamps
 - [x] Exibir status de autosave
+- [x] Adicionar painel curto de onboarding
 - [x] Melhorar feedback visual dos canteiros
+- [x] Adicionar indicadores de progresso úteis
 - [x] Adicionar upgrade de crescimento
 - [x] Adicionar upgrade de venda
 - [x] Adicionar expansão para 4x4
 - [x] Adicionar 3 eventos aleatórios simples
 - [x] Exibir banner visual de evento ativo
+- [x] Exibir feedback visual de conclusão de meta
+- [x] Melhorar responsividade visual do ticker
 - [x] Persistir expansão, eventos e progresso no save
 - [x] Exibir mensagem de vitória ao chegar em `35` moedas
 - [x] Manter constantes separadas em `config.js`
@@ -157,6 +177,7 @@ O projeto possui um teste principal de interface e fluxo em:
 
 Esse teste valida:
 - renderização inicial
+- onboarding e ajuda persistente
 - economia base
 - expansão da fazenda
 - eventos e timing

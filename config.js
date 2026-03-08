@@ -15,25 +15,25 @@ window.STRAWBERRY_CONFIG = {
   upgrades: {
     fertilizer: {
       label: "Adubo rápido",
-      cost: 12,
+      cost: 10,
       growthMultiplier: 0.75,
       description: "Reduz o tempo de crescimento em 25%.",
     },
     market: {
       label: "Caixa premium",
-      cost: 15,
+      cost: 14,
       sellPriceBonus: 2,
       description: "Cada morango vendido rende +2 moedas.",
     },
   },
   expansion: {
-    cost: 12,
+    cost: 10,
     label: "Expandir fazenda",
     description: "Libera mais 7 canteiros e transforma a fazenda em 4x4.",
   },
   events: {
-    durationMs: 16000,
-    triggerChanceOnSell: 0.45,
+    durationMs: 12000,
+    triggerChanceOnSell: 0.35,
     definitions: [
       {
         id: "sunshine",
@@ -70,7 +70,7 @@ window.STRAWBERRY_CONFIG = {
       targetType: "harvestedTotal",
       targetValue: 4,
       reward: {
-        money: 3,
+        money: 4,
       },
     },
     {
@@ -80,7 +80,7 @@ window.STRAWBERRY_CONFIG = {
       targetType: "expandedFarm",
       targetValue: 1,
       reward: {
-        seeds: 3,
+        seeds: 4,
       },
     },
     {
@@ -90,7 +90,7 @@ window.STRAWBERRY_CONFIG = {
       targetType: "upgradesPurchased",
       targetValue: 2,
       reward: {
-        money: 4,
+        money: 5,
       },
     },
     {

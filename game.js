@@ -4,9 +4,15 @@ const elements = {
   moneyCount: document.querySelector("#moneyCount"),
   seedCount: document.querySelector("#seedCount"),
   berryCount: document.querySelector("#berryCount"),
+  moneyCard: document.querySelector("#moneyCard"),
+  seedCard: document.querySelector("#seedCard"),
+  berryCard: document.querySelector("#berryCard"),
   sellPriceValue: document.querySelector("#sellPriceValue"),
+  sellPriceCard: document.querySelector("#sellPriceCard"),
   growthTimeValue: document.querySelector("#growthTimeValue"),
+  growthTimeCard: document.querySelector("#growthTimeCard"),
   plotCountValue: document.querySelector("#plotCountValue"),
+  plotCountCard: document.querySelector("#plotCountCard"),
   goalStatus: document.querySelector("#goalStatus"),
   helpPanel: document.querySelector("#helpPanel"),
   helpToggleButton: document.querySelector("#helpToggleButton"),
@@ -22,6 +28,7 @@ const elements = {
   eventBanner: document.querySelector("#eventBanner"),
   eventTitle: document.querySelector("#eventTitle"),
   eventDescription: document.querySelector("#eventDescription"),
+  eventEffect: document.querySelector("#eventEffect"),
   eventTimer: document.querySelector("#eventTimer"),
   eventProgressBar: document.querySelector("#eventProgressBar"),
   progressSummary: document.querySelector("#progressSummary"),
@@ -50,11 +57,11 @@ let state = loadState();
 let autosaveIntervalId = null;
 let dirty = false;
 
+attachEvents();
+attachDebugHelpers();
 render();
 startTicker();
 startAutosave();
-attachEvents();
-attachDebugHelpers();
 
 function attachEvents() {
   elements.buySeedButton.addEventListener("click", buySeed);
@@ -243,6 +250,7 @@ function saveState() {
   state.lastSavedAt = Date.now();
   storage.setItem(config.storageKey, JSON.stringify(state));
   dirty = false;
+  renderSaveStatus();
 }
 
 function createStorageAdapter() {
@@ -277,6 +285,10 @@ function createStorageAdapter() {
 
 function getEventDefinition(eventId) {
   return config.events.definitions.find((event) => event.id === eventId) || null;
+}
+
+function getVisiblePlots(targetState = state) {
+  return targetState.plots.slice(0, targetState.unlockedPlotCount);
 }
 
 function getActiveEventDefinition(targetState = state) {
@@ -539,13 +551,18 @@ function activateEvent(eventId, durationMs, isForced = false) {
 function accelerateGrowingPlots(remainingMultiplier) {
   const now = Date.now();
 
-  state.plots.slice(0, state.unlockedPlotCount).forEach((plot) => {
+  getVisiblePlots().forEach((plot) => {
     if (plot.state !== config.plotStates.growing || !Number.isFinite(plot.readyAt)) {
       return;
     }
 
     const remaining = Math.max(0, plot.readyAt - now);
-    plot.readyAt = now + Math.max(1000, Math.floor(remaining * remainingMultiplier));
+    const nextRemaining = Math.max(1000, Math.floor(remaining * remainingMultiplier));
+    plot.readyAt = now + nextRemaining;
+
+    if (Number.isFinite(plot.plantedAt)) {
+      plot.growthDurationMs = Math.max(1000, now - plot.plantedAt + nextRemaining);
+    }
   });
 }
 
@@ -570,7 +587,7 @@ function updatePlotsByTime(targetState = state) {
   const now = Date.now();
   let changed = false;
 
-  targetState.plots.slice(0, targetState.unlockedPlotCount).forEach((plot) => {
+  getVisiblePlots(targetState).forEach((plot) => {
     if (plot.state === config.plotStates.growing && Number.isFinite(plot.readyAt) && now >= plot.readyAt) {
       plot.state = config.plotStates.ready;
       plot.plantedAt = null;
@@ -591,12 +608,18 @@ function startTicker() {
     if (eventEnded) {
       setMessage("O evento terminou.");
       dirty = true;
-    } else if (plotsReady) {
-      setMessage("Um morango está pronto para colher.");
-      dirty = true;
+      render();
+      return;
     }
 
-    render();
+    if (plotsReady) {
+      setMessage("Um morango está pronto para colher.");
+      dirty = true;
+      render();
+      return;
+    }
+
+    renderLiveState();
   }, 250);
 }
 
@@ -708,7 +731,11 @@ function render() {
   syncMilestoneToast();
 
   const farmMetrics = getFarmMetrics();
+  renderStaticState(farmMetrics);
+  renderLiveState(farmMetrics);
+}
 
+function renderStaticState(farmMetrics = getFarmMetrics()) {
   document.title = config.title;
   elements.moneyCount.textContent = String(state.money);
   elements.seedCount.textContent = String(state.seeds);
@@ -717,22 +744,33 @@ function render() {
   elements.growthTimeValue.textContent = formatSeconds(getGrowthTimeMs());
   elements.plotCountValue.textContent = `${state.unlockedPlotCount}/${config.maxPlotCount}`;
   elements.statusMessage.textContent = state.message;
-  elements.saveStatus.textContent = getSaveStatusText();
+  renderSaveStatus();
+  renderGoalStatus();
+  renderStatHighlights();
+  renderPrimaryActions();
+  renderHelpPanel();
+  renderUpgradeCards();
+  renderProgression();
+}
 
+function renderLiveState(farmMetrics = getFarmMetrics()) {
+  syncMilestoneToast();
+  renderProgressIndicators(farmMetrics);
+  renderMilestoneToast();
+  renderEventBanner();
+  renderFarmGrid(farmMetrics);
+}
+
+function renderGoalStatus() {
   const hasWon = state.progression.completedGoalIds.includes("reach-35");
   elements.goalStatus.textContent = hasWon
     ? "Você construiu uma pequena fazenda de morangos!"
     : `Meta: alcançar ${config.winMoney} moedas`;
   elements.goalStatus.classList.toggle("goal--won", hasWon);
+}
 
-  renderPrimaryActions();
-  renderHelpPanel();
-  renderProgressIndicators(farmMetrics);
-  renderMilestoneToast();
-  renderUpgradeCards();
-  renderEventBanner();
-  renderFarmGrid(farmMetrics);
-  renderProgression();
+function renderSaveStatus() {
+  elements.saveStatus.textContent = getSaveStatusText();
 }
 
 function renderPrimaryActions() {
@@ -776,6 +814,7 @@ function renderEventBanner() {
     elements.eventTitle.textContent = "Nenhum evento ativo";
     elements.eventDescription.textContent =
       "Venda morangos para ter chance de ativar um evento curto.";
+    elements.eventEffect.textContent = "Sem bônus ativo no momento.";
     elements.eventTimer.textContent = "Aguardando";
     elements.eventProgressBar.style.width = "0%";
     return;
@@ -787,6 +826,7 @@ function renderEventBanner() {
   elements.eventBanner.className = `event-banner ${activeEvent.accentClass}`;
   elements.eventTitle.textContent = activeEvent.title;
   elements.eventDescription.textContent = activeEvent.description;
+  elements.eventEffect.textContent = getEventEffectText(activeEvent);
   elements.eventTimer.textContent = `Termina em ${formatSeconds(remainingMs)}`;
   elements.eventProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
 }
@@ -1096,7 +1136,7 @@ function getSaveStatusText() {
 }
 
 function getFarmMetrics() {
-  const visiblePlots = state.plots.slice(0, state.unlockedPlotCount);
+  const visiblePlots = getVisiblePlots();
   const readyPlots = visiblePlots.filter((plot) => plot.state === config.plotStates.ready).length;
   const growingPlots = visiblePlots.filter((plot) => plot.state === config.plotStates.growing).length;
 
@@ -1105,6 +1145,57 @@ function getFarmMetrics() {
     readyPlots,
     growingPlots,
   };
+}
+
+function renderStatHighlights() {
+  clearStatHighlights();
+
+  const activeEvent = getActiveEventDefinition();
+
+  if (!activeEvent) {
+    return;
+  }
+
+  if (activeEvent.sellPriceBonus) {
+    elements.sellPriceCard.classList.add("stat--highlight");
+    elements.moneyCard.classList.add("stat--highlight");
+  }
+
+  if (activeEvent.seedPriceDiscount) {
+    elements.seedCard.classList.add("stat--highlight");
+  }
+
+  if (activeEvent.growthMultiplier) {
+    elements.growthTimeCard.classList.add("stat--highlight");
+    elements.plotCountCard.classList.add("stat--highlight");
+  }
+}
+
+function clearStatHighlights() {
+  [
+    elements.moneyCard,
+    elements.seedCard,
+    elements.berryCard,
+    elements.sellPriceCard,
+    elements.growthTimeCard,
+    elements.plotCountCard,
+  ].forEach((element) => element.classList.remove("stat--highlight"));
+}
+
+function getEventEffectText(activeEvent) {
+  if (activeEvent.sellPriceBonus) {
+    return `Efeito: +${activeEvent.sellPriceBonus} moeda por morango vendido.`;
+  }
+
+  if (activeEvent.seedPriceDiscount) {
+    return `Efeito: sementes por ${getSeedPrice()} moeda.`;
+  }
+
+  if (activeEvent.growthMultiplier) {
+    return `Efeito: crescimento atual em ${formatSeconds(getGrowthTimeMs())}.`;
+  }
+
+  return "Sem bônus ativo no momento.";
 }
 
 function getEventDurationMs(eventDefinition) {
