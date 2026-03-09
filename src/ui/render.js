@@ -54,7 +54,7 @@
     const hasWon = game.state.progression.completedGoalIds.includes("reach-35");
     game.elements.goalStatus.textContent = hasWon
       ? "Meta concluída"
-      : `Meta ${SF.config.winMoney} moedas`;
+      : `Meta ${SF.config.winMoney}`;
     game.elements.goalStatus.classList.toggle("goal--won", hasWon);
   }
 
@@ -71,7 +71,7 @@
     elements.buySeedButton.disabled = state.money < seedPrice;
     elements.buySeedButton.textContent = `Semente (${seedPrice})`;
     elements.sellButton.disabled = state.strawberries <= 0;
-    elements.sellButton.textContent = "Vender";
+    elements.sellButton.textContent = "Vender lote";
     elements.fertilizerButton.disabled = state.upgrades.fertilizer || state.money < SF.config.upgrades.fertilizer.cost;
     elements.marketButton.disabled = state.upgrades.market || state.money < SF.config.upgrades.market.cost;
     elements.expandFarmButton.disabled = state.hasExpandedFarm || state.money < SF.config.expansion.cost;
@@ -83,21 +83,21 @@
 
     elements.fertilizerButton.textContent = state.upgrades.fertilizer
       ? "Adubo ativo"
-      : `Adubo (${SF.config.upgrades.fertilizer.cost})`;
+      : `Comprar · ${SF.config.upgrades.fertilizer.cost}`;
     elements.marketButton.textContent = state.upgrades.market
       ? "Venda melhor"
-      : `Venda + (${SF.config.upgrades.market.cost})`;
+      : `Comprar · ${SF.config.upgrades.market.cost}`;
     elements.expandFarmButton.textContent = state.hasExpandedFarm
       ? "4x4 ativa"
-      : `Expandir (${SF.config.expansion.cost})`;
+      : `Comprar · ${SF.config.expansion.cost}`;
     elements.helperButton.textContent = state.upgrades.helper
       ? "Helper ativo"
-      : `Helper (${SF.config.upgrades.helper.cost})`;
+      : `Comprar · ${SF.config.upgrades.helper.cost}`;
     elements.helperPlantingButton.textContent = state.upgrades.helperPlanting
-      ? "Plantio assistido ativo"
+      ? "Suporte ativo"
       : state.upgrades.helper
-        ? `Plantio assistido (${SF.config.upgrades.helperPlanting.cost})`
-        : `Exige Helper (${SF.config.upgrades.helperPlanting.cost})`;
+        ? `Comprar · ${SF.config.upgrades.helperPlanting.cost}`
+        : `Exige helper · ${SF.config.upgrades.helperPlanting.cost}`;
 
     elements.buySeedButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.seedPriceDiscount));
     elements.sellButton.classList.toggle(
@@ -112,21 +112,21 @@
   function renderUpgradeCards(game) {
     const activeEvent = SF.events.getActiveEventDefinition(game);
     game.elements.fertilizerDescription.textContent = game.state.upgrades.fertilizer
-      ? `Ativo: ${SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game))}.`
+      ? `Cresce em ${SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game))}.`
       : SF.config.upgrades.fertilizer.description;
     game.elements.marketDescription.textContent = game.state.upgrades.market
-      ? `Ativo: ${SF.market.getSellPrice(game)} moedas${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " com evento." : "."}`
+      ? `${SF.market.getSellPrice(game)} moedas${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " com evento." : "."}`
       : SF.config.upgrades.market.description;
     game.elements.expansionDescription.textContent = game.state.hasExpandedFarm
-      ? "Ativo: 16 canteiros."
+      ? "16 lotes liberados."
       : SF.config.expansion.description;
     game.elements.helperDescription.textContent = game.state.upgrades.helper
       ? game.state.upgrades.helperPlanting
-        ? `Ativo: colhe 1 pronto e planta 1 vazio sem colheita a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
-        : `Ativo: colhe 1 pronto a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
+        ? `Colhe 1 pronto e planta se sobrar ciclo a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
+        : `Colhe 1 pronto a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
       : SF.config.upgrades.helper.description;
     game.elements.helperPlantingDescription.textContent = game.state.upgrades.helperPlanting
-      ? "Ativo: usa 1 semente do estoque quando sobra um ciclo sem colheita."
+      ? "Ativo: usa 1 semente quando sobra um ciclo sem colheita."
       : SF.config.upgrades.helperPlanting.description;
   }
 
@@ -136,8 +136,8 @@
     if (!activeEvent || !game.state.systems.activeEvent) {
       game.elements.eventBanner.className = "event-banner event-banner--idle";
       game.elements.eventTitle.textContent = "Sem evento";
-      game.elements.eventDescription.textContent = "Pode surgir ao vender.";
-      game.elements.eventEffect.textContent = "Sem bônus.";
+      game.elements.eventDescription.textContent = "Pode surgir nas vendas.";
+      game.elements.eventEffect.textContent = "Sem bonus.";
       game.elements.eventTags.hidden = true;
       game.elements.eventTags.innerHTML = "";
       game.elements.eventTimer.textContent = "Em espera";
@@ -170,7 +170,7 @@
     game.elements.marketEffect.textContent = activeEvent?.sellPriceBonus
       ? `Base ${marketBasePrice}. Venda ${finalSellPrice}${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : "."}`
       : game.state.prestige.level > 0
-        ? `Base ${marketBasePrice}. Conhecimento +${SF.prestige.getPrestigeBonusPercent(game)}%.`
+        ? `Base ${marketBasePrice}. Knowledge +${SF.prestige.getPrestigeBonusPercent(game)}%.`
         : `Base ${marketBasePrice}.`;
     game.elements.marketPriceValue.textContent = `${marketBasePrice} moedas`;
     game.elements.marketChangeIndicator.textContent = SF.market.getMarketChangeText(game);
@@ -227,15 +227,15 @@
     game.elements.prestigePanel.classList.toggle("prestige-panel--available", isAvailable);
     game.elements.prestigePanelTitle.textContent = "Strawberry Knowledge";
     game.elements.prestigePanelDescription.textContent = isAvailable
-      ? `Disponível: nível ${game.state.prestige.level + 1} com +${nextBonusPercent}% venda.`
+      ? `Disponível: nivel ${game.state.prestige.level + 1} com +${nextBonusPercent}% venda.`
       : SF.config.prestige.description;
     game.elements.prestigeThresholdText.textContent = isAvailable
       ? `Disponível com ${game.state.money} moedas.`
-      : `Próximo em ${currentThreshold} moedas.`;
+      : `Proximo em ${currentThreshold} moedas.`;
     game.elements.prestigeButton.disabled = !isAvailable;
     game.elements.prestigeButton.textContent = isAvailable
       ? `Prestigiar (+${nextBonusPercent}%)`
-      : `Bloqueado (${currentThreshold})`;
+      : `Bloqueado · ${currentThreshold}`;
   }
 
   function renderHelperStrip(game) {
@@ -259,7 +259,7 @@
       recentAction && helper.lastActionText
         ? helper.lastActionText
         : game.state.upgrades.helperPlanting
-          ? "Colhe 1 pronto. Sem colheita no ciclo, planta 1 vazio."
+          ? "Colhe 1 pronto. Sem colheita, planta 1 vazio."
           : "Colhe 1 pronto por ciclo.";
     game.elements.helperStripTimer.textContent = `${SF.utils.formatSeconds(nextHarvestAt)}`;
   }
@@ -297,7 +297,7 @@
 
       const meta = document.createElement("div");
       meta.className = "goal-item__meta";
-      meta.textContent = isDone ? "Concluída" : getGoalProgressText(game, goal);
+      meta.textContent = isDone ? "Concluida" : getGoalProgressText(game, goal);
 
       const progressBar = document.createElement("div");
       progressBar.className = "goal-item__bar";
@@ -314,7 +314,7 @@
 
   function renderHelpPanel(game) {
     game.elements.helpPanel.hidden = !game.state.ui.helpOpen;
-    game.elements.helpToggleButton.textContent = game.state.ui.helpOpen ? "Fechar ajuda" : "Ajuda";
+    game.elements.helpToggleButton.textContent = game.state.ui.helpOpen ? "Fechar guia" : "Guia";
     game.elements.helpToggleButton.setAttribute("aria-expanded", String(game.state.ui.helpOpen));
   }
 
@@ -323,7 +323,7 @@
     const readyProgressPercent =
       farmMetrics.unlockedPlots > 0 ? (farmMetrics.readyPlots / farmMetrics.unlockedPlots) * 100 : 0;
 
-    game.elements.moneyGoalProgressLabel.textContent = `${game.state.money} / ${SF.config.winMoney} moedas`;
+    game.elements.moneyGoalProgressLabel.textContent = `${game.state.money} / ${SF.config.winMoney}`;
     game.elements.moneyGoalProgressBar.style.width = `${Math.max(0, Math.min(100, moneyProgressPercent))}%`;
     game.elements.readyPlotProgressLabel.textContent = `${farmMetrics.readyPlots} / ${farmMetrics.unlockedPlots}`;
     game.elements.readyPlotProgressBar.style.width = `${Math.max(0, Math.min(100, readyProgressPercent))}%`;
@@ -361,13 +361,13 @@
       return `${currentValue}/${goal.targetValue} moedas`;
     }
     if (goal.targetType === "harvestedTotal") {
-      return `${currentValue}/${goal.targetValue} morangos colhidos`;
+      return `${currentValue}/${goal.targetValue} colhidos`;
     }
     if (goal.targetType === "upgradesPurchased") {
-      return `${currentValue}/${goal.targetValue} melhorias`;
+      return `${currentValue}/${goal.targetValue} upgrades`;
     }
     if (goal.targetType === "expandedFarm") {
-      return game.state.hasExpandedFarm ? "4x4 liberado" : "Expansão pendente";
+      return game.state.hasExpandedFarm ? "4x4 liberado" : "4x4 pendente";
     }
 
     return `${currentValue}/${goal.targetValue}`;
@@ -403,7 +403,7 @@
       return "Save indisponível";
     }
     if (game.dirty) {
-      return "Salvando...";
+      return "Salvando";
     }
     if (Number.isFinite(game.state.systems.lastSavedAt)) {
       return `Salvo ${SF.utils.formatClock(game.state.systems.lastSavedAt)}`;

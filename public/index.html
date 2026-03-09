@@ -10,67 +10,85 @@
     <main class="app">
       <section class="panel">
         <div class="panel__header">
-          <div>
-            <p class="eyebrow">MVP+ com economia e prestígio</p>
+          <div class="brand-block">
+            <p class="eyebrow">UI Sprint 12</p>
             <h1>Fazenda de Morangos</h1>
-            <p class="subtitle">Plante, colha e venda.</p>
+            <p class="subtitle">Plante, colha e venda em um painel mais visual.</p>
+            <div class="header-pills" aria-label="Resumo do jogo">
+              <span class="header-pill">1 cultura</span>
+              <span class="header-pill">sessões curtas</span>
+              <span class="header-pill">prestígio leve</span>
+            </div>
           </div>
-          <button class="helper-btn" id="helpToggleButton" type="button" aria-expanded="false">Ajuda</button>
+          <button class="helper-btn" id="helpToggleButton" type="button" aria-expanded="false">Guia</button>
         </div>
 
         <section class="game-shell">
           <aside class="zone zone--left">
-            <div class="goal" id="goalStatus" aria-live="polite">Meta 35 moedas</div>
+            <section class="overview-card">
+              <div class="overview-card__head">
+                <div>
+                  <p class="section-kicker">Ritmo atual</p>
+                  <h2 class="overview-card__title">Sua banca de morango</h2>
+                </div>
+                <div class="goal" id="goalStatus" aria-live="polite">Meta 35</div>
+              </div>
 
-            <section class="stats stats--compact" aria-label="Recursos">
-              <article class="stat" id="moneyCard">
-                <span class="stat__label">Moedas</span>
-                <strong class="stat__value" id="moneyCount">0</strong>
-              </article>
-              <article class="stat" id="seedCard">
-                <span class="stat__label">Sementes</span>
-                <strong class="stat__value" id="seedCount">0</strong>
-              </article>
-              <article class="stat" id="berryCard">
-                <span class="stat__label">Morangos</span>
-                <strong class="stat__value" id="berryCount">0</strong>
-              </article>
-              <article class="stat" id="sellPriceCard">
-                <span class="stat__label">Venda</span>
-                <strong class="stat__value stat__value--small" id="sellPriceValue">3 moedas</strong>
-                <span class="stat__hint" id="sellPriceHint">Estável</span>
-              </article>
-            </section>
+              <section class="stats stats--compact" aria-label="Recursos">
+                <article class="stat" id="moneyCard">
+                  <span class="stat__icon" aria-hidden="true">◌</span>
+                  <span class="stat__label">Moedas</span>
+                  <strong class="stat__value" id="moneyCount">0</strong>
+                </article>
+                <article class="stat" id="seedCard">
+                  <span class="stat__icon" aria-hidden="true">✦</span>
+                  <span class="stat__label">Sementes</span>
+                  <strong class="stat__value" id="seedCount">0</strong>
+                </article>
+                <article class="stat" id="berryCard">
+                  <span class="stat__icon" aria-hidden="true">✿</span>
+                  <span class="stat__label">Morangos</span>
+                  <strong class="stat__value" id="berryCount">0</strong>
+                </article>
+                <article class="stat" id="sellPriceCard">
+                  <span class="stat__icon" aria-hidden="true">$</span>
+                  <span class="stat__label">Venda</span>
+                  <strong class="stat__value stat__value--small" id="sellPriceValue">3 moedas</strong>
+                  <span class="stat__hint" id="sellPriceHint">Estável</span>
+                </article>
+              </section>
 
-            <section class="quick-status" aria-label="Status compactos">
-              <article class="mini-stat" id="growthTimeCard">
-                <span class="mini-stat__label">Tempo</span>
-                <strong class="mini-stat__value" id="growthTimeValue">10s</strong>
-              </article>
-              <article class="mini-stat" id="plotCountCard">
-                <span class="mini-stat__label">Fazenda</span>
-                <strong class="mini-stat__value" id="plotCountValue">9/16</strong>
-              </article>
-              <article class="mini-stat" id="helperCard">
-                <span class="mini-stat__label">Helper</span>
-                <strong class="mini-stat__value" id="helperStatusValue">Off</strong>
-                <span class="mini-stat__hint" id="helperStatusHint">Inativo</span>
-              </article>
-              <article class="mini-stat" id="prestigeCard">
-                <span class="mini-stat__label">Conhecimento</span>
-                <strong class="mini-stat__value" id="prestigeLevelValue">Nível 0</strong>
-                <span class="mini-stat__hint" id="prestigeBonusHint">+0% venda</span>
-              </article>
+              <section class="quick-status" aria-label="Status compactos">
+                <article class="mini-stat" id="growthTimeCard">
+                  <span class="mini-stat__label">Tempo</span>
+                  <strong class="mini-stat__value" id="growthTimeValue">10s</strong>
+                </article>
+                <article class="mini-stat" id="plotCountCard">
+                  <span class="mini-stat__label">Lotes</span>
+                  <strong class="mini-stat__value" id="plotCountValue">9/16</strong>
+                </article>
+                <article class="mini-stat" id="helperCard">
+                  <span class="mini-stat__label">Helper</span>
+                  <strong class="mini-stat__value" id="helperStatusValue">Off</strong>
+                  <span class="mini-stat__hint" id="helperStatusHint">Inativo</span>
+                </article>
+                <article class="mini-stat" id="prestigeCard">
+                  <span class="mini-stat__label">Knowledge</span>
+                  <strong class="mini-stat__value" id="prestigeLevelValue">Nível 0</strong>
+                  <span class="mini-stat__hint" id="prestigeBonusHint">+0% venda</span>
+                </article>
+              </section>
             </section>
 
             <section class="actions actions--compact" aria-label="Ações">
               <button class="action-btn" id="buySeedButton" type="button">Semente (2)</button>
-              <button class="action-btn" id="sellButton" type="button">Vender</button>
+              <button class="action-btn action-btn--accent" id="sellButton" type="button">Vender</button>
               <button class="action-btn action-btn--ghost action-btn--compact" id="resetButton" type="button">Reset</button>
             </section>
 
             <section class="status-stack" aria-label="Status rápidos">
               <section class="status-module status-module--message">
+                <p class="status-module__label">Feed</p>
                 <p id="statusMessage" aria-live="polite">Comece plantando.</p>
               </section>
 
@@ -100,6 +118,69 @@
                 </div>
                 <div class="helper-strip__timer" id="helperStripTimer">3s</div>
               </section>
+            </section>
+          </aside>
+
+          <section class="zone zone--center">
+            <section class="board-stage">
+              <section class="progress-strip progress-strip--compact" aria-label="Indicadores de progresso">
+                <article class="progress-card">
+                  <div class="progress-card__head">
+                    <span>Meta</span>
+                    <strong id="moneyGoalProgressLabel">0 / 35 moedas</strong>
+                  </div>
+                  <div class="progress-card__bar">
+                    <div class="progress-card__fill" id="moneyGoalProgressBar"></div>
+                  </div>
+                </article>
+                <article class="progress-card">
+                  <div class="progress-card__head">
+                    <span>Prontos</span>
+                    <strong id="readyPlotProgressLabel">0 / 9</strong>
+                  </div>
+                  <div class="progress-card__bar">
+                    <div class="progress-card__fill progress-card__fill--ready" id="readyPlotProgressBar"></div>
+                  </div>
+                </article>
+              </section>
+
+              <section class="milestone-toast" id="milestoneToast" aria-live="polite" hidden>
+                <strong class="milestone-toast__title">Meta concluída</strong>
+                <p class="milestone-toast__text" id="milestoneToastText"></p>
+              </section>
+
+              <section class="farm-section">
+                <div class="farm-stage__header">
+                  <div>
+                    <p class="section-kicker">Fazenda</p>
+                    <h2 class="farm-stage__title">Tabuleiro principal</h2>
+                  </div>
+                  <div class="legend" aria-label="Estados dos canteiros">
+                    <span class="legend__item"><span class="legend__dot legend__dot--empty"></span>Vazio</span>
+                    <span class="legend__item"><span class="legend__dot legend__dot--growing"></span>Cresce</span>
+                    <span class="legend__item"><span class="legend__dot legend__dot--ready"></span>Pronto</span>
+                  </div>
+                </div>
+                <div class="farm-grid" id="farmGrid" aria-label="Grade da fazenda"></div>
+              </section>
+            </section>
+          </section>
+
+          <aside class="zone zone--right">
+            <section class="insight-stack">
+              <section class="market-banner market-banner--steady" id="marketBanner" aria-live="polite">
+                <div>
+                  <p class="market-banner__eyebrow">Mercado</p>
+                  <h2 id="marketHeadline">Preço estável</h2>
+                  <p class="market-banner__text" id="marketSummary">Varia sozinho ao longo da partida.</p>
+                  <p class="market-banner__effect" id="marketEffect">Base: 3 moedas.</p>
+                </div>
+                <div class="market-banner__aside">
+                  <div class="market-banner__price" id="marketPriceValue">3 moedas</div>
+                  <div class="market-banner__change" id="marketChangeIndicator">Sem mudança</div>
+                  <div class="market-banner__timer" id="marketTimer">12s</div>
+                </div>
+              </section>
 
               <section class="event-banner event-banner--idle status-module" id="eventBanner" aria-live="polite">
                 <div>
@@ -116,78 +197,22 @@
                   </div>
                 </div>
               </section>
-            </section>
-          </aside>
 
-          <section class="zone zone--center">
-            <section class="progress-strip progress-strip--compact" aria-label="Indicadores de progresso">
-              <article class="progress-card">
-                <div class="progress-card__head">
-                  <span>Meta</span>
-                  <strong id="moneyGoalProgressLabel">0 / 35 moedas</strong>
+              <section class="prestige-panel" id="prestigePanel" aria-live="polite">
+                <div>
+                  <p class="prestige-panel__eyebrow">Prestígio</p>
+                  <h2 id="prestigePanelTitle">Strawberry Knowledge</h2>
+                  <p class="prestige-panel__text" id="prestigePanelDescription">Reinicie para ganhar bônus permanente.</p>
+                  <p class="prestige-panel__meta" id="prestigeThresholdText">Próximo em 120 moedas.</p>
                 </div>
-                <div class="progress-card__bar">
-                  <div class="progress-card__fill" id="moneyGoalProgressBar"></div>
-                </div>
-              </article>
-              <article class="progress-card">
-                <div class="progress-card__head">
-                  <span>Prontos</span>
-                  <strong id="readyPlotProgressLabel">0 / 9</strong>
-                </div>
-                <div class="progress-card__bar">
-                  <div class="progress-card__fill progress-card__fill--ready" id="readyPlotProgressBar"></div>
-                </div>
-              </article>
-            </section>
-
-            <section class="milestone-toast" id="milestoneToast" aria-live="polite" hidden>
-              <strong class="milestone-toast__title">Meta concluída</strong>
-              <p class="milestone-toast__text" id="milestoneToastText"></p>
-            </section>
-
-            <section class="farm-section">
-              <div class="farm-grid" id="farmGrid" aria-label="Grade da fazenda"></div>
-            </section>
-
-            <section class="meta-row meta-row--center" aria-label="Legenda e leitura rápida">
-              <div class="legend" aria-label="Estados dos canteiros">
-                <span class="legend__item"><span class="legend__dot legend__dot--empty"></span>Vazio</span>
-                <span class="legend__item"><span class="legend__dot legend__dot--growing"></span>Cresce</span>
-                <span class="legend__item"><span class="legend__dot legend__dot--ready"></span>Pronto</span>
-              </div>
-            </section>
-          </section>
-
-          <aside class="zone zone--right">
-            <section class="market-banner market-banner--steady" id="marketBanner" aria-live="polite">
-              <div>
-                <p class="market-banner__eyebrow">Mercado</p>
-                <h2 id="marketHeadline">Preço estável</h2>
-                <p class="market-banner__text" id="marketSummary">Varia sozinho ao longo da partida.</p>
-                <p class="market-banner__effect" id="marketEffect">Base: 3 moedas.</p>
-              </div>
-              <div class="market-banner__aside">
-                <div class="market-banner__price" id="marketPriceValue">3 moedas</div>
-                <div class="market-banner__change" id="marketChangeIndicator">Sem mudança</div>
-                <div class="market-banner__timer" id="marketTimer">12s</div>
-              </div>
-            </section>
-
-            <section class="prestige-panel" id="prestigePanel" aria-live="polite">
-              <div>
-                <p class="prestige-panel__eyebrow">Prestígio</p>
-                <h2 id="prestigePanelTitle">Strawberry Knowledge</h2>
-                <p class="prestige-panel__text" id="prestigePanelDescription">Reinicie para ganhar bônus permanente.</p>
-                <p class="prestige-panel__meta" id="prestigeThresholdText">Próximo em 120 moedas.</p>
-              </div>
-              <button class="action-btn action-btn--ghost" id="prestigeButton" type="button">Prestigiar</button>
+                <button class="action-btn action-btn--ghost" id="prestigeButton" type="button">Prestigiar</button>
+              </section>
             </section>
 
             <section class="progression" aria-label="Progresso">
               <div class="progression__header">
                 <div>
-                  <p class="progression__eyebrow">Progressão</p>
+                  <p class="progression__eyebrow">Rota</p>
                   <h2>Metas</h2>
                 </div>
                 <div class="progression__summary" id="progressSummary">0 de 4 metas concluídas</div>
@@ -237,16 +262,17 @@
             <section class="help-panel" id="helpPanel" aria-label="Ajuda inicial" hidden>
               <div class="help-panel__header">
                 <div>
-                  <p class="help-panel__eyebrow">Como jogar</p>
+                  <p class="help-panel__eyebrow">Guia</p>
                   <h2>Loop rápido</h2>
                 </div>
                 <button class="helper-btn helper-btn--ghost" id="helpDismissButton" type="button">Ocultar</button>
               </div>
-              <ol class="help-steps">
-                <li>Compre sementes.</li>
-                <li>Plante nos vazios.</li>
-                <li>Colha e venda.</li>
-              </ol>
+              <div class="help-steps">
+                <span class="help-step">1. Compre</span>
+                <span class="help-step">2. Plante</span>
+                <span class="help-step">3. Colha</span>
+                <span class="help-step">4. Venda</span>
+              </div>
             </section>
           </aside>
         </section>
