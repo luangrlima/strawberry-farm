@@ -11,6 +11,7 @@ O jogo atual inclui:
 - upgrades
 - expansão `3x3` -> `4x4`
 - `Farm Helper`
+- upgrade de plantio assistido para o `Farm Helper`
 - prestígio `Strawberry Knowledge`
 - save/load com `localStorage`
 - HUD compacto em tela única
@@ -70,6 +71,7 @@ Arquivos principais:
 
 Relatório mais recente:
 - [tests/reports/QA_REPORT.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT.md)
+- vigente em 2026-03-09: [tests/reports/QA_REPORT_SPRINT_11.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT_SPRINT_11.md)
 
 Regra:
 - `tests/reports/QA_REPORT_SPRINT_<N>.md` é o artefato versionado do sprint

@@ -33,6 +33,7 @@
       comboTimer: document.querySelector("#comboTimer"),
       comboProgressBar: document.querySelector("#comboProgressBar"),
       helperStrip: document.querySelector("#helperStrip"),
+      helperStripTitle: document.querySelector("#helperStripTitle"),
       helperStripText: document.querySelector("#helperStripText"),
       helperStripTimer: document.querySelector("#helperStripTimer"),
       milestoneToast: document.querySelector("#milestoneToast"),
@@ -70,11 +71,13 @@
       marketButton: document.querySelector("#marketButton"),
       expandFarmButton: document.querySelector("#expandFarmButton"),
       helperButton: document.querySelector("#helperButton"),
+      helperPlantingButton: document.querySelector("#helperPlantingButton"),
       prestigeButton: document.querySelector("#prestigeButton"),
       fertilizerDescription: document.querySelector("#fertilizerDescription"),
       marketDescription: document.querySelector("#marketDescription"),
       expansionDescription: document.querySelector("#expansionDescription"),
       helperDescription: document.querySelector("#helperDescription"),
+      helperPlantingDescription: document.querySelector("#helperPlantingDescription"),
     };
   }
 

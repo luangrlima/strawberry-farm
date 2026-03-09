@@ -53,6 +53,11 @@ window.StrawberryFarm.config = {
       harvestIntervalMs: 3500,
       description: "Colhe 1 pronto por ciclo.",
     },
+    helperPlanting: {
+      label: "Bolsa de sementes",
+      cost: 22,
+      description: "O Helper planta 1 vazio por ciclo se nao houver colheita. Consome sementes.",
+    },
   },
   expansion: {
     cost: 10,

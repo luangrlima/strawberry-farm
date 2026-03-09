@@ -176,6 +176,7 @@ async function preparePostPrestigeProgression(page) {
     currentState.upgrades.fertilizer = false;
     currentState.upgrades.market = false;
     currentState.upgrades.helper = false;
+    currentState.upgrades.helperPlanting = false;
     currentState.systems.helper = {
       nextHarvestAt: null,
       lastHarvestAt: null,
@@ -383,7 +384,11 @@ async function reachMoneyTarget(page, target) {
     await waitForAllGrowingPlots(page);
     const moneyBeforeCombo = await numberOf(page, "#moneyCount");
     await harvestAllReadyPlots(page);
-    await waitForText(page, "#comboTitle", "Combo x3");
+    await page.waitForFunction(() => {
+      const title = document.querySelector("#comboTitle")?.textContent || "";
+      const match = title.match(/Combo x(\d+)/);
+      return match && Number(match[1]) >= 3;
+    });
     assert(!(await page.locator("#comboStrip").isHidden()), "O combo ativo deveria aparecer na interface.");
     assert(
       (await numberOf(page, "#moneyCount")) >= moneyBeforeCombo + 1,
@@ -523,13 +528,33 @@ async function reachMoneyTarget(page, target) {
     const comboBeforeHelper = await getComboSnapshot(page);
     assert(comboBeforeHelper.count === 0, "O combo deveria estar zerado antes do helper colher.");
 
-    await forceEvent(page, "drizzle", 9000);
-    await waitForText(page, "#eventTitle", "Chuva leve");
-    await ensureAtLeastOneSeed(page);
-    await plantAllAvailableSeeds(page);
-    await waitForAnyReadyPlot(page, 12000);
+    await reachMoneyTarget(page, 22);
+    await page.click("#helperPlantingButton");
+    await page.waitForFunction(() => {
+      const button = document.querySelector("#helperPlantingButton");
+      return button && button.textContent.includes("ativo");
+    });
+    assert(
+      (await textOf(page, "#helperPlantingDescription")).includes("usa 1 semente"),
+      "A melhoria de plantio assistido deveria deixar claro o consumo de sementes.",
+    );
+
+    await clearEvent(page);
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      currentState.seeds = 2;
+      currentState.systems.helper.nextHarvestAt = Date.now() + 200;
+      currentState.plots = currentState.plots.map((plot, index) => ({
+        ...plot,
+        id: index,
+        state: index === 0 ? "ready" : "empty",
+        plantedAt: null,
+        readyAt: null,
+        growthDurationMs: null,
+      }));
+      window.__strawberryFarmDebug.setState(currentState);
+    });
     const berriesBeforeHelperHarvest = await numberOf(page, "#berryCount");
-    await setHelperNextHarvestIn(page, 200);
     await page.waitForFunction(
       (currentBerries) => Number(document.querySelector("#berryCount")?.textContent || "0") === currentBerries + 1,
       berriesBeforeHelperHarvest,
@@ -542,10 +567,82 @@ async function reachMoneyTarget(page, target) {
     const comboAfterHelper = await getComboSnapshot(page);
     assert(comboAfterHelper.count === 0, "O helper não deveria ativar combo automático.");
 
+    await clearEvent(page);
+    await resetComboState(page);
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      const growthDurationMs = 6000;
+      currentState.seeds = 2;
+      currentState.systems.helper.nextHarvestAt = Date.now() + 200;
+      currentState.systems.combo = {
+        count: 0,
+        lastHarvestAt: null,
+        expiresAt: null,
+        lastRewardedThreshold: 0,
+        rewardMoney: 0,
+      };
+      currentState.plots = currentState.plots.map((plot, index) => ({
+        ...plot,
+        id: index,
+        state: index === 0 ? "empty" : "growing",
+        plantedAt: index === 0 ? null : Date.now(),
+        readyAt: index === 0 ? null : Date.now() + growthDurationMs,
+        growthDurationMs: index === 0 ? null : growthDurationMs,
+      }));
+      window.__strawberryFarmDebug.setState(currentState);
+    });
+    await page.waitForFunction(() => Number(document.querySelector("#seedCount")?.textContent || "0") === 1, {
+      timeout: 5000,
+    });
+    assert(
+      (await page.locator(".plot").nth(0).getAttribute("aria-label"))?.includes("Crescendo"),
+      "O helper deveria plantar automaticamente em um canteiro vazio quando nao ha colheita.",
+    );
+    assert(
+      (await textOf(page, "#helperStripText")).includes("plantou no canteiro"),
+      "A UI do helper deveria notificar o plantio automatico.",
+    );
+    const comboAfterHelperPlant = await getComboSnapshot(page);
+    assert(comboAfterHelperPlant.count === 0, "O helper nao deveria ativar combo ao plantar.");
+
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     assert((await textOf(page, "#helperStatusValue")) === "On", "O estado do helper não persistiu após reload.");
     assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper não persistiu após reload.");
+    assert(
+      (await textOf(page, "#helperPlantingButton")).includes("ativo"),
+      "A melhoria de plantio assistido nao persistiu apos reload.",
+    );
+
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      const growthDurationMs = 6000;
+      currentState.seeds = 2;
+      currentState.systems.helper.nextHarvestAt = Date.now() + 200;
+      currentState.systems.combo = {
+        count: 0,
+        lastHarvestAt: null,
+        expiresAt: null,
+        lastRewardedThreshold: 0,
+        rewardMoney: 0,
+      };
+      currentState.plots = currentState.plots.map((plot, index) => ({
+        ...plot,
+        id: index,
+        state: index === 1 ? "empty" : "growing",
+        plantedAt: index === 1 ? null : Date.now(),
+        readyAt: index === 1 ? null : Date.now() + growthDurationMs,
+        growthDurationMs: index === 1 ? null : growthDurationMs,
+      }));
+      window.__strawberryFarmDebug.setState(currentState);
+    });
+    await page.waitForFunction(() => Number(document.querySelector("#seedCount")?.textContent || "0") === 1, {
+      timeout: 5000,
+    });
+    assert(
+      (await page.locator(".plot").nth(1).getAttribute("aria-label"))?.includes("Crescendo"),
+      "O helper deveria voltar a plantar apos reload quando o upgrade persistiu.",
+    );
 
     await resetComboState(page);
     await clearEvent(page);

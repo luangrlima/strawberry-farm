@@ -8,6 +8,7 @@
 
 Relatório mais recente:
 - `reports/QA_REPORT.md`
+- vigente em 2026-03-09: `reports/QA_REPORT_SPRINT_11.md`
 
 ## Execução
 Exemplo com `playwright-skill`:

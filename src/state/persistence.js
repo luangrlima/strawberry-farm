@@ -97,6 +97,7 @@
       nextState.upgrades.fertilizer = Boolean(savedState.upgrades.fertilizer);
       nextState.upgrades.market = Boolean(savedState.upgrades.market);
       nextState.upgrades.helper = Boolean(savedState.upgrades.helper);
+      nextState.upgrades.helperPlanting = Boolean(savedState.upgrades.helperPlanting);
     }
 
     if (savedState.progression && Array.isArray(savedState.progression.completedGoalIds)) {

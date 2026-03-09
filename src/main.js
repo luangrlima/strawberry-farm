@@ -78,6 +78,7 @@
     game.elements.marketButton.addEventListener("click", buyMarketUpgrade);
     game.elements.expandFarmButton.addEventListener("click", expandFarm);
     game.elements.helperButton.addEventListener("click", buyHelperUpgrade);
+    game.elements.helperPlantingButton.addEventListener("click", buyHelperPlantingUpgrade);
     game.elements.prestigeButton.addEventListener("click", prestigeFarm);
     game.elements.helpToggleButton.addEventListener("click", toggleHelpPanel);
     game.elements.helpDismissButton.addEventListener("click", dismissHelpPanel);
@@ -246,6 +247,36 @@
     game.state.systems.helper.lastActionAt = Date.now();
     game.state.systems.helper.lastActionText = "Helper ativado.";
     game.setMessage("Helper comprado.");
+    game.commit();
+  }
+
+  function buyHelperPlantingUpgrade() {
+    const upgrade = SF.config.upgrades.helperPlanting;
+
+    if (!game.state.upgrades.helper) {
+      game.setMessage("Compre o Helper primeiro.");
+      SF.render.render(game);
+      return;
+    }
+
+    if (game.state.upgrades.helperPlanting) {
+      game.setMessage("Plantio assistido ja ativo.");
+      SF.render.render(game);
+      return;
+    }
+
+    if (game.state.money < upgrade.cost) {
+      game.setMessage("Moedas insuficientes.");
+      SF.render.render(game);
+      return;
+    }
+
+    game.state.money -= upgrade.cost;
+    game.state.upgrades.helperPlanting = true;
+    game.state.stats.upgradesPurchased += 1;
+    game.state.systems.helper.lastActionAt = Date.now();
+    game.state.systems.helper.lastActionText = "Plantio assistido ativado.";
+    game.setMessage("Plantio assistido comprado.");
     game.commit();
   }
 

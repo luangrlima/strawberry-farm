@@ -26,6 +26,11 @@
     game.state.systems.helper.lastActionText = `Helper colheu o canteiro ${plotId + 1}.`;
   }
 
+  function noteHelperPlant(game, plotId) {
+    game.state.systems.helper.lastActionAt = Date.now();
+    game.state.systems.helper.lastActionText = `Helper plantou no canteiro ${plotId + 1}.`;
+  }
+
   function runFarmHelper(game) {
     if (!game.state.upgrades.helper) {
       return false;
@@ -44,7 +49,18 @@
     const readyPlot = SF.plots.getVisiblePlots(game).find((plot) => plot.state === SF.config.plotStates.ready);
 
     if (!readyPlot) {
-      return false;
+      if (!game.state.upgrades.helperPlanting || game.state.seeds <= 0) {
+        return false;
+      }
+
+      const emptyPlot = SF.plots.getVisiblePlots(game).find((plot) => plot.state === SF.config.plotStates.empty);
+
+      if (!emptyPlot) {
+        return false;
+      }
+
+      SF.plots.plantPlotWithSource(game, emptyPlot, "helper");
+      return true;
     }
 
     SF.plots.harvestPlotWithSource(game, readyPlot, "helper");
@@ -54,6 +70,7 @@
   SF.helper = {
     updateHelperState,
     noteHelperHarvest,
+    noteHelperPlant,
     runFarmHelper,
   };
 })(window.StrawberryFarm = window.StrawberryFarm || {});

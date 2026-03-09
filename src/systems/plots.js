@@ -59,9 +59,17 @@
   }
 
   function plantPlot(game, plot) {
+    plantPlotWithSource(game, plot, "manual");
+  }
+
+  function plantPlotWithSource(game, plot, source) {
+    const isHelperPlant = source === "helper";
+
     if (game.state.seeds <= 0) {
-      game.setMessage("Sem sementes.");
-      SF.render.render(game);
+      if (!isHelperPlant) {
+        game.setMessage("Sem sementes.");
+        SF.render.render(game);
+      }
       return;
     }
 
@@ -72,7 +80,13 @@
     plot.readyAt = now + growthDurationMs;
     plot.growthDurationMs = growthDurationMs;
     game.state.seeds -= 1;
-    game.setMessage("Plantado.");
+
+    if (isHelperPlant) {
+      SF.helper.noteHelperPlant(game, plot.id);
+    } else {
+      game.setMessage("Plantado.");
+    }
+
     game.commit();
   }
 
@@ -212,6 +226,7 @@
     markPlotHarvested,
     syncHarvestEffects,
     plantPlot,
+    plantPlotWithSource,
     harvestPlot,
     harvestPlotWithSource,
     getFarmMetrics,

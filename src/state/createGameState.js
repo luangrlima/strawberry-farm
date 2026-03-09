@@ -31,6 +31,7 @@
         fertilizer: false,
         market: false,
         helper: false,
+        helperPlanting: false,
       },
       progression: {
         completedGoalIds: [],

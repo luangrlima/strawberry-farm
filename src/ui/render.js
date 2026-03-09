@@ -76,6 +76,10 @@
     elements.marketButton.disabled = state.upgrades.market || state.money < SF.config.upgrades.market.cost;
     elements.expandFarmButton.disabled = state.hasExpandedFarm || state.money < SF.config.expansion.cost;
     elements.helperButton.disabled = state.upgrades.helper || state.money < SF.config.upgrades.helper.cost;
+    elements.helperPlantingButton.disabled =
+      !state.upgrades.helper ||
+      state.upgrades.helperPlanting ||
+      state.money < SF.config.upgrades.helperPlanting.cost;
 
     elements.fertilizerButton.textContent = state.upgrades.fertilizer
       ? "Adubo ativo"
@@ -89,6 +93,11 @@
     elements.helperButton.textContent = state.upgrades.helper
       ? "Helper ativo"
       : `Helper (${SF.config.upgrades.helper.cost})`;
+    elements.helperPlantingButton.textContent = state.upgrades.helperPlanting
+      ? "Plantio assistido ativo"
+      : state.upgrades.helper
+        ? `Plantio assistido (${SF.config.upgrades.helperPlanting.cost})`
+        : `Exige Helper (${SF.config.upgrades.helperPlanting.cost})`;
 
     elements.buySeedButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.seedPriceDiscount));
     elements.sellButton.classList.toggle(
@@ -97,6 +106,7 @@
     );
     elements.fertilizerButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.growthMultiplier));
     elements.helperButton.classList.toggle("action-btn--highlight", state.upgrades.helper);
+    elements.helperPlantingButton.classList.toggle("action-btn--highlight", state.upgrades.helperPlanting);
   }
 
   function renderUpgradeCards(game) {
@@ -111,8 +121,13 @@
       ? "Ativo: 16 canteiros."
       : SF.config.expansion.description;
     game.elements.helperDescription.textContent = game.state.upgrades.helper
-      ? `Ativo: 1 a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
+      ? game.state.upgrades.helperPlanting
+        ? `Ativo: colhe 1 pronto e planta 1 vazio sem colheita a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
+        : `Ativo: colhe 1 pronto a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
       : SF.config.upgrades.helper.description;
+    game.elements.helperPlantingDescription.textContent = game.state.upgrades.helperPlanting
+      ? "Ativo: usa 1 semente do estoque quando sobra um ciclo sem colheita."
+      : SF.config.upgrades.helperPlanting.description;
   }
 
   function renderEventBanner(game) {
@@ -191,7 +206,9 @@
     game.elements.helperStatusValue.textContent = isActive ? "On" : "Off";
     game.elements.helperStatusHint.textContent =
       isActive && Number.isFinite(nextHarvestAt)
-        ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - Date.now()))}`
+        ? game.state.upgrades.helperPlanting
+          ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - Date.now()))} + plantio`
+          : `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - Date.now()))}`
         : "Inativo";
     game.elements.helperCard.classList.toggle("stat--highlight", isActive);
   }
@@ -234,11 +251,16 @@
       ? Math.max(0, helper.nextHarvestAt - Date.now())
       : SF.config.upgrades.helper.harvestIntervalMs;
     const recentAction = Number.isFinite(helper.lastActionAt) && Date.now() - helper.lastActionAt < 2800;
+    game.elements.helperStripTitle.textContent = game.state.upgrades.helperPlanting
+      ? "Auto-colheita + plantio"
+      : "Auto-colheita";
 
     game.elements.helperStripText.textContent =
       recentAction && helper.lastActionText
         ? helper.lastActionText
-        : "Colhe 1 pronto por ciclo.";
+        : game.state.upgrades.helperPlanting
+          ? "Colhe 1 pronto. Sem colheita no ciclo, planta 1 vazio."
+          : "Colhe 1 pronto por ciclo.";
     game.elements.helperStripTimer.textContent = `${SF.utils.formatSeconds(nextHarvestAt)}`;
   }
 
