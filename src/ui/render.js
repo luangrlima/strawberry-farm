@@ -67,13 +67,18 @@
     const seedPrice = SF.plots.getSeedPrice(game);
     const activeEvent = SF.events.getActiveEventDefinition(game);
     const marketBasePrice = SF.market.getMarketBasePrice(game);
+    const fertilizerLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
+    const marketLevel = SF.upgrades.getUpgradeLevel(game, "market");
+    const nextFertilizerCost = SF.upgrades.getUpgradeCost("fertilizer", fertilizerLevel);
+    const nextMarketCost = SF.upgrades.getUpgradeCost("market", marketLevel);
 
     elements.buySeedButton.disabled = state.money < seedPrice;
     elements.buySeedButton.textContent = `Semente (${seedPrice})`;
     elements.sellButton.disabled = state.strawberries <= 0;
     elements.sellButton.textContent = "Vender lote";
-    elements.fertilizerButton.disabled = state.upgrades.fertilizer || state.money < SF.config.upgrades.fertilizer.cost;
-    elements.marketButton.disabled = state.upgrades.market || state.money < SF.config.upgrades.market.cost;
+    elements.fertilizerButton.disabled =
+      SF.upgrades.isMaxLevel(game, "fertilizer") || state.money < nextFertilizerCost;
+    elements.marketButton.disabled = SF.upgrades.isMaxLevel(game, "market") || state.money < nextMarketCost;
     elements.expandFarmButton.disabled = state.hasExpandedFarm || state.money < SF.config.expansion.cost;
     elements.helperButton.disabled = state.upgrades.helper || state.money < SF.config.upgrades.helper.cost;
     elements.helperPlantingButton.disabled =
@@ -81,12 +86,16 @@
       state.upgrades.helperPlanting ||
       state.money < SF.config.upgrades.helperPlanting.cost;
 
-    elements.fertilizerButton.textContent = state.upgrades.fertilizer
-      ? "Adubo ativo"
-      : `Comprar · ${SF.config.upgrades.fertilizer.cost}`;
-    elements.marketButton.textContent = state.upgrades.market
-      ? "Venda melhor"
-      : `Comprar · ${SF.config.upgrades.market.cost}`;
+    elements.fertilizerButton.textContent = SF.upgrades.isMaxLevel(game, "fertilizer")
+      ? "Nivel maximo"
+      : fertilizerLevel > 0
+        ? `Nivel ${fertilizerLevel + 1} · ${nextFertilizerCost}`
+        : `Comprar · ${nextFertilizerCost}`;
+    elements.marketButton.textContent = SF.upgrades.isMaxLevel(game, "market")
+      ? "Nivel maximo"
+      : marketLevel > 0
+        ? `Nivel ${marketLevel + 1} · ${nextMarketCost}`
+        : `Comprar · ${nextMarketCost}`;
     elements.expandFarmButton.textContent = state.hasExpandedFarm
       ? "4x4 ativa"
       : `Comprar · ${SF.config.expansion.cost}`;
@@ -111,12 +120,31 @@
 
   function renderUpgradeCards(game) {
     const activeEvent = SF.events.getActiveEventDefinition(game);
-    game.elements.fertilizerDescription.textContent = game.state.upgrades.fertilizer
-      ? `Cresce em ${SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game))}.`
-      : SF.config.upgrades.fertilizer.description;
-    game.elements.marketDescription.textContent = game.state.upgrades.market
-      ? `${SF.market.getSellPrice(game)} moedas${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " com evento." : "."}`
-      : SF.config.upgrades.market.description;
+    const fertilizerLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
+    const marketLevel = SF.upgrades.getUpgradeLevel(game, "market");
+    const maxFertilizerLevel = SF.config.upgrades.fertilizer.maxLevel;
+    const maxMarketLevel = SF.config.upgrades.market.maxLevel;
+    const currentGrowthTime = SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game));
+    const nextFertilizerLevel = Math.min(maxFertilizerLevel, fertilizerLevel + 1);
+    const nextFertilizerReduction = SF.upgrades.getFertilizerReductionPercent(nextFertilizerLevel);
+    const currentMarketBonus = SF.upgrades.getMarketSellBonus(marketLevel);
+    const nextMarketLevel = Math.min(maxMarketLevel, marketLevel + 1);
+    const nextMarketBonus = SF.upgrades.getMarketSellBonus(nextMarketLevel);
+
+    game.elements.fertilizerLevelMeta.textContent = `Nivel ${fertilizerLevel}/${maxFertilizerLevel}`;
+    game.elements.marketLevelMeta.textContent = `Nivel ${marketLevel}/${maxMarketLevel}`;
+    game.elements.fertilizerDescription.textContent =
+      fertilizerLevel > 0
+        ? SF.upgrades.isMaxLevel(game, "fertilizer")
+          ? `Tempo atual ${currentGrowthTime}. Reducao total de ${SF.upgrades.getFertilizerReductionPercent(fertilizerLevel)}%.`
+          : `Tempo atual ${currentGrowthTime}. Proximo nivel deixa em -${nextFertilizerReduction}% do tempo base.`
+        : SF.config.upgrades.fertilizer.description;
+    game.elements.marketDescription.textContent =
+      marketLevel > 0
+        ? SF.upgrades.isMaxLevel(game, "market")
+          ? `${SF.market.getSellPrice(game)} moedas por venda. Bonus total +${currentMarketBonus}.${game.state.prestige.level > 0 ? ` Knowledge +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " Evento somado." : ""}`
+          : `${SF.market.getSellPrice(game)} moedas por venda. Bonus atual +${currentMarketBonus}; proximo nivel vai para +${nextMarketBonus}.`
+        : SF.config.upgrades.market.description;
     game.elements.expansionDescription.textContent = game.state.hasExpandedFarm
       ? "16 lotes liberados."
       : SF.config.expansion.description;

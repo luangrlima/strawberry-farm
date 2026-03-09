@@ -37,15 +37,19 @@ window.StrawberryFarm.config = {
   upgrades: {
     fertilizer: {
       label: "Adubo rápido",
-      cost: 10,
-      growthMultiplier: 0.75,
-      description: "-25% no tempo.",
+      baseCost: 10,
+      costStep: 8,
+      maxLevel: 3,
+      growthMultiplierPerLevel: 0.75,
+      description: "Cada nivel reduz 25% do tempo de crescimento.",
     },
     market: {
       label: "Caixa premium",
-      cost: 14,
-      sellPriceBonus: 2,
-      description: "+2 moedas por venda.",
+      baseCost: 14,
+      costStep: 10,
+      maxLevel: 3,
+      sellPriceBonusPerLevel: 2,
+      description: "Cada nivel adiciona +2 moedas por venda.",
     },
     helper: {
       label: "Farm Helper",

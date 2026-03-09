@@ -11,9 +11,10 @@
 
   function getGrowthTimeMs(game) {
     let growthTime = SF.config.crop.growthTimeMs;
+    const fertilizerLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
 
-    if (game.state.upgrades.fertilizer) {
-      growthTime *= SF.config.upgrades.fertilizer.growthMultiplier;
+    if (fertilizerLevel > 0) {
+      growthTime *= SF.upgrades.getFertilizerGrowthMultiplier(fertilizerLevel);
     }
 
     const activeEvent = SF.events.getActiveEventDefinition(game);

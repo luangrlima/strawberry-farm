@@ -63,9 +63,10 @@
 
   function getSellPrice(game) {
     let sellPrice = getMarketBasePrice(game);
+    const marketLevel = SF.upgrades.getUpgradeLevel(game, "market");
 
-    if (game.state.upgrades.market) {
-      sellPrice += SF.config.upgrades.market.sellPriceBonus;
+    if (marketLevel > 0) {
+      sellPrice += SF.upgrades.getMarketSellBonus(marketLevel);
     }
 
     const activeEvent = SF.events.getActiveEventDefinition(game);

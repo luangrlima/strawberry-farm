@@ -94,8 +94,14 @@
     }
 
     if (savedState.upgrades && typeof savedState.upgrades === "object") {
-      nextState.upgrades.fertilizer = Boolean(savedState.upgrades.fertilizer);
-      nextState.upgrades.market = Boolean(savedState.upgrades.market);
+      nextState.upgrades.fertilizer = SF.upgrades.normalizeLeveledUpgradeValue(
+        savedState.upgrades.fertilizer,
+        config.upgrades.fertilizer.maxLevel,
+      );
+      nextState.upgrades.market = SF.upgrades.normalizeLeveledUpgradeValue(
+        savedState.upgrades.market,
+        config.upgrades.market.maxLevel,
+      );
       nextState.upgrades.helper = Boolean(savedState.upgrades.helper);
       nextState.upgrades.helperPlanting = Boolean(savedState.upgrades.helperPlanting);
     }

@@ -182,46 +182,48 @@
   }
 
   function buyFertilizerUpgrade() {
-    const upgrade = SF.config.upgrades.fertilizer;
+    const currentLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
+    const nextCost = SF.upgrades.getUpgradeCost("fertilizer", currentLevel);
 
-    if (game.state.upgrades.fertilizer) {
-      game.setMessage("Adubo já ativo.");
+    if (SF.upgrades.isMaxLevel(game, "fertilizer")) {
+      game.setMessage("Adubo no nivel maximo.");
       SF.render.render(game);
       return;
     }
 
-    if (game.state.money < upgrade.cost) {
+    if (game.state.money < nextCost) {
       game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
 
-    game.state.money -= upgrade.cost;
-    game.state.upgrades.fertilizer = true;
+    game.state.money -= nextCost;
+    game.state.upgrades.fertilizer = currentLevel + 1;
     game.state.stats.upgradesPurchased += 1;
-    game.setMessage("Adubo comprado.");
+    game.setMessage(`Adubo melhorado para nivel ${currentLevel + 1}.`);
     game.commit();
   }
 
   function buyMarketUpgrade() {
-    const upgrade = SF.config.upgrades.market;
+    const currentLevel = SF.upgrades.getUpgradeLevel(game, "market");
+    const nextCost = SF.upgrades.getUpgradeCost("market", currentLevel);
 
-    if (game.state.upgrades.market) {
-      game.setMessage("Caixa premium já ativa.");
+    if (SF.upgrades.isMaxLevel(game, "market")) {
+      game.setMessage("Caixa premium no nivel maximo.");
       SF.render.render(game);
       return;
     }
 
-    if (game.state.money < upgrade.cost) {
+    if (game.state.money < nextCost) {
       game.setMessage("Moedas insuficientes.");
       SF.render.render(game);
       return;
     }
 
-    game.state.money -= upgrade.cost;
-    game.state.upgrades.market = true;
+    game.state.money -= nextCost;
+    game.state.upgrades.market = currentLevel + 1;
     game.state.stats.upgradesPurchased += 1;
-    game.setMessage("Venda melhorada.");
+    game.setMessage(`Caixa premium nivel ${currentLevel + 1}.`);
     game.commit();
   }
 

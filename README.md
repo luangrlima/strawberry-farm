@@ -71,7 +71,7 @@ Arquivos principais:
 
 Relatório mais recente:
 - [tests/reports/QA_REPORT.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT.md)
-- vigente em 2026-03-09: [tests/reports/QA_REPORT_SPRINT_11.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT_SPRINT_11.md)
+- vigente em 2026-03-09: [tests/reports/QA_REPORT_SPRINT_13.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT_SPRINT_13.md)
 
 Regra:
 - `tests/reports/QA_REPORT_SPRINT_<N>.md` é o artefato versionado do sprint

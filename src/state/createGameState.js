@@ -28,8 +28,8 @@
       unlockedPlotCount: config.initialPlotCount,
       hasExpandedFarm: false,
       upgrades: {
-        fertilizer: false,
-        market: false,
+        fertilizer: 0,
+        market: 0,
         helper: false,
         helperPlanting: false,
       },

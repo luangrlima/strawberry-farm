@@ -173,8 +173,8 @@ async function preparePostPrestigeProgression(page) {
     currentState.stats.harvestedTotal = 4;
     currentState.stats.upgradesPurchased = 0;
     currentState.progression.completedGoalIds = ["harvest-3"];
-    currentState.upgrades.fertilizer = false;
-    currentState.upgrades.market = false;
+    currentState.upgrades.fertilizer = 0;
+    currentState.upgrades.market = 0;
     currentState.upgrades.helper = false;
     currentState.upgrades.helperPlanting = false;
     currentState.systems.helper = {
@@ -380,8 +380,28 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O preço de mercado não persistiu após reload.");
 
     console.log("Cenário 2.1: combo de colheita e persistência curta");
-    await plantAllAvailableSeeds(page);
-    await waitForAllGrowingPlots(page);
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      window.StrawberryFarm.config.combo.windowMs = 5000;
+      currentState.seeds = 0;
+      currentState.strawberries = 0;
+      currentState.systems.combo = {
+        count: 0,
+        lastHarvestAt: null,
+        expiresAt: null,
+        lastRewardedThreshold: 0,
+        rewardMoney: 0,
+      };
+      currentState.plots = currentState.plots.map((plot, index) => ({
+        ...plot,
+        id: index,
+        state: index < 3 ? "ready" : "empty",
+        plantedAt: null,
+        readyAt: null,
+        growthDurationMs: null,
+      }));
+      window.__strawberryFarmDebug.setState(currentState);
+    });
     const moneyBeforeCombo = await numberOf(page, "#moneyCount");
     await harvestAllReadyPlots(page);
     await page.waitForFunction(() => {
@@ -451,8 +471,13 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const button = document.querySelector("#fertilizerButton");
       const timeValue = document.querySelector("#growthTimeValue");
-      return button && button.textContent.includes("Adubo ativo") && timeValue.textContent === "8s";
+      const meta = document.querySelector("#fertilizerLevelMeta");
+      return button && button.textContent.includes("Nivel 2") && timeValue.textContent === "8s" && meta && meta.textContent.includes("1/3");
     });
+    assert(
+      (await textOf(page, "#fertilizerDescription")).includes("Tempo atual 8s"),
+      "O card do adubo deveria mostrar o tempo atual apos o primeiro nivel.",
+    );
     await forceEvent(page, "drizzle", 4000);
     await waitForText(page, "#eventTitle", "Chuva leve");
     assert((await textOf(page, "#growthTimeValue")) === "6s", "A Chuva leve não acelerou o tempo junto com o adubo.");
@@ -479,6 +504,18 @@ async function reachMoneyTarget(page, target) {
       const growth = document.querySelector("#growthTimeValue");
       return title && title.textContent === "Sem evento" && growth && growth.textContent === "8s";
     }, { timeout: 9000 });
+    await reachMoneyTarget(page, 18);
+    await page.click("#fertilizerButton");
+    await page.waitForFunction(() => {
+      const button = document.querySelector("#fertilizerButton");
+      const timeValue = document.querySelector("#growthTimeValue");
+      const meta = document.querySelector("#fertilizerLevelMeta");
+      return button && button.textContent.includes("Nivel 3") && timeValue && timeValue.textContent === "6s" && meta && meta.textContent.includes("2/3");
+    });
+    assert(
+      (await textOf(page, "#fertilizerDescription")).includes("Proximo nivel"),
+      "O card do adubo deveria indicar o proximo tier antes do nivel maximo.",
+    );
 
     console.log("Cenário 6: upgrade de venda e economia do evento Sol forte");
     await reachMoneyTarget(page, 14);
@@ -487,16 +524,40 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const button = document.querySelector("#marketButton");
       const sellValue = document.querySelector("#sellPriceValue");
-      return button && button.textContent.includes("Venda melhor") && sellValue.textContent === "7 moedas";
+      const meta = document.querySelector("#marketLevelMeta");
+      return button && button.textContent.includes("Nivel 2") && sellValue.textContent === "7 moedas" && meta && meta.textContent.includes("1/3");
     });
-    await ensureAtLeastOneSeed(page);
-    await plantAllAvailableSeeds(page);
-    await waitForAnyReadyPlot(page, 10000);
-    await harvestAllReadyPlots(page);
+    assert(
+      (await textOf(page, "#marketDescription")).includes("Bonus atual +2"),
+      "O card da caixa premium deveria mostrar o bonus atual apos o primeiro nivel.",
+    );
+    await reachMoneyTarget(page, 24);
+    await page.click("#marketButton");
+    await setMarketState(page, { currentPrice: 5, previousPrice: 4, nextUpdateInMs: 12000 });
+    await page.waitForFunction(() => {
+      const button = document.querySelector("#marketButton");
+      const sellValue = document.querySelector("#sellPriceValue");
+      const meta = document.querySelector("#marketLevelMeta");
+      return button && button.textContent.includes("Nivel 3") && sellValue && sellValue.textContent === "9 moedas" && meta && meta.textContent.includes("2/3");
+    });
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      currentState.strawberries = 3;
+      currentState.seeds = 0;
+      currentState.plots = currentState.plots.map((plot, index) => ({
+        ...plot,
+        id: index,
+        state: "empty",
+        plantedAt: null,
+        readyAt: null,
+        growthDurationMs: null,
+      }));
+      window.__strawberryFarmDebug.setState(currentState);
+    });
     assert(!(await page.locator("#sellButton").isDisabled()), "Era esperado ter morangos para vender antes do Sol forte.");
     await forceEvent(page, "sunshine", 5000);
     await waitForText(page, "#eventTitle", "Sol forte");
-    assert((await textOf(page, "#sellPriceValue")) === "8 moedas", "O Sol forte não aumentou o preço de venda sobre o mercado atual.");
+    assert((await textOf(page, "#sellPriceValue")) === "10 moedas", "O Sol forte não aumentou o preço de venda sobre o mercado atual.");
     assert(
       (await textOf(page, "#eventEffect")).includes("+1 por morango"),
       "O efeito textual do Sol forte não ficou claro.",
@@ -509,7 +570,7 @@ async function reachMoneyTarget(page, target) {
     const berriesBeforeSunnySale = await numberOf(page, "#berryCount");
     await page.click("#sellButton");
     assert(
-      (await numberOf(page, "#moneyCount")) === moneyBeforeSunnySale + berriesBeforeSunnySale * 8,
+      (await numberOf(page, "#moneyCount")) === moneyBeforeSunnySale + berriesBeforeSunnySale * 10,
       "A venda durante o Sol forte não respeitou o cálculo de mercado + upgrade + evento.",
     );
     await clearEvent(page);
@@ -540,6 +601,7 @@ async function reachMoneyTarget(page, target) {
     );
 
     await clearEvent(page);
+    await resetComboState(page);
     await page.evaluate(() => {
       const currentState = window.__strawberryFarmDebug.getState();
       currentState.seeds = 2;
