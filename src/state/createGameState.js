@@ -18,7 +18,7 @@
     };
   }
 
-  function createInitialState() {
+  function createInitialState(now = Date.now()) {
     const config = SF.config;
 
     return {
@@ -52,7 +52,7 @@
           currentPrice: config.market.basePrice,
           previousPrice: config.market.basePrice,
           direction: "steady",
-          nextUpdateAt: Date.now() + config.market.updateIntervalMs,
+          nextUpdateAt: now + config.market.updateIntervalMs,
         },
         combo: {
           count: 0,

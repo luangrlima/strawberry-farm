@@ -1,19 +1,25 @@
 (function (SF) {
   SF.render = SF.render || {};
 
-  function render(game) {
-    SF.events.updateActiveEvent(game);
-    SF.combo.updateComboState(game);
-    SF.plots.updatePlotsByTime(game);
-    SF.plots.syncHarvestEffects(game);
-    syncMilestoneToast(game);
+  function getRenderNow(game, now) {
+    if (Number.isFinite(now)) {
+      return now;
+    }
 
-    const farmMetrics = SF.plots.getFarmMetrics(game);
-    renderStaticState(game, farmMetrics);
-    renderLiveState(game, farmMetrics);
+    if (game && game.runtime && Number.isFinite(game.runtime.now)) {
+      return game.runtime.now;
+    }
+
+    return 0;
   }
 
-  function renderStaticState(game) {
+  function render(game, now = getRenderNow(game)) {
+    const farmMetrics = SF.plots.getFarmMetrics(game);
+    renderStaticState(game, now);
+    renderLiveState(game, farmMetrics, now);
+  }
+
+  function renderStaticState(game, now = getRenderNow(game)) {
     const { elements, state } = game;
 
     document.title = SF.config.title;
@@ -29,7 +35,7 @@
     renderGoalStatus(game);
     renderStatHighlights(game);
     renderPrimaryActions(game);
-    renderHelperCard(game);
+    renderHelperCard(game, now);
     renderPrestigeCard(game);
     renderPrestigePanel(game);
     renderHelpPanel(game);
@@ -37,17 +43,15 @@
     renderProgression(game);
   }
 
-  function renderLiveState(game, farmMetrics = SF.plots.getFarmMetrics(game)) {
-    SF.plots.syncHarvestEffects(game);
-    syncMilestoneToast(game);
-    renderHelperCard(game);
+  function renderLiveState(game, farmMetrics = SF.plots.getFarmMetrics(game), now = getRenderNow(game)) {
+    renderHelperCard(game, now);
     renderProgressIndicators(game, farmMetrics);
-    renderComboStrip(game);
-    renderHelperStrip(game);
-    renderMilestoneToast(game);
-    renderEventBanner(game);
-    renderMarketBanner(game);
-    SF.ui.renderFarmGrid(game, farmMetrics);
+    renderComboStrip(game, now);
+    renderHelperStrip(game, now);
+    renderMilestoneToast(game, now);
+    renderEventBanner(game, now);
+    renderMarketBanner(game, now);
+    SF.ui.renderFarmGrid(game, farmMetrics, now);
   }
 
   function renderGoalStatus(game) {
@@ -158,7 +162,7 @@
       : SF.config.upgrades.helperPlanting.description;
   }
 
-  function renderEventBanner(game) {
+  function renderEventBanner(game, now = getRenderNow(game)) {
     const activeEvent = SF.events.getActiveEventDefinition(game);
 
     if (!activeEvent || !game.state.systems.activeEvent) {
@@ -173,7 +177,7 @@
       return;
     }
 
-    const remainingMs = Math.max(0, game.state.systems.activeEvent.endsAt - Date.now());
+    const remainingMs = Math.max(0, game.state.systems.activeEvent.endsAt - now);
     const totalDurationMs = SF.events.getEventDurationMs(game, activeEvent);
     const progressPercent = totalDurationMs > 0 ? (remainingMs / totalDurationMs) * 100 : 0;
     game.elements.eventBanner.className = `event-banner ${activeEvent.accentClass}`;
@@ -185,11 +189,11 @@
     game.elements.eventProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
   }
 
-  function renderMarketBanner(game) {
+  function renderMarketBanner(game, now = getRenderNow(game)) {
     const market = game.state.systems.market;
     const marketBasePrice = SF.market.getMarketBasePrice(game);
     const finalSellPrice = SF.market.getSellPrice(game);
-    const remainingMs = Math.max(0, market.nextUpdateAt - Date.now());
+    const remainingMs = Math.max(0, market.nextUpdateAt - now);
     const activeEvent = SF.events.getActiveEventDefinition(game);
 
     game.elements.marketBanner.className = `market-banner market-banner--${market.direction}`;
@@ -205,16 +209,16 @@
     game.elements.marketTimer.textContent = `${SF.utils.formatSeconds(remainingMs)}`;
   }
 
-  function renderComboStrip(game) {
+  function renderComboStrip(game, now = getRenderNow(game)) {
     const combo = game.state.systems.combo;
-    const isActive = combo.count >= 2 && Number.isFinite(combo.expiresAt) && Date.now() < combo.expiresAt;
+    const isActive = combo.count >= 2 && Number.isFinite(combo.expiresAt) && now < combo.expiresAt;
 
     game.elements.comboStrip.hidden = !isActive;
     if (!isActive) {
       return;
     }
 
-    const remainingMs = Math.max(0, combo.expiresAt - Date.now());
+    const remainingMs = Math.max(0, combo.expiresAt - now);
     const progressPercent = (remainingMs / SF.config.combo.windowMs) * 100;
     const nextThreshold = SF.combo.getNextComboThreshold(combo.count);
     const rewardText = combo.rewardMoney > 0 ? ` +${combo.rewardMoney} moeda bônus` : "";
@@ -227,7 +231,7 @@
     game.elements.comboProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
   }
 
-  function renderHelperCard(game) {
+  function renderHelperCard(game, now = getRenderNow(game)) {
     const isActive = game.state.upgrades.helper;
     const nextHarvestAt = game.state.systems.helper.nextHarvestAt;
 
@@ -235,8 +239,8 @@
     game.elements.helperStatusHint.textContent =
       isActive && Number.isFinite(nextHarvestAt)
         ? game.state.upgrades.helperPlanting
-          ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - Date.now()))} + plantio`
-          : `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - Date.now()))}`
+          ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))} + plantio`
+          : `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))}`
         : "Inativo";
     game.elements.helperCard.classList.toggle("stat--highlight", isActive);
   }
@@ -266,7 +270,7 @@
       : `Bloqueado · ${currentThreshold}`;
   }
 
-  function renderHelperStrip(game) {
+  function renderHelperStrip(game, now = getRenderNow(game)) {
     const isActive = game.state.upgrades.helper;
     game.elements.helperStrip.hidden = !isActive;
 
@@ -276,9 +280,9 @@
 
     const helper = game.state.systems.helper;
     const nextHarvestAt = Number.isFinite(helper.nextHarvestAt)
-      ? Math.max(0, helper.nextHarvestAt - Date.now())
+      ? Math.max(0, helper.nextHarvestAt - now)
       : SF.config.upgrades.helper.harvestIntervalMs;
-    const recentAction = Number.isFinite(helper.lastActionAt) && Date.now() - helper.lastActionAt < 2800;
+    const recentAction = Number.isFinite(helper.lastActionAt) && now - helper.lastActionAt < 2800;
     game.elements.helperStripTitle.textContent = game.state.upgrades.helperPlanting
       ? "Auto-colheita + plantio"
       : "Auto-colheita";
@@ -357,9 +361,9 @@
     game.elements.readyPlotProgressBar.style.width = `${Math.max(0, Math.min(100, readyProgressPercent))}%`;
   }
 
-  function renderMilestoneToast(game) {
+  function renderMilestoneToast(game, now = getRenderNow(game)) {
     const toast = game.uiState.milestoneToast;
-    const isVisible = Boolean(toast && toast.visibleUntil > Date.now());
+    const isVisible = Boolean(toast && toast.visibleUntil > now);
 
     game.elements.milestoneToast.hidden = !isVisible;
     if (!isVisible) {
@@ -367,19 +371,6 @@
     }
 
     game.elements.milestoneToastText.textContent = toast.message;
-  }
-
-  function showMilestoneToast(game, message) {
-    game.uiState.milestoneToast = {
-      message,
-      visibleUntil: Date.now() + 5000,
-    };
-  }
-
-  function syncMilestoneToast(game) {
-    if (game.uiState.milestoneToast && game.uiState.milestoneToast.visibleUntil <= Date.now()) {
-      game.uiState.milestoneToast = null;
-    }
   }
 
   function getGoalProgressText(game, goal) {
@@ -485,6 +476,4 @@
   SF.render.renderStaticState = renderStaticState;
   SF.render.renderLiveState = renderLiveState;
   SF.render.renderSaveStatus = renderSaveStatus;
-  SF.render.showMilestoneToast = showMilestoneToast;
-  SF.render.syncMilestoneToast = syncMilestoneToast;
 })(window.StrawberryFarm = window.StrawberryFarm || {});

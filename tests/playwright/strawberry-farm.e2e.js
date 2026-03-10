@@ -1,7 +1,15 @@
 const path = require("path");
 const fs = require("fs");
 const { pathToFileURL, fileURLToPath } = require("url");
-const { chromium } = require("playwright");
+let chromium;
+
+try {
+  ({ chromium } = require("playwright"));
+} catch (error) {
+  console.error("Playwright não está disponível neste ambiente Node.");
+  console.error("Instale a dependência ou execute o script em um ambiente com `playwright` já disponível.");
+  process.exit(1);
+}
 
 const PROJECT_ROOT = resolveProjectRoot();
 const TARGET_URL = process.env.TARGET_URL || pathToFileURL(path.resolve(PROJECT_ROOT, "public/index.html")).href;
@@ -11,6 +19,11 @@ const ARTIFACTS_DIR = path.resolve(PROJECT_ROOT, "tests/artifacts");
 const RUN_ID = createRunId();
 const SUCCESS_SCREENSHOT_PATH = path.join(ARTIFACTS_DIR, `strawberry-farm-test-${RUN_ID}.png`);
 const ERROR_SCREENSHOT_PATH = path.join(ARTIFACTS_DIR, `strawberry-farm-test-error-${RUN_ID}.png`);
+const PLAYWRIGHT_HEADLESS = process.env.PW_HEADLESS !== "false";
+const PLAYWRIGHT_SLOW_MO = Number(process.env.PW_SLOW_MO || 0);
+const PLAYWRIGHT_ARGS = process.env.PW_ARGS
+  ? process.env.PW_ARGS.split(/\s+/).filter(Boolean)
+  : ["--no-sandbox", "--disable-dev-shm-usage"];
 
 fs.mkdirSync(ARTIFACTS_DIR, { recursive: true });
 
@@ -89,6 +102,55 @@ async function clearEvent(page) {
   });
 }
 
+async function installLegacySaveFixture(page) {
+  await page.evaluate((storageKey) => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    const now = Date.now();
+    const growthDurationMs = 4000;
+    currentState.money = 17;
+    currentState.seeds = 1;
+    currentState.strawberries = 2;
+    currentState.ui.helpOpen = true;
+    currentState.systems.activeEvent = {
+      id: "market-day",
+      endsAt: now + 4000,
+      durationMs: 4000,
+    };
+    currentState.systems.combo = {
+      count: 2,
+      lastHarvestAt: now,
+      expiresAt: now + 4000,
+      lastRewardedThreshold: 0,
+      rewardMoney: 0,
+    };
+    currentState.systems.market = {
+      currentPrice: 5,
+      previousPrice: 4,
+      direction: "up",
+      nextUpdateAt: now + 6000,
+    };
+    currentState.upgrades.helper = true;
+    currentState.upgrades.helperPlanting = false;
+    currentState.systems.helper = {
+      nextHarvestAt: now + 4000,
+      lastHarvestAt: null,
+      lastPlotId: null,
+      lastActionAt: now,
+      lastActionText: "Helper ativado.",
+    };
+    currentState.plots = currentState.plots.map((plot, index) => ({
+      ...plot,
+      id: index,
+      state: index === 0 ? "growing" : "empty",
+      plantedAt: index === 0 ? now : null,
+      readyAt: index === 0 ? now + growthDurationMs : null,
+      growthDurationMs: index === 0 ? growthDurationMs : null,
+    }));
+    delete currentState.saveVersion;
+    window.localStorage.setItem(storageKey, JSON.stringify(currentState));
+  }, STORAGE_KEY);
+}
+
 async function setMarketState(page, { currentPrice, previousPrice = currentPrice, nextUpdateInMs = 12000, forcedSteps = [] }) {
   await page.evaluate(
     ({ nextPrice, lastPrice, nextUpdateMs, steps }) => {
@@ -133,6 +195,34 @@ async function resetComboState(page) {
   await page.waitForFunction(() => {
     const comboStrip = document.querySelector("#comboStrip");
     return !comboStrip || comboStrip.hidden;
+  });
+}
+
+async function resetHelperUpgradeState(page) {
+  await page.evaluate(() => {
+    const currentState = window.__strawberryFarmDebug.getState();
+    currentState.upgrades.helper = false;
+    currentState.upgrades.helperPlanting = false;
+    currentState.systems.helper = {
+      nextHarvestAt: null,
+      lastHarvestAt: null,
+      lastPlotId: null,
+      lastActionAt: null,
+      lastActionText: "",
+    };
+    window.__strawberryFarmDebug.setState(currentState);
+  });
+
+  await page.waitForFunction(() => {
+    const button = document.querySelector("#helperButton");
+    const status = document.querySelector("#helperStatusValue");
+    return (
+      button &&
+      button.textContent &&
+      button.textContent.includes("Comprar") &&
+      status &&
+      status.textContent === "Off"
+    );
   });
 }
 
@@ -286,7 +376,11 @@ async function reachMoneyTarget(page, target) {
 }
 
 (async () => {
-  const browser = await chromium.launch({ headless: false, slowMo: 100 });
+  const browser = await chromium.launch({
+    headless: PLAYWRIGHT_HEADLESS,
+    slowMo: PLAYWRIGHT_SLOW_MO,
+    args: PLAYWRIGHT_ARGS,
+  });
   const page = await browser.newPage({ viewport: { width: 1366, height: 860 } });
 
   try {
@@ -379,7 +473,20 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#plotCountValue")) === "9/16", "O save/load corrompeu o tamanho base da fazenda.");
     assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O preço de mercado não persistiu após reload.");
 
-    console.log("Cenário 2.1: combo de colheita e persistência curta");
+    console.log("Cenário 2.1: save legado sem versão");
+    await installLegacySaveFixture(page);
+    await page.reload({ waitUntil: "load" });
+    await disableRandomEvents(page);
+    await waitForText(page, "#eventTitle", "Feira local");
+    assert((await textOf(page, "#moneyCount")) === "17", "O save legado sem versão não restaurou o dinheiro.");
+    assert((await textOf(page, "#seedCount")) === "1", "O save legado sem versão não restaurou as sementes.");
+    assert((await textOf(page, "#sellPriceValue")) === "5 moedas", "O mercado do save legado não foi hidratado.");
+    assert((await textOf(page, "#buySeedButton")) === "Semente (1)", "O evento ativo do save legado não foi hidratado.");
+    assert((await textOf(page, "#helperStatusValue")) === "On", "O helper do save legado não foi hidratado.");
+    assert(!(await page.locator("#comboStrip").isHidden()), "O combo ativo do save legado não foi hidratado.");
+    assert(!(await page.locator("#helpPanel").isHidden()), "O help panel do save legado não foi hidratado.");
+
+    console.log("Cenário 2.2: combo de colheita e persistência curta");
     await page.evaluate(() => {
       const currentState = window.__strawberryFarmDebug.getState();
       window.StrawberryFarm.config.combo.windowMs = 5000;
@@ -577,6 +684,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O evento não foi limpo corretamente no modo de teste.");
 
     console.log("Cenário 7: Farm Helper, eventos e persistência");
+    await resetHelperUpgradeState(page);
     await reachMoneyTarget(page, 18);
     await page.click("#helperButton");
     await page.waitForFunction(() => {

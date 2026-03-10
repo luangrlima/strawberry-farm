@@ -1,5 +1,6 @@
 (function (SF) {
   SF.state = SF.state || {};
+  const SAVE_VERSION = 2;
 
   function createStorageAdapter(storageKey) {
     try {
@@ -31,9 +32,21 @@
     }
   }
 
-  function hydrateState(savedState) {
+  function getHydrationNow(options = {}) {
+    return Number.isFinite(options.now) ? options.now : Date.now();
+  }
+
+  function serializeState(state) {
+    return {
+      ...state,
+      saveVersion: SAVE_VERSION,
+    };
+  }
+
+  function hydrateState(savedState, options = {}) {
     const config = SF.config;
-    const nextState = SF.state.createInitialState();
+    const now = getHydrationNow(options);
+    const nextState = SF.state.createInitialState(now);
 
     nextState.money = Number.isFinite(savedState.money) ? savedState.money : nextState.money;
     nextState.seeds = Number.isFinite(savedState.seeds) ? savedState.seeds : nextState.seeds;
@@ -90,7 +103,7 @@
       );
       nextState.systems.market.nextUpdateAt = Number.isFinite(savedMarket.nextUpdateAt)
         ? savedMarket.nextUpdateAt
-        : Date.now() + config.market.updateIntervalMs;
+        : now + config.market.updateIntervalMs;
     }
 
     if (savedState.upgrades && typeof savedState.upgrades === "object") {
@@ -183,19 +196,20 @@
       });
     }
 
-    SF.events.updateActiveEvent({ state: nextState });
-    SF.market.updateMarketState({ state: nextState, debugState: { forcedMarketSteps: [] } });
-    SF.combo.updateComboState({ state: nextState });
-    SF.helper.updateHelperState({ state: nextState, config });
-    SF.plots.updatePlotsByTime({ state: nextState, config });
+    SF.events.updateActiveEvent({ state: nextState }, now);
+    SF.market.updateMarketState({ state: nextState, debugState: { forcedMarketSteps: [] } }, now);
+    SF.combo.updateComboState({ state: nextState }, now);
+    SF.helper.updateHelperState({ state: nextState, config }, now);
+    SF.plots.updatePlotsByTime({ state: nextState, config }, now);
     return nextState;
   }
 
-  function loadState(storage) {
+  function loadState(storage, options = {}) {
+    const now = getHydrationNow(options);
     const saved = storage.getItem(SF.config.storageKey);
 
     if (!saved) {
-      const initialState = SF.state.createInitialState();
+      const initialState = SF.state.createInitialState(now);
 
       if (!storage.isPersistent) {
         initialState.message =
@@ -206,20 +220,21 @@
     }
 
     try {
-      return hydrateState(JSON.parse(saved));
+      return hydrateState(JSON.parse(saved), { now });
     } catch {
-      return SF.state.createInitialState();
+      return SF.state.createInitialState(now);
     }
   }
 
-  function saveState(game) {
-    game.state.systems.lastSavedAt = Date.now();
-    game.storage.setItem(SF.config.storageKey, JSON.stringify(game.state));
+  function saveState(game, now = Date.now()) {
+    game.state.systems.lastSavedAt = now;
+    game.storage.setItem(SF.config.storageKey, JSON.stringify(serializeState(game.state)));
     game.dirty = false;
-    SF.render.renderSaveStatus(game);
   }
 
+  SF.state.SAVE_VERSION = SAVE_VERSION;
   SF.state.createStorageAdapter = createStorageAdapter;
+  SF.state.serializeState = serializeState;
   SF.state.hydrateState = hydrateState;
   SF.state.loadState = loadState;
   SF.state.saveState = saveState;

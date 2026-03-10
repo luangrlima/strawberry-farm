@@ -1,0 +1,75 @@
+{
+  "money": 24,
+  "seeds": 2,
+  "strawberries": 1,
+  "unlockedPlotCount": 9,
+  "hasExpandedFarm": false,
+  "upgrades": {
+    "fertilizer": 1,
+    "market": 1,
+    "helper": true,
+    "helperPlanting": false
+  },
+  "progression": {
+    "completedGoalIds": [
+      "harvest-3"
+    ]
+  },
+  "ui": {
+    "helpOpen": false
+  },
+  "stats": {
+    "harvestedTotal": 4,
+    "soldTotal": 3,
+    "upgradesPurchased": 3,
+    "eventsTriggered": 1
+  },
+  "prestige": {
+    "level": 0,
+    "sellBonusMultiplier": 0
+  },
+  "activeEvent": {
+    "id": "market-day",
+    "durationMs": 5000,
+    "endsInMs": 3500
+  },
+  "combo": {
+    "count": 2,
+    "lastHarvestOffsetMs": -600,
+    "expiresInMs": 3000,
+    "lastRewardedThreshold": 0,
+    "rewardMoney": 0
+  },
+  "market": {
+    "currentPrice": 4,
+    "previousPrice": 3,
+    "nextUpdateInMs": 4000
+  },
+  "helper": {
+    "nextHarvestInMs": 300,
+    "lastHarvestOffsetMs": -1000,
+    "lastPlotId": 0,
+    "lastActionOffsetMs": -1000,
+    "lastActionText": "Helper pronto."
+  },
+  "plots": [
+    {
+      "state": "ready",
+      "plantedAt": null,
+      "readyAt": null,
+      "growthDurationMs": null
+    },
+    {
+      "state": "growing",
+      "plantedOffsetMs": -2000,
+      "readyInMs": 2500,
+      "growthDurationMs": 6000
+    },
+    {
+      "state": "empty",
+      "plantedAt": null,
+      "readyAt": null,
+      "growthDurationMs": null
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "name": "strawberry-farm",
+  "private": true,
+  "scripts": {
+    "test:smoke": "node tests/playwright/strawberry-farm.smoke.js",
+    "test:e2e": "node tests/playwright/strawberry-farm.e2e.js",
+    "test:e2e:headed": "PW_HEADLESS=false PW_SLOW_MO=100 node tests/playwright/strawberry-farm.e2e.js"
+  },
+  "devDependencies": {
+    "playwright": ">=1.40.0 <2"
+  }
+}

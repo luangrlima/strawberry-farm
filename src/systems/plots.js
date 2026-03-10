@@ -25,8 +25,7 @@
     return Math.max(3000, Math.floor(growthTime));
   }
 
-  function updatePlotsByTime(game) {
-    const now = Date.now();
+  function updatePlotsByTime(game, now = Date.now()) {
     let changed = false;
 
     getVisiblePlots(game).forEach((plot) => {
@@ -42,16 +41,14 @@
     return changed;
   }
 
-  function markPlotHarvested(game, plotId, source = "manual") {
+  function markPlotHarvested(game, plotId, source = "manual", now = Date.now()) {
     game.uiState.harvestedPlots[plotId] = {
-      until: Date.now() + 450,
+      until: now + 450,
       source,
     };
   }
 
-  function syncHarvestEffects(game) {
-    const now = Date.now();
-
+  function syncHarvestEffects(game, now = Date.now()) {
     Object.keys(game.uiState.harvestedPlots).forEach((plotId) => {
       if (game.uiState.harvestedPlots[plotId].until <= now) {
         delete game.uiState.harvestedPlots[plotId];
@@ -59,22 +56,20 @@
     });
   }
 
-  function plantPlot(game, plot) {
-    plantPlotWithSource(game, plot, "manual");
+  function plantPlot(game, plot, now = Date.now()) {
+    plantPlotWithSource(game, plot, "manual", now);
   }
 
-  function plantPlotWithSource(game, plot, source) {
+  function plantPlotWithSource(game, plot, source, now = Date.now()) {
     const isHelperPlant = source === "helper";
 
     if (game.state.seeds <= 0) {
       if (!isHelperPlant) {
-        game.setMessage("Sem sementes.");
-        SF.render.render(game);
+        SF.runtime.showMessage(game, "Sem sementes.", { now });
       }
       return;
     }
 
-    const now = Date.now();
     const growthDurationMs = getGrowthTimeMs(game);
     plot.state = SF.config.plotStates.growing;
     plot.plantedAt = now;
@@ -83,31 +78,31 @@
     game.state.seeds -= 1;
 
     if (isHelperPlant) {
-      SF.helper.noteHelperPlant(game, plot.id);
+      SF.helper.noteHelperPlant(game, plot.id, now);
     } else {
       game.setMessage("Plantado.");
     }
 
-    game.commit();
+    game.commit({ now });
   }
 
-  function harvestPlot(game, plot) {
-    harvestPlotWithSource(game, plot, "manual");
+  function harvestPlot(game, plot, now = Date.now()) {
+    harvestPlotWithSource(game, plot, "manual", now);
   }
 
-  function harvestPlotWithSource(game, plot, source) {
+  function harvestPlotWithSource(game, plot, source, now = Date.now()) {
     const isHelperHarvest = source === "helper";
-    const comboSummary = isHelperHarvest ? { count: 0, bonusMoney: 0 } : SF.combo.applyHarvestCombo(game);
+    const comboSummary = isHelperHarvest ? { count: 0, bonusMoney: 0 } : SF.combo.applyHarvestCombo(game, now);
     plot.state = SF.config.plotStates.empty;
     plot.plantedAt = null;
     plot.readyAt = null;
     plot.growthDurationMs = null;
     game.state.strawberries += SF.config.crop.harvestYield;
     game.state.stats.harvestedTotal += SF.config.crop.harvestYield;
-    markPlotHarvested(game, plot.id, source);
+    markPlotHarvested(game, plot.id, source, now);
 
     if (isHelperHarvest) {
-      SF.helper.noteHelperHarvest(game, plot.id);
+      SF.helper.noteHelperHarvest(game, plot.id, now);
     } else if (comboSummary.bonusMoney > 0) {
       game.state.money += comboSummary.bonusMoney;
       game.setMessage(`Colheita. Combo x${comboSummary.count}: +${comboSummary.bonusMoney}.`);
@@ -117,7 +112,7 @@
       game.setMessage("Colheita.");
     }
 
-    game.commit();
+    game.commit({ now });
   }
 
   function getFarmMetrics(game) {
@@ -132,7 +127,7 @@
     };
   }
 
-  function getPlotProgress(plot) {
+  function getPlotProgress(plot, now = Date.now()) {
     if (
       plot.state !== SF.config.plotStates.growing ||
       !Number.isFinite(plot.readyAt) ||
@@ -142,7 +137,7 @@
     }
 
     const duration = plot.growthDurationMs || SF.config.crop.growthTimeMs;
-    const elapsed = Date.now() - plot.plantedAt;
+    const elapsed = now - plot.plantedAt;
     return Math.max(0, Math.min(100, (elapsed / duration) * 100));
   }
 
@@ -176,7 +171,7 @@
     return "Plantar";
   }
 
-  function getPlotStageText(plot) {
+  function getPlotStageText(plot, now = Date.now()) {
     if (plot.state === SF.config.plotStates.empty) {
       return "Pronto para plantar";
     }
@@ -184,7 +179,7 @@
       return "Madura";
     }
 
-    const progress = getPlotProgress(plot);
+    const progress = getPlotProgress(plot, now);
     if (progress < 34) {
       return "Brotando";
     }
@@ -194,9 +189,9 @@
     return "Quase pronto";
   }
 
-  function getPlotTimerText(plot) {
+  function getPlotTimerText(plot, now = Date.now()) {
     if (plot.state === SF.config.plotStates.growing && Number.isFinite(plot.readyAt)) {
-      const remainingMs = Math.max(0, plot.readyAt - Date.now());
+      const remainingMs = Math.max(0, plot.readyAt - now);
       return `Faltam ${SF.utils.formatSeconds(remainingMs)}`;
     }
     if (plot.state === SF.config.plotStates.ready) {
@@ -205,9 +200,9 @@
     return "Clique para plantar";
   }
 
-  function getPlotHint(plot) {
+  function getPlotHint(plot, now = Date.now()) {
     if (plot.state === SF.config.plotStates.growing) {
-      return `${Math.round(getPlotProgress(plot))}% concluído`;
+      return `${Math.round(getPlotProgress(plot, now))}% concluído`;
     }
     if (plot.state === SF.config.plotStates.ready) {
       return "Clique agora para colher";
@@ -215,8 +210,8 @@
     return "Clique para plantar";
   }
 
-  function getPlotLabel(plot, index) {
-    return `Canteiro ${index + 1}: ${getPlotName(plot)}. Etapa: ${getPlotStageText(plot)}. ${getPlotTimerText(plot)}. ${getPlotHint(plot)}`;
+  function getPlotLabel(plot, index, now = Date.now()) {
+    return `Canteiro ${index + 1}: ${getPlotName(plot)}. Etapa: ${getPlotStageText(plot, now)}. ${getPlotTimerText(plot, now)}. ${getPlotHint(plot, now)}`;
   }
 
   SF.plots = {

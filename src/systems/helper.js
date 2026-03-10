@@ -1,5 +1,5 @@
 (function (SF) {
-  function updateHelperState(game) {
+  function updateHelperState(game, now = Date.now()) {
     const helper = game.state.systems.helper;
 
     if (!helper) {
@@ -12,39 +12,37 @@
     }
 
     if (!Number.isFinite(helper.nextHarvestAt)) {
-      helper.nextHarvestAt = Date.now() + SF.config.upgrades.helper.harvestIntervalMs;
+      helper.nextHarvestAt = now + SF.config.upgrades.helper.harvestIntervalMs;
       return true;
     }
 
     return false;
   }
 
-  function noteHelperHarvest(game, plotId) {
-    game.state.systems.helper.lastHarvestAt = Date.now();
+  function noteHelperHarvest(game, plotId, now = Date.now()) {
+    game.state.systems.helper.lastHarvestAt = now;
     game.state.systems.helper.lastPlotId = plotId;
-    game.state.systems.helper.lastActionAt = Date.now();
+    game.state.systems.helper.lastActionAt = now;
     game.state.systems.helper.lastActionText = `Helper colheu o canteiro ${plotId + 1}.`;
   }
 
-  function noteHelperPlant(game, plotId) {
-    game.state.systems.helper.lastActionAt = Date.now();
+  function noteHelperPlant(game, plotId, now = Date.now()) {
+    game.state.systems.helper.lastActionAt = now;
     game.state.systems.helper.lastActionText = `Helper plantou no canteiro ${plotId + 1}.`;
   }
 
-  function runFarmHelper(game) {
+  function runFarmHelper(game, now = Date.now()) {
     if (!game.state.upgrades.helper) {
       return false;
     }
 
-    updateHelperState(game);
-
     const helper = game.state.systems.helper;
 
-    if (!Number.isFinite(helper.nextHarvestAt) || Date.now() < helper.nextHarvestAt) {
+    if (!Number.isFinite(helper.nextHarvestAt) || now < helper.nextHarvestAt) {
       return false;
     }
 
-    helper.nextHarvestAt = Date.now() + SF.config.upgrades.helper.harvestIntervalMs;
+    helper.nextHarvestAt = now + SF.config.upgrades.helper.harvestIntervalMs;
 
     const readyPlot = SF.plots.getVisiblePlots(game).find((plot) => plot.state === SF.config.plotStates.ready);
 
@@ -59,11 +57,11 @@
         return false;
       }
 
-      SF.plots.plantPlotWithSource(game, emptyPlot, "helper");
+      SF.plots.plantPlotWithSource(game, emptyPlot, "helper", now);
       return true;
     }
 
-    SF.plots.harvestPlotWithSource(game, readyPlot, "helper");
+    SF.plots.harvestPlotWithSource(game, readyPlot, "helper", now);
     return true;
   }
 

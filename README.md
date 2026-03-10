@@ -27,7 +27,7 @@ O runtime jogável agora está separado da documentação e do workflow:
 - `src/ui/*`: grid e renderização
 - `src/utils/*`: utilitários
 
-O arquivo [index.html](/Users/wiser/projects/strawberry-farm/index.html) na raiz foi mantido como redirecionamento de compatibilidade para [public/index.html](/Users/wiser/projects/strawberry-farm/public/index.html).
+O arquivo [index.html](index.html) na raiz foi mantido como redirecionamento de compatibilidade para [public/index.html](public/index.html).
 
 ## Estrutura do repositório
 - `public/`: arquivos estáticos do jogo
@@ -40,20 +40,21 @@ O arquivo [index.html](/Users/wiser/projects/strawberry-farm/index.html) na raiz
 
 ## Arquitetura
 Documentos principais:
-- [docs/ARCHITECTURE_PROPOSAL.md](/Users/wiser/projects/strawberry-farm/docs/ARCHITECTURE_PROPOSAL.md)
-- [docs/CODE_SPLIT_PLAN.md](/Users/wiser/projects/strawberry-farm/docs/CODE_SPLIT_PLAN.md)
-- [docs/REPO_ORGANIZATION_PLAN.md](/Users/wiser/projects/strawberry-farm/docs/REPO_ORGANIZATION_PLAN.md)
-- [docs/ARCHITECTURE_IMPLEMENTATION.md](/Users/wiser/projects/strawberry-farm/docs/ARCHITECTURE_IMPLEMENTATION.md)
+- [docs/ARCHITECTURE_PROPOSAL.md](docs/ARCHITECTURE_PROPOSAL.md)
+- [docs/CODE_SPLIT_PLAN.md](docs/CODE_SPLIT_PLAN.md)
+- [docs/REPO_ORGANIZATION_PLAN.md](docs/REPO_ORGANIZATION_PLAN.md)
+- [docs/ARCHITECTURE_IMPLEMENTATION.md](docs/ARCHITECTURE_IMPLEMENTATION.md)
 
 ## Desenvolvimento
 Prompts e material de coordenação do projeto:
-- [agents/prompts/full-game-director.md](/Users/wiser/projects/strawberry-farm/agents/prompts/full-game-director.md)
-- [agents/prompts/product-director.md](/Users/wiser/projects/strawberry-farm/agents/prompts/product-director.md)
-- [agents/prompts/game-designer.md](/Users/wiser/projects/strawberry-farm/agents/prompts/game-designer.md)
-- [agents/prompts/economy-balance-designer.md](/Users/wiser/projects/strawberry-farm/agents/prompts/economy-balance-designer.md)
-- [agents/prompts/gameplay-developer.md](/Users/wiser/projects/strawberry-farm/agents/prompts/gameplay-developer.md)
-- [agents/prompts/ui-ux-developer.md](/Users/wiser/projects/strawberry-farm/agents/prompts/ui-ux-developer.md)
-- [agents/prompts/qa-playtest-agent.md](/Users/wiser/projects/strawberry-farm/agents/prompts/qa-playtest-agent.md)
+- [agents/prompts/full-game-director.md](agents/prompts/full-game-director.md)
+- [agents/prompts/post-audit-correction-sprint-master.md](agents/prompts/post-audit-correction-sprint-master.md)
+- [agents/prompts/product-director.md](agents/prompts/product-director.md)
+- [agents/prompts/game-designer.md](agents/prompts/game-designer.md)
+- [agents/prompts/economy-balance-designer.md](agents/prompts/economy-balance-designer.md)
+- [agents/prompts/gameplay-developer.md](agents/prompts/gameplay-developer.md)
+- [agents/prompts/ui-ux-developer.md](agents/prompts/ui-ux-developer.md)
+- [agents/prompts/qa-playtest-agent.md](agents/prompts/qa-playtest-agent.md)
 
 Artefatos de sprint:
 - `agents/planning/sprint-plans/`: planos por sprint
@@ -61,23 +62,30 @@ Artefatos de sprint:
 - `agents/planning/reviews/`: reviews por sprint
 
 ## Testes
-Visão geral em [tests/README.md](/Users/wiser/projects/strawberry-farm/tests/README.md).
+Visão geral em [tests/README.md](tests/README.md).
 
 Arquivos principais:
-- [tests/playwright/strawberry-farm.e2e.js](/Users/wiser/projects/strawberry-farm/tests/playwright/strawberry-farm.e2e.js)
-- [tests/manual/TEST_SCENARIOS.md](/Users/wiser/projects/strawberry-farm/tests/manual/TEST_SCENARIOS.md)
-- [tests/reports/](/Users/wiser/projects/strawberry-farm/tests/reports)
-- [tests/artifacts/](/Users/wiser/projects/strawberry-farm/tests/artifacts)
+- [tests/playwright/strawberry-farm.smoke.js](tests/playwright/strawberry-farm.smoke.js)
+- [tests/playwright/strawberry-farm.e2e.js](tests/playwright/strawberry-farm.e2e.js)
+- [tests/fixtures/legacy-save-v1.json](tests/fixtures/legacy-save-v1.json)
+- [tests/manual/TEST_SCENARIOS.md](tests/manual/TEST_SCENARIOS.md)
+- [tests/reports/](tests/reports/)
+- [tests/artifacts/](tests/artifacts/)
+
+Execução repo-native de QA:
+- `npm install`
+- `npm run test:smoke`
+- `npm run test:e2e`
 
 Relatório mais recente:
-- [tests/reports/QA_REPORT.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT.md)
-- vigente em 2026-03-09: [tests/reports/QA_REPORT_SPRINT_13.md](/Users/wiser/projects/strawberry-farm/tests/reports/QA_REPORT_SPRINT_13.md)
+- [tests/reports/QA_REPORT.md](tests/reports/QA_REPORT.md)
+- vigente em 2026-03-10: [tests/reports/QA_REPORT_SPRINT_16.md](tests/reports/QA_REPORT_SPRINT_16.md)
 
 Regra:
 - `tests/reports/QA_REPORT_SPRINT_<N>.md` é o artefato versionado do sprint
 - `tests/reports/QA_REPORT.md` aponta para o QA vigente
 
 ## Execução do jogo
-Abra [public/index.html](/Users/wiser/projects/strawberry-farm/public/index.html) no navegador.
+Abra [public/index.html](public/index.html) no navegador.
 
-Se preferir, [index.html](/Users/wiser/projects/strawberry-farm/index.html) também funciona como entrypoint compatível.
+Se preferir, [index.html](index.html) também funciona como entrypoint compatível.

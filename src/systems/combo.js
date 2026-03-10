@@ -11,10 +11,9 @@
     return SF.config.combo.thresholds.find((threshold) => threshold.count > count) || null;
   }
 
-  function applyHarvestCombo(game) {
-    const now = Date.now();
+  function applyHarvestCombo(game, now = Date.now()) {
     const combo = game.state.systems.combo;
-    const comboStillActive = Number.isFinite(combo.expiresAt) && now <= combo.expiresAt;
+    const comboStillActive = Number.isFinite(combo.expiresAt) && now < combo.expiresAt;
 
     if (comboStillActive) {
       combo.count += 1;
@@ -53,14 +52,14 @@
     };
   }
 
-  function updateComboState(game) {
+  function updateComboState(game, now = Date.now()) {
     const combo = game.state.systems.combo;
 
     if (!combo || !Number.isFinite(combo.expiresAt)) {
       return false;
     }
 
-    if (Date.now() < combo.expiresAt) {
+    if (now < combo.expiresAt) {
       return false;
     }
 

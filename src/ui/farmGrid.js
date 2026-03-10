@@ -52,7 +52,7 @@
     });
   }
 
-  function renderFarmGrid(game, farmMetrics) {
+  function renderFarmGrid(game, farmMetrics, now = Number.isFinite(game?.runtime?.now) ? game.runtime.now : 0) {
     if (game.plotElements.length !== game.state.unlockedPlotCount) {
       createFarmGrid(game);
     }
@@ -66,15 +66,15 @@
         return;
       }
 
-      const progress = SF.plots.getPlotProgress(plot);
+      const progress = SF.plots.getPlotProgress(plot, now);
       plotElement.button.className = `plot plot--${plot.state}`;
-      plotElement.button.setAttribute("aria-label", SF.plots.getPlotLabel(plot, index));
+      plotElement.button.setAttribute("aria-label", SF.plots.getPlotLabel(plot, index, now));
       plotElement.badge.textContent = SF.plots.getPlotBadge(plot);
       plotElement.emoji.textContent = SF.plots.getPlotEmoji(plot);
       plotElement.name.textContent = SF.plots.getPlotName(plot);
-      plotElement.stage.textContent = SF.plots.getPlotStageText(plot);
-      plotElement.timer.textContent = SF.plots.getPlotTimerText(plot);
-      plotElement.hint.textContent = SF.plots.getPlotHint(plot);
+      plotElement.stage.textContent = SF.plots.getPlotStageText(plot, now);
+      plotElement.timer.textContent = SF.plots.getPlotTimerText(plot, now);
+      plotElement.hint.textContent = SF.plots.getPlotHint(plot, now);
       plotElement.progressFill.style.width = `${progress}%`;
       plotElement.progressTrack.hidden = plot.state !== SF.config.plotStates.growing;
       plotElement.button.classList.toggle(

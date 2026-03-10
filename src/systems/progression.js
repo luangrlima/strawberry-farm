@@ -63,19 +63,15 @@
 
   function maybeNotifyPrestigeUnlocked(game) {
     if (!SF.prestige.isPrestigeAvailable(game)) {
-      return false;
+      return "";
     }
 
     if (game.state.systems.prestige.unlockShownForLevel === game.state.prestige.level) {
-      return false;
+      return "";
     }
 
     game.state.systems.prestige.unlockShownForLevel = game.state.prestige.level;
-    SF.render.showMilestoneToast(
-      game,
-      `Strawberry Knowledge disponível. Prestigie para ganhar +${SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1)}% permanente nas vendas.`,
-    );
-    return true;
+    return `Strawberry Knowledge disponível. Prestigie para ganhar +${SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1)}% permanente nas vendas.`;
   }
 
   SF.progression = {

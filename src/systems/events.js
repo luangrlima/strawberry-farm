@@ -11,7 +11,7 @@
     return getEventDefinition(game.state.systems.activeEvent.id);
   }
 
-  function activateEvent(game, eventId, durationMs, isForced = false) {
+  function activateEvent(game, eventId, durationMs, isForced = false, now = Date.now()) {
     const eventDefinition = getEventDefinition(eventId);
 
     if (!eventDefinition) {
@@ -20,12 +20,12 @@
 
     game.state.systems.activeEvent = {
       id: eventDefinition.id,
-      endsAt: Date.now() + durationMs,
+      endsAt: now + durationMs,
       durationMs,
     };
 
     if (eventDefinition.activePlotRemainingMultiplier) {
-      accelerateGrowingPlots(game, eventDefinition.activePlotRemainingMultiplier);
+      accelerateGrowingPlots(game, eventDefinition.activePlotRemainingMultiplier, now);
     }
 
     if (!isForced) {
@@ -34,9 +34,7 @@
     }
   }
 
-  function accelerateGrowingPlots(game, remainingMultiplier) {
-    const now = Date.now();
-
+  function accelerateGrowingPlots(game, remainingMultiplier, now = Date.now()) {
     SF.plots.getVisiblePlots(game).forEach((plot) => {
       if (plot.state !== SF.config.plotStates.growing || !Number.isFinite(plot.readyAt)) {
         return;
@@ -56,12 +54,12 @@
     game.state.systems.activeEvent = null;
   }
 
-  function updateActiveEvent(game) {
+  function updateActiveEvent(game, now = Date.now()) {
     if (!game.state.systems.activeEvent) {
       return false;
     }
 
-    if (Date.now() < game.state.systems.activeEvent.endsAt) {
+    if (now < game.state.systems.activeEvent.endsAt) {
       return false;
     }
 

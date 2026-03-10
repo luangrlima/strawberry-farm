@@ -28,7 +28,7 @@
     return "steady";
   }
 
-  function updateMarketState(game) {
+  function updateMarketState(game, now = Date.now()) {
     const market = game.state.systems.market;
 
     if (!market || !Number.isFinite(market.nextUpdateAt)) {
@@ -38,7 +38,7 @@
     let changed = false;
     let guard = 0;
 
-    while (Date.now() >= market.nextUpdateAt && guard < 6) {
+    while (now >= market.nextUpdateAt && guard < 6) {
       const previousPrice = normalizeMarketPrice(market.currentPrice);
       const nextPrice = normalizeMarketPrice(previousPrice + getRandomMarketStep(game));
 
@@ -50,8 +50,8 @@
       guard += 1;
     }
 
-    if (market.nextUpdateAt < Date.now()) {
-      market.nextUpdateAt = Date.now() + SF.config.market.updateIntervalMs;
+    if (market.nextUpdateAt < now) {
+      market.nextUpdateAt = now + SF.config.market.updateIntervalMs;
     }
 
     return changed;
