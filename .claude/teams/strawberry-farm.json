@@ -1,0 +1,64 @@
+{
+  "team_name": "strawberry-farm",
+  "description": "Time completo de desenvolvimento do Strawberry Farm — inclui direção de produto, design de jogo, economia, desenvolvimento, UI/UX, QA e direção geral.",
+  "members": [
+    {
+      "name": "product-director",
+      "subagent_type": "product-director",
+      "role": "Diretor de Produto",
+      "description": "Define escopo de sprint, prioriza features, escreve critérios de aceitação e decide o que entra ou fica fora do próximo marco.",
+      "tools": ["Read", "Glob", "Grep"]
+    },
+    {
+      "name": "game-designer",
+      "subagent_type": "game-designer",
+      "role": "Designer de Jogo",
+      "description": "Desenha mecânicas de gameplay, sistemas de progressão, upgrades, eventos aleatórios e loops de jogo.",
+      "tools": ["Read", "Glob", "Grep"]
+    },
+    {
+      "name": "economy-designer",
+      "subagent_type": "economy-balance-designer",
+      "role": "Designer de Economia e Balanceamento",
+      "description": "Define e revisa números do jogo — preços, tempos de crescimento, custos de upgrades, ritmo de recompensas e exploits.",
+      "tools": ["Read", "Glob", "Grep"]
+    },
+    {
+      "name": "gameplay-developer",
+      "subagent_type": "gameplay-developer",
+      "role": "Desenvolvedor de Gameplay",
+      "description": "Implementa e modifica código de gameplay — lógica de fazenda, upgrades, eventos, progressão e save/load com localStorage.",
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+    },
+    {
+      "name": "ui-ux-developer",
+      "subagent_type": "ui-ux-developer",
+      "role": "Desenvolvedor de UI/UX",
+      "description": "Melhora HUD, visibilidade de estados das plantas, botões, mensagens de feedback, layout e clareza visual.",
+      "tools": ["Read", "Write", "Edit", "Glob", "Grep"]
+    },
+    {
+      "name": "qa-tester",
+      "subagent_type": "qa-playtest",
+      "role": "QA e Playtest",
+      "description": "Testa o jogo — bugs, exploits, soft locks, problemas de UX, regressões de save/load, falhas em upgrades e eventos.",
+      "tools": ["Read", "Bash", "Glob", "Grep"]
+    },
+    {
+      "name": "game-director",
+      "subagent_type": "game-director",
+      "role": "Diretor Geral do Jogo",
+      "description": "Coordena sprints completos — planejamento, distribuição de tarefas entre os agentes e geração dos artefatos obrigatórios.",
+      "tools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "Agent"]
+    }
+  ],
+  "how_to_spawn": {
+    "description": "Para recriar o time em uma nova sessão, use o TeamCreate com team_name 'strawberry-farm' e depois spawne cada membro com o Agent tool usando os campos name e subagent_type definidos acima.",
+    "steps": [
+      "1. TeamCreate com team_name: 'strawberry-farm'",
+      "2. Para cada membro: Agent tool com subagent_type, team_name: 'strawberry-farm', name e run_in_background: true",
+      "3. Aguardar todos confirmarem disponibilidade antes de distribuir tarefas",
+      "4. Para encerrar: SendMessage shutdown_request para cada membro pelo name"
+    ]
+  }
+}
