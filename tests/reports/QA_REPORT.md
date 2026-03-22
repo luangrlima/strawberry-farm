@@ -4,9 +4,9 @@
 
 O QA vigente do projeto é:
 
-- `tests/reports/QA_REPORT_SPRINT_18.md`
+- `tests/reports/QA_REPORT_SPRINT_19.md`
 
 Resumo:
-- status: aprovado, com a mecanica de morango estragado validada em 10 de marco de 2026
-- foco mais recente: adicionar apodrecimento apos a janela de colheita, exigir limpeza manual e preservar o loop atual
-- evidência: `npm run test:smoke` e `npm run test:e2e` com cenarios cobrindo apodrecimento, limpeza e replantio
+- status: aprovado em 21 de março de 2026
+- foco: design visual (emojis grandes nos canteiros, interface 100% PT-BR, fazenda como protagonista visual)
+- evidência: `npm run test:smoke` (6/6) e `npm run test:e2e` (11/11)

@@ -92,26 +92,26 @@
       state.money < SF.config.upgrades.helperPlanting.cost;
 
     elements.fertilizerButton.textContent = SF.upgrades.isMaxLevel(game, "fertilizer")
-      ? "Nivel maximo"
+      ? "Nível máximo"
       : fertilizerLevel > 0
-        ? `Nivel ${fertilizerLevel + 1} · ${nextFertilizerCost}`
+        ? `Nível ${fertilizerLevel + 1} · ${nextFertilizerCost}`
         : `Comprar · ${nextFertilizerCost}`;
     elements.marketButton.textContent = SF.upgrades.isMaxLevel(game, "market")
-      ? "Nivel maximo"
+      ? "Nível máximo"
       : marketLevel > 0
-        ? `Nivel ${marketLevel + 1} · ${nextMarketCost}`
+        ? `Nível ${marketLevel + 1} · ${nextMarketCost}`
         : `Comprar · ${nextMarketCost}`;
     elements.expandFarmButton.textContent = state.hasExpandedFarm
       ? "4x4 ativa"
       : `Comprar · ${SF.config.expansion.cost}`;
     elements.helperButton.textContent = state.upgrades.helper
-      ? "Helper ativo"
+      ? "Ajudante ativo"
       : `Comprar · ${SF.config.upgrades.helper.cost}`;
     elements.helperPlantingButton.textContent = state.upgrades.helperPlanting
       ? "Suporte ativo"
       : state.upgrades.helper
         ? `Comprar · ${SF.config.upgrades.helperPlanting.cost}`
-        : `Exige helper · ${SF.config.upgrades.helperPlanting.cost}`;
+        : `Exige ajudante · ${SF.config.upgrades.helperPlanting.cost}`;
 
     elements.buySeedButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.seedPriceDiscount));
     elements.sellButton.classList.toggle(
@@ -136,19 +136,19 @@
     const nextMarketLevel = Math.min(maxMarketLevel, marketLevel + 1);
     const nextMarketBonus = SF.upgrades.getMarketSellBonus(nextMarketLevel);
 
-    game.elements.fertilizerLevelMeta.textContent = `Nivel ${fertilizerLevel}/${maxFertilizerLevel}`;
-    game.elements.marketLevelMeta.textContent = `Nivel ${marketLevel}/${maxMarketLevel}`;
+    game.elements.fertilizerLevelMeta.textContent = `Nível ${fertilizerLevel}/${maxFertilizerLevel}`;
+    game.elements.marketLevelMeta.textContent = `Nível ${marketLevel}/${maxMarketLevel}`;
     game.elements.fertilizerDescription.textContent =
       fertilizerLevel > 0
         ? SF.upgrades.isMaxLevel(game, "fertilizer")
-          ? `Tempo atual ${currentGrowthTime}. Reducao total de ${SF.upgrades.getFertilizerReductionPercent(fertilizerLevel)}%.`
-          : `Tempo atual ${currentGrowthTime}. Proximo nivel deixa em -${nextFertilizerReduction}% do tempo base.`
+          ? `Tempo atual ${currentGrowthTime}. Redução total de ${SF.upgrades.getFertilizerReductionPercent(fertilizerLevel)}%.`
+          : `Tempo atual ${currentGrowthTime}. Próximo nível deixa em -${nextFertilizerReduction}% do tempo base.`
         : SF.config.upgrades.fertilizer.description;
     game.elements.marketDescription.textContent =
       marketLevel > 0
         ? SF.upgrades.isMaxLevel(game, "market")
-          ? `${SF.market.getSellPrice(game)} moedas por venda. Bonus total +${currentMarketBonus}.${game.state.prestige.level > 0 ? ` Knowledge +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " Evento somado." : ""}`
-          : `${SF.market.getSellPrice(game)} moedas por venda. Bonus atual +${currentMarketBonus}; proximo nivel vai para +${nextMarketBonus}.`
+          ? `${SF.market.getSellPrice(game)} moedas por venda. Bônus total +${currentMarketBonus}.${game.state.prestige.level > 0 ? ` Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " Evento somado." : ""}`
+          : `${SF.market.getSellPrice(game)} moedas por venda. Bônus atual +${currentMarketBonus}; próximo nível vai para +${nextMarketBonus}.`
         : SF.config.upgrades.market.description;
     game.elements.expansionDescription.textContent = game.state.hasExpandedFarm
       ? "16 lotes liberados."
@@ -170,7 +170,7 @@
       game.elements.eventBanner.className = "event-banner event-banner--idle";
       game.elements.eventTitle.textContent = "Sem evento";
       game.elements.eventDescription.textContent = "Pode surgir nas vendas.";
-      game.elements.eventEffect.textContent = "Sem bonus.";
+      game.elements.eventEffect.textContent = "Sem bônus.";
       game.elements.eventTags.hidden = true;
       game.elements.eventTags.innerHTML = "";
       game.elements.eventTimer.textContent = "Em espera";
@@ -203,7 +203,7 @@
     game.elements.marketEffect.textContent = activeEvent?.sellPriceBonus
       ? `Base ${marketBasePrice}. Venda ${finalSellPrice}${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : "."}`
       : game.state.prestige.level > 0
-        ? `Base ${marketBasePrice}. Knowledge +${SF.prestige.getPrestigeBonusPercent(game)}%.`
+        ? `Base ${marketBasePrice}. Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.`
         : `Base ${marketBasePrice}.`;
     game.elements.marketPriceValue.textContent = `${marketBasePrice} moedas`;
     game.elements.marketChangeIndicator.textContent = SF.market.getMarketChangeText(game);
@@ -258,13 +258,13 @@
     const nextBonusPercent = SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1);
 
     game.elements.prestigePanel.classList.toggle("prestige-panel--available", isAvailable);
-    game.elements.prestigePanelTitle.textContent = "Strawberry Knowledge";
+    game.elements.prestigePanelTitle.textContent = "Conhecimento do Morango";
     game.elements.prestigePanelDescription.textContent = isAvailable
-      ? `Disponível: nivel ${game.state.prestige.level + 1} com +${nextBonusPercent}% venda.`
+      ? `Disponível: nível ${game.state.prestige.level + 1} com +${nextBonusPercent}% venda.`
       : SF.config.prestige.description;
     game.elements.prestigeThresholdText.textContent = isAvailable
       ? `Disponível com ${game.state.money} moedas.`
-      : `Proximo em ${currentThreshold} moedas.`;
+      : `Próximo em ${currentThreshold} moedas.`;
     game.elements.prestigeButton.disabled = !isAvailable;
     game.elements.prestigeButton.textContent = isAvailable
       ? `Prestigiar (+${nextBonusPercent}%)`
@@ -330,7 +330,7 @@
 
       const meta = document.createElement("div");
       meta.className = "goal-item__meta";
-      meta.textContent = isDone ? "Concluida" : getGoalProgressText(game, goal);
+      meta.textContent = isDone ? "Concluída" : getGoalProgressText(game, goal);
 
       const progressBar = document.createElement("div");
       progressBar.className = "goal-item__bar";

@@ -620,7 +620,7 @@ async function reachMoneyTarget(page, target) {
       const button = document.querySelector("#fertilizerButton");
       const timeValue = document.querySelector("#growthTimeValue");
       const meta = document.querySelector("#fertilizerLevelMeta");
-      return button && button.textContent.includes("Nivel 2") && timeValue.textContent === "8s" && meta && meta.textContent.includes("1/3");
+      return button && button.textContent.includes("Nível 2") && timeValue.textContent === "8s" && meta && meta.textContent.includes("1/3");
     });
     assert(
       (await textOf(page, "#fertilizerDescription")).includes("Tempo atual 8s"),
@@ -658,10 +658,10 @@ async function reachMoneyTarget(page, target) {
       const button = document.querySelector("#fertilizerButton");
       const timeValue = document.querySelector("#growthTimeValue");
       const meta = document.querySelector("#fertilizerLevelMeta");
-      return button && button.textContent.includes("Nivel 3") && timeValue && timeValue.textContent === "6s" && meta && meta.textContent.includes("2/3");
+      return button && button.textContent.includes("Nível 3") && timeValue && timeValue.textContent === "6s" && meta && meta.textContent.includes("2/3");
     });
     assert(
-      (await textOf(page, "#fertilizerDescription")).includes("Proximo nivel"),
+      (await textOf(page, "#fertilizerDescription")).includes("Próximo nível"),
       "O card do adubo deveria indicar o proximo tier antes do nivel maximo.",
     );
 
@@ -673,10 +673,10 @@ async function reachMoneyTarget(page, target) {
       const button = document.querySelector("#marketButton");
       const sellValue = document.querySelector("#sellPriceValue");
       const meta = document.querySelector("#marketLevelMeta");
-      return button && button.textContent.includes("Nivel 2") && sellValue.textContent === "7 moedas" && meta && meta.textContent.includes("1/3");
+      return button && button.textContent.includes("Nível 2") && sellValue.textContent === "7 moedas" && meta && meta.textContent.includes("1/3");
     });
     assert(
-      (await textOf(page, "#marketDescription")).includes("Bonus atual +2"),
+      (await textOf(page, "#marketDescription")).includes("Bônus atual +2"),
       "O card da caixa premium deveria mostrar o bonus atual apos o primeiro nivel.",
     );
     await reachMoneyTarget(page, 24);
@@ -686,7 +686,7 @@ async function reachMoneyTarget(page, target) {
       const button = document.querySelector("#marketButton");
       const sellValue = document.querySelector("#sellPriceValue");
       const meta = document.querySelector("#marketLevelMeta");
-      return button && button.textContent.includes("Nivel 3") && sellValue && sellValue.textContent === "9 moedas" && meta && meta.textContent.includes("2/3");
+      return button && button.textContent.includes("Nível 3") && sellValue && sellValue.textContent === "9 moedas" && meta && meta.textContent.includes("2/3");
     });
     await page.evaluate(() => {
       const currentState = window.__strawberryFarmDebug.getState();
@@ -731,7 +731,7 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const button = document.querySelector("#helperButton");
       const status = document.querySelector("#helperStatusValue");
-      return button && button.textContent.includes("Helper ativo") && status && status.textContent === "On";
+      return button && button.textContent.includes("Ajudante ativo") && status && status.textContent === "On";
     });
     assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper deveria aparecer quando ativo.");
     await resetComboState(page);
@@ -883,7 +883,7 @@ async function reachMoneyTarget(page, target) {
       "O painel de prestígio deveria indicar disponibilidade ao atingir o requisito.",
     );
     assert(
-      (await textOf(page, "#milestoneToast")).includes("Strawberry Knowledge") ||
+      (await textOf(page, "#milestoneToast")).includes("Conhecimento do Morango") ||
         (await textOf(page, "#prestigePanelDescription")).includes("Disponível:"),
       "A UI deveria deixar claro que o prestígio foi desbloqueado.",
     );

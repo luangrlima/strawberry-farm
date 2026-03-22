@@ -77,6 +77,10 @@
       plotElement.hint.textContent = SF.plots.getPlotHint(plot, now);
       plotElement.progressFill.style.width = `${progress}%`;
       plotElement.progressTrack.hidden = plot.state !== SF.config.plotStates.growing;
+      plotElement.name.hidden = true;
+      plotElement.stage.hidden = true;
+      plotElement.hint.hidden = true;
+      plotElement.timer.hidden = plot.state === SF.config.plotStates.empty;
       plotElement.button.classList.toggle(
         "plot--attention",
         (plot.state === SF.config.plotStates.ready && farmMetrics.readyPlots > 0) ||

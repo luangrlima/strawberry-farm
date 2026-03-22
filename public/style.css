@@ -246,6 +246,11 @@ h1 {
   max-height: 100%;
 }
 
+.zone--left,
+.zone--right {
+  opacity: 0.92;
+}
+
 .zone--right {
   height: calc(100vh - 170px);
   align-self: stretch;
@@ -367,13 +372,13 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   background: rgba(200, 52, 89, 0.12);
   color: var(--accent-dark);
   font-family: "Trebuchet MS", "Gill Sans", sans-serif;
-  font-size: 0.84rem;
+  font-size: 1.1rem;
   font-weight: 700;
 }
 
@@ -615,9 +620,9 @@ h1 {
   padding: 10px;
   border-radius: 30px;
   background:
-    linear-gradient(180deg, rgba(255, 248, 241, 0.96), rgba(248, 226, 214, 0.78)),
-    rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(124, 69, 44, 0.1);
+    linear-gradient(180deg, rgba(196, 138, 101, 0.15), rgba(131, 80, 54, 0.12)),
+    rgba(255, 248, 241, 0.9);
+  border: 1px solid rgba(124, 69, 44, 0.22);
 }
 
 .farm-stage__header {
@@ -682,7 +687,7 @@ h1 {
 
 .plot {
   appearance: none;
-  min-height: 98px;
+  min-height: 120px;
   padding: 8px;
   border: 0;
   border-radius: 28px;
@@ -725,41 +730,22 @@ h1 {
 }
 
 .plot__emoji {
-  font-size: 1.45rem;
+  font-size: 2.5rem;
   line-height: 1;
 }
 
 .plot__name,
 .plot__stage,
-.plot__timer,
 .plot__hint {
-  text-align: center;
-}
-
-.plot__name {
-  font-size: 0.76rem;
-  font-weight: 700;
-}
-
-.plot__stage,
-.plot__timer,
-.plot__hint {
-  font-family: "Trebuchet MS", "Gill Sans", sans-serif;
-}
-
-.plot__stage {
-  font-size: 0.64rem;
-  font-weight: 700;
+  display: none;
 }
 
 .plot__timer {
-  font-size: 0.62rem;
-  opacity: 0.92;
-}
-
-.plot__hint {
-  font-size: 0.6rem;
-  opacity: 0.95;
+  text-align: center;
+  font-family: "Trebuchet MS", "Gill Sans", sans-serif;
+  font-size: 0.68rem;
+  opacity: 0.85;
+  margin-top: 2px;
 }
 
 .plot__progress {
@@ -1224,6 +1210,6 @@ h1 {
   }
 
   .plot {
-    min-height: 140px;
+    min-height: 150px;
   }
 }

@@ -8,7 +8,7 @@ window.StrawberryFarm.config = {
   winMoney: 35,
   autosaveIntervalMs: 4000,
   prestige: {
-    label: "Strawberry Knowledge",
+    label: "Conhecimento do Morango",
     baseThresholdMoney: 120,
     sellBonusPerLevel: 0.2,
     description: "Reinicie para ganhar +20% permanente nas vendas por nível.",
@@ -42,7 +42,7 @@ window.StrawberryFarm.config = {
       costStep: 8,
       maxLevel: 3,
       growthMultiplierPerLevel: 0.75,
-      description: "Cada nivel reduz 25% do tempo de crescimento.",
+      description: "Cada nível reduz 25% do tempo de crescimento.",
     },
     market: {
       label: "Caixa premium",
@@ -50,10 +50,10 @@ window.StrawberryFarm.config = {
       costStep: 10,
       maxLevel: 3,
       sellPriceBonusPerLevel: 2,
-      description: "Cada nivel adiciona +2 moedas por venda.",
+      description: "Cada nível adiciona +2 moedas por venda.",
     },
     helper: {
-      label: "Farm Helper",
+      label: "Ajudante",
       cost: 18,
       harvestIntervalMs: 3500,
       description: "Colhe 1 pronto por ciclo.",
@@ -61,7 +61,7 @@ window.StrawberryFarm.config = {
     helperPlanting: {
       label: "Bolsa de sementes",
       cost: 22,
-      description: "O Helper planta 1 vazio por ciclo se nao houver colheita. Consome sementes.",
+      description: "O ajudante planta 1 vazio por ciclo se não houver colheita. Consome sementes.",
     },
   },
   expansion: {

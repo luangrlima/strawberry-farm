@@ -71,7 +71,7 @@
     }
 
     game.state.systems.prestige.unlockShownForLevel = game.state.prestige.level;
-    return `Strawberry Knowledge disponível. Prestigie para ganhar +${SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1)}% permanente nas vendas.`;
+    return `Conhecimento do Morango disponível. Prestigie para ganhar +${SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1)}% permanente nas vendas.`;
   }
 
   SF.progression = {

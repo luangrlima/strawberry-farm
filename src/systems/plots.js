@@ -182,9 +182,9 @@
       return "🍓";
     }
     if (plot.state === SF.config.plotStates.rotten) {
-      return "🫙";
+      return "💀";
     }
-    return "🟫";
+    return "⬜";
   }
 
   function getPlotName(plot) {

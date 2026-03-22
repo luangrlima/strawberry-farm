@@ -189,7 +189,7 @@
     const nextCost = SF.upgrades.getUpgradeCost("fertilizer", currentLevel);
 
     if (SF.upgrades.isMaxLevel(game, "fertilizer")) {
-      SF.runtime.showMessage(game, "Adubo no nivel maximo.", { now });
+      SF.runtime.showMessage(game, "Adubo no nível máximo.", { now });
       return;
     }
 
@@ -201,7 +201,7 @@
     game.state.money -= nextCost;
     game.state.upgrades.fertilizer = currentLevel + 1;
     game.state.stats.upgradesPurchased += 1;
-    game.setMessage(`Adubo melhorado para nivel ${currentLevel + 1}.`);
+    game.setMessage(`Adubo melhorado para nível ${currentLevel + 1}.`);
     game.commit({ now });
   }
 
@@ -212,7 +212,7 @@
     const nextCost = SF.upgrades.getUpgradeCost("market", currentLevel);
 
     if (SF.upgrades.isMaxLevel(game, "market")) {
-      SF.runtime.showMessage(game, "Caixa premium no nivel maximo.", { now });
+      SF.runtime.showMessage(game, "Caixa premium no nível máximo.", { now });
       return;
     }
 
@@ -224,7 +224,7 @@
     game.state.money -= nextCost;
     game.state.upgrades.market = currentLevel + 1;
     game.state.stats.upgradesPurchased += 1;
-    game.setMessage(`Caixa premium nivel ${currentLevel + 1}.`);
+    game.setMessage(`Caixa premium nível ${currentLevel + 1}.`);
     game.commit({ now });
   }
 
@@ -234,7 +234,7 @@
     const upgrade = SF.config.upgrades.helper;
 
     if (game.state.upgrades.helper) {
-      SF.runtime.showMessage(game, "Helper já ativo.", { now });
+      SF.runtime.showMessage(game, "Ajudante já ativo.", { now });
       return;
     }
 
@@ -248,8 +248,8 @@
     game.state.stats.upgradesPurchased += 1;
     game.state.systems.helper.nextHarvestAt = now + upgrade.harvestIntervalMs;
     game.state.systems.helper.lastActionAt = now;
-    game.state.systems.helper.lastActionText = "Helper ativado.";
-    game.setMessage("Helper comprado.");
+    game.state.systems.helper.lastActionText = "Ajudante ativado.";
+    game.setMessage("Ajudante comprado.");
     game.commit({ now });
   }
 
@@ -259,12 +259,12 @@
     const upgrade = SF.config.upgrades.helperPlanting;
 
     if (!game.state.upgrades.helper) {
-      SF.runtime.showMessage(game, "Compre o Helper primeiro.", { now });
+      SF.runtime.showMessage(game, "Compre o ajudante primeiro.", { now });
       return;
     }
 
     if (game.state.upgrades.helperPlanting) {
-      SF.runtime.showMessage(game, "Plantio assistido ja ativo.", { now });
+      SF.runtime.showMessage(game, "Plantio assistido já ativo.", { now });
       return;
     }
 
@@ -315,7 +315,7 @@
     const nextLevel = game.state.prestige.level + 1;
     const nextBonusPercent = SF.prestige.getPrestigeBonusPercent(game, nextLevel);
     const shouldPrestige = window.confirm(
-      `Prestigiar a fazenda?\n\nVocê perderá moedas, sementes, morangos, fazenda expandida, plantações, upgrades, helper, evento e combo atuais.\n\nVocê ganhará Strawberry Knowledge nível ${nextLevel} com +${nextBonusPercent}% permanente no valor total das vendas.`,
+      `Prestigiar a fazenda?\n\nVocê perderá moedas, sementes, morangos, fazenda expandida, plantações, melhorias, ajudante, evento e combo atuais.\n\nVocê ganhará Conhecimento do Morango nível ${nextLevel} com +${nextBonusPercent}% permanente no valor total das vendas.`,
     );
 
     if (!shouldPrestige) {
@@ -343,7 +343,7 @@
     const now = Date.now();
     SF.runtime.setNow(game, now);
     const shouldReset = window.confirm(
-      "Reiniciar todo o progresso?\n\nIsso apaga moedas, sementes, upgrades, helper, eventos, metas, plantações salvas e também o Strawberry Knowledge.",
+      "Reiniciar todo o progresso?\n\nIsso apaga moedas, sementes, melhorias, ajudante, eventos, metas, plantações salvas e também o Conhecimento do Morango.",
     );
 
     if (!shouldReset) {

@@ -23,12 +23,12 @@
     game.state.systems.helper.lastHarvestAt = now;
     game.state.systems.helper.lastPlotId = plotId;
     game.state.systems.helper.lastActionAt = now;
-    game.state.systems.helper.lastActionText = `Helper colheu o canteiro ${plotId + 1}.`;
+    game.state.systems.helper.lastActionText = `Ajudante colheu o canteiro ${plotId + 1}.`;
   }
 
   function noteHelperPlant(game, plotId, now = Date.now()) {
     game.state.systems.helper.lastActionAt = now;
-    game.state.systems.helper.lastActionText = `Helper plantou no canteiro ${plotId + 1}.`;
+    game.state.systems.helper.lastActionText = `Ajudante plantou no canteiro ${plotId + 1}.`;
   }
 
   function runFarmHelper(game, now = Date.now()) {

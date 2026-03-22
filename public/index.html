@@ -11,13 +11,13 @@
       <section class="panel">
         <div class="panel__header">
           <div class="brand-block">
-            <p class="eyebrow">UI Sprint 17</p>
+            <p class="eyebrow">Temporada 1</p>
             <h1>Fazenda de Morangos</h1>
-            <p class="subtitle">Plante, colha e venda em um painel mais visual.</p>
+            <p class="subtitle">Sua fazenda de morangos espera por você!</p>
             <div class="header-pills" aria-label="Resumo do jogo">
-              <span class="header-pill">1 cultura</span>
-              <span class="header-pill">sessões curtas</span>
-              <span class="header-pill">prestígio leve</span>
+              <span class="header-pill">Morangos frescos</span>
+              <span class="header-pill">Sessões rápidas</span>
+              <span class="header-pill">Conhecimento acumulado</span>
             </div>
           </div>
           <button class="helper-btn" id="helpToggleButton" type="button" aria-expanded="false">Guia</button>
@@ -28,30 +28,30 @@
             <section class="overview-card">
               <div class="overview-card__head">
                 <div>
-                  <p class="section-kicker">Ritmo atual</p>
-                  <h2 class="overview-card__title">Sua banca de morango</h2>
+                  <p class="section-kicker">Visão geral</p>
+                  <h2 class="overview-card__title">Painel de recursos</h2>
                 </div>
                 <div class="goal" id="goalStatus" aria-live="polite">Meta 35</div>
               </div>
 
               <section class="stats stats--compact" aria-label="Recursos">
                 <article class="stat" id="moneyCard">
-                  <span class="stat__icon" aria-hidden="true">◌</span>
+                  <span class="stat__icon" aria-hidden="true">💰</span>
                   <span class="stat__label">Moedas</span>
                   <strong class="stat__value" id="moneyCount">0</strong>
                 </article>
                 <article class="stat" id="seedCard">
-                  <span class="stat__icon" aria-hidden="true">✦</span>
+                  <span class="stat__icon" aria-hidden="true">🌱</span>
                   <span class="stat__label">Sementes</span>
                   <strong class="stat__value" id="seedCount">0</strong>
                 </article>
                 <article class="stat" id="berryCard">
-                  <span class="stat__icon" aria-hidden="true">✿</span>
+                  <span class="stat__icon" aria-hidden="true">🍓</span>
                   <span class="stat__label">Morangos</span>
                   <strong class="stat__value" id="berryCount">0</strong>
                 </article>
                 <article class="stat" id="sellPriceCard">
-                  <span class="stat__icon" aria-hidden="true">$</span>
+                  <span class="stat__icon" aria-hidden="true">📊</span>
                   <span class="stat__label">Venda</span>
                   <strong class="stat__value stat__value--small" id="sellPriceValue">3 moedas</strong>
                   <span class="stat__hint" id="sellPriceHint">Estável</span>
@@ -68,12 +68,12 @@
                   <strong class="mini-stat__value" id="plotCountValue">9/16</strong>
                 </article>
                 <article class="mini-stat" id="helperCard">
-                  <span class="mini-stat__label">Helper</span>
+                  <span class="mini-stat__label">Ajudante</span>
                   <strong class="mini-stat__value" id="helperStatusValue">Off</strong>
                   <span class="mini-stat__hint" id="helperStatusHint">Inativo</span>
                 </article>
                 <article class="mini-stat" id="prestigeCard">
-                  <span class="mini-stat__label">Knowledge</span>
+                  <span class="mini-stat__label">Prestígio</span>
                   <strong class="mini-stat__value" id="prestigeLevelValue">Nível 0</strong>
                   <span class="mini-stat__hint" id="prestigeBonusHint">+0% venda</span>
                 </article>
@@ -88,7 +88,7 @@
 
             <section class="status-stack" aria-label="Status rápidos">
               <section class="status-module status-module--message">
-                <p class="status-module__label">Feed</p>
+                <p class="status-module__label">Status</p>
                 <p id="statusMessage" aria-live="polite">Comece plantando.</p>
               </section>
 
@@ -112,7 +112,7 @@
 
               <section class="helper-strip status-module" id="helperStrip" aria-live="polite" hidden>
                 <div>
-                  <p class="helper-strip__eyebrow">Farm Helper</p>
+                  <p class="helper-strip__eyebrow">Ajudante</p>
                   <strong class="helper-strip__title" id="helperStripTitle">Auto-colheita</strong>
                   <p class="helper-strip__text" id="helperStripText">Monitorando a fazenda.</p>
                 </div>
@@ -152,8 +152,8 @@
               <section class="farm-section">
                 <div class="farm-stage__header">
                   <div>
-                    <p class="section-kicker">Fazenda</p>
-                    <h2 class="farm-stage__title">Tabuleiro principal</h2>
+                    <p class="section-kicker">Sua fazenda</p>
+                    <h2 class="farm-stage__title">Canteiros</h2>
                   </div>
                   <div class="legend" aria-label="Estados dos canteiros">
                     <span class="legend__item"><span class="legend__dot legend__dot--empty"></span>Vazio</span>
@@ -202,7 +202,7 @@
               <section class="prestige-panel" id="prestigePanel" aria-live="polite">
                 <div>
                   <p class="prestige-panel__eyebrow">Prestígio</p>
-                  <h2 id="prestigePanelTitle">Strawberry Knowledge</h2>
+                  <h2 id="prestigePanelTitle">Conhecimento do Morango</h2>
                   <p class="prestige-panel__text" id="prestigePanelDescription">Reinicie para ganhar bônus permanente.</p>
                   <p class="prestige-panel__meta" id="prestigeThresholdText">Próximo em 120 moedas.</p>
                 </div>
@@ -213,7 +213,7 @@
             <section class="management-deck" aria-label="Gestão compacta">
               <div class="management-deck__header">
                 <div>
-                  <p class="progression__eyebrow">Painel rápido</p>
+                  <p class="progression__eyebrow">Progresso</p>
                   <h2>Gestão da fazenda</h2>
                 </div>
                 <div class="progression__summary" id="progressSummary">0 de 4 metas concluídas</div>
@@ -258,7 +258,7 @@
                 <article class="upgrade-card">
                   <p class="upgrade-card__eyebrow">Melhoria</p>
                   <h2>Adubo rápido</h2>
-                  <p class="upgrade-card__meta" id="fertilizerLevelMeta">Nivel 0/3</p>
+                  <p class="upgrade-card__meta" id="fertilizerLevelMeta">Nível 0/3</p>
                   <p class="upgrade-card__text" id="fertilizerDescription">-25% no tempo.</p>
                   <button class="action-btn" id="fertilizerButton" type="button">Comprar adubo (10)</button>
                 </article>
@@ -266,7 +266,7 @@
                 <article class="upgrade-card">
                   <p class="upgrade-card__eyebrow">Melhoria</p>
                   <h2>Caixa premium</h2>
-                  <p class="upgrade-card__meta" id="marketLevelMeta">Nivel 0/3</p>
+                  <p class="upgrade-card__meta" id="marketLevelMeta">Nível 0/3</p>
                   <p class="upgrade-card__text" id="marketDescription">+2 moedas por venda.</p>
                   <button class="action-btn" id="marketButton" type="button">Melhorar venda (14)</button>
                 </article>
@@ -280,18 +280,18 @@
 
                 <article class="upgrade-card">
                   <p class="upgrade-card__eyebrow">Automação leve</p>
-                  <h2>Farm Helper</h2>
+                  <h2>Ajudante</h2>
                   <p class="upgrade-card__text" id="helperDescription">Colhe 1 pronto por ciclo.</p>
-                  <button class="action-btn" id="helperButton" type="button">Comprar helper (18)</button>
+                  <button class="action-btn" id="helperButton" type="button">Comprar ajudante (18)</button>
                 </article>
 
                 <article class="upgrade-card">
-                  <p class="upgrade-card__eyebrow">Suporte do helper</p>
+                  <p class="upgrade-card__eyebrow">Suporte do ajudante</p>
                   <h2>Bolsa de sementes</h2>
                   <p class="upgrade-card__text" id="helperPlantingDescription">
-                    O Helper planta 1 vazio por ciclo se nao houver colheita. Consome sementes.
+                    O ajudante planta 1 vazio por ciclo se não houver colheita. Consome sementes.
                   </p>
-                  <button class="action-btn" id="helperPlantingButton" type="button">Exige Helper (22)</button>
+                  <button class="action-btn" id="helperPlantingButton" type="button">Exige ajudante (22)</button>
                 </article>
               </section>
 
