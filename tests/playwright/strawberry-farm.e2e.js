@@ -261,9 +261,10 @@ async function preparePostPrestigeProgression(page) {
     currentState.strawberries = 0;
     currentState.hasExpandedFarm = false;
     currentState.unlockedPlotCount = 9;
-    currentState.stats.harvestedTotal = 4;
-    currentState.stats.upgradesPurchased = 0;
-    currentState.progression.completedGoalIds = ["harvest-3"];
+    currentState.stats.harvestedTotal = 51;
+    currentState.stats.upgradesPurchased = 3;
+    currentState.stats.soldTotal = 20;
+    currentState.progression.completedGoalIds = ["harvest-3", "sell-20", "harvest-50", "prestige-1", "buy-upgrade", "reach-35"];
     currentState.upgrades.fertilizer = 0;
     currentState.upgrades.market = 0;
     currentState.upgrades.helper = false;
@@ -290,7 +291,7 @@ async function preparePostPrestigeProgression(page) {
   await page.waitForFunction(() => {
     const money = Number(document.querySelector("#moneyCount")?.textContent || "0");
     const completed = document.querySelector("#progressSummary")?.textContent || "";
-    return money === 80 && completed.includes("1/4");
+    return money === 80 && completed.includes("6/8");
   }, { timeout: 5000 });
 }
 
@@ -412,7 +413,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 0", "O prestígio deveria iniciar no nível 0.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+0%"), "O bônus inicial de prestígio deveria ser 0%.");
-    assert((await textOf(page, "#progressSummary")) === "0/4 metas", "Resumo inicial de metas incorreto.");
+    assert((await textOf(page, "#progressSummary")) === "0/8 metas", "Resumo inicial de metas incorreto.");
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O banner de evento deveria iniciar vazio.");
     assert((await textOf(page, "#marketHeadline")).includes("Preço estável"), "O banner de mercado deveria iniciar estável.");
     assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda deveria iniciar recolhido.");
@@ -714,6 +715,18 @@ async function reachMoneyTarget(page, target) {
       (await textOf(page, "#eventBanner")).includes("Afeta vendas"),
       "O banner do Sol forte deveria destacar a venda como ação afetada.",
     );
+    // Neutralize all goals with money rewards to prevent contamination during sellButton click.
+    // Goals that grant money: harvest-3 (+4), buy-upgrade (+5), sell-20 (+6), harvest-50 (+8), all-upgrades (+12).
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      const goalsWithMoneyReward = ["harvest-3", "buy-upgrade", "sell-20", "harvest-50", "all-upgrades"];
+      goalsWithMoneyReward.forEach((id) => {
+        if (!currentState.progression.completedGoalIds.includes(id)) {
+          currentState.progression.completedGoalIds.push(id);
+        }
+      });
+      window.__strawberryFarmDebug.setState(currentState);
+    });
     const moneyBeforeSunnySale = await numberOf(page, "#moneyCount");
     const berriesBeforeSunnySale = await numberOf(page, "#berryCount");
     await page.click("#sellButton");
@@ -888,6 +901,14 @@ async function reachMoneyTarget(page, target) {
       "A UI deveria deixar claro que o prestígio foi desbloqueado.",
     );
     assert(!(await page.locator("#prestigeButton").isDisabled()), "O botão de prestígio deveria ficar ativo.");
+    // Neutralize prestige-1 goal reward (seeds: +5) before triggering prestige to avoid seed count contamination.
+    await page.evaluate(() => {
+      const currentState = window.__strawberryFarmDebug.getState();
+      if (!currentState.progression.completedGoalIds.includes("prestige-1")) {
+        currentState.progression.completedGoalIds.push("prestige-1");
+      }
+      window.__strawberryFarmDebug.setState(currentState);
+    });
     page.once("dialog", (dialog) => {
       dialog.accept().catch(() => {});
     });
@@ -926,7 +947,7 @@ async function reachMoneyTarget(page, target) {
       (await textOf(page, "#goalStatus")) === "Meta concluída",
       "A mensagem final de vitória não apareceu ao alcançar 35 moedas.",
     );
-    assert((await textOf(page, "#progressSummary")) === "4/4 metas", "As metas finais não foram concluídas.");
+    assert((await textOf(page, "#progressSummary")) === "8/8 metas", "As metas finais não foram concluídas.");
 
     console.log("Cenário 10: reset e restauração completa");
     page.once("dialog", (dialog) => {
@@ -939,7 +960,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O reset não restaurou o preço base de venda.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "O reset não restaurou o tempo base.");
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O reset não limpou o evento ativo.");
-    assert((await textOf(page, "#progressSummary")) === "0/4 metas", "O reset não limpou as metas.");
+    assert((await textOf(page, "#progressSummary")) === "0/8 metas", "O reset não limpou as metas.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 0", "O reset total deveria limpar o prestígio.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+0%"), "O reset total deveria limpar o bônus permanente.");
 

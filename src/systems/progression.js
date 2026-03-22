@@ -16,6 +16,14 @@
       return game.state.hasExpandedFarm;
     }
 
+    if (goal.targetType === "soldTotal") {
+      return game.state.stats.soldTotal >= goal.targetValue;
+    }
+
+    if (goal.targetType === "prestigeLevel") {
+      return game.state.prestige.level >= goal.targetValue;
+    }
+
     return false;
   }
 

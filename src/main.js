@@ -74,6 +74,7 @@
     game.elements.expandFarmButton.addEventListener("click", expandFarm);
     game.elements.helperButton.addEventListener("click", buyHelperUpgrade);
     game.elements.helperPlantingButton.addEventListener("click", buyHelperPlantingUpgrade);
+    game.elements.helperGlovesButton.addEventListener("click", buyHelperGlovesUpgrade);
     game.elements.prestigeButton.addEventListener("click", prestigeFarm);
     game.elements.helpToggleButton.addEventListener("click", toggleHelpPanel);
     game.elements.helpDismissButton.addEventListener("click", dismissHelpPanel);
@@ -282,6 +283,35 @@
     game.commit({ now });
   }
 
+  function buyHelperGlovesUpgrade() {
+    const now = Date.now();
+    SF.runtime.setNow(game, now);
+    const upgrade = SF.config.upgrades.helperGloves;
+
+    if (!game.state.upgrades.helper) {
+      SF.runtime.showMessage(game, "Compre o ajudante primeiro.", { now });
+      return;
+    }
+
+    if (game.state.upgrades.helperGloves) {
+      SF.runtime.showMessage(game, "Luvas já ativas.", { now });
+      return;
+    }
+
+    if (game.state.money < upgrade.cost) {
+      SF.runtime.showMessage(game, "Moedas insuficientes.", { now });
+      return;
+    }
+
+    game.state.money -= upgrade.cost;
+    game.state.upgrades.helperGloves = true;
+    game.state.stats.upgradesPurchased += 1;
+    game.state.systems.helper.lastActionAt = now;
+    game.state.systems.helper.lastActionText = "Luvas Resistentes equipadas.";
+    game.setMessage("Luvas Resistentes compradas.");
+    game.commit({ now });
+  }
+
   function expandFarm() {
     const now = Date.now();
     SF.runtime.setNow(game, now);
@@ -328,8 +358,12 @@
       sellBonusMultiplier: SF.prestige.getPrestigeMultiplierForLevel(nextLevel) - 1,
     };
 
+    SF.progression.applyProgressionGoals(game);
+    const completedGoals = [...game.state.progression.completedGoalIds];
+
     const nextState = SF.state.createInitialState(now);
     nextState.prestige = nextPrestigeState;
+    nextState.progression.completedGoalIds = completedGoals;
     nextState.systems.prestige.unlockShownForLevel = -1;
     SF.runtime.replaceState(game, nextState, {
       now,

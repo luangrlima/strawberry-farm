@@ -74,6 +74,10 @@
       sellPrice += activeEvent.sellPriceBonus;
     }
 
+    if (activeEvent?.sellPricePenalty) {
+      sellPrice = Math.max(SF.config.market.minPrice, sellPrice - activeEvent.sellPricePenalty);
+    }
+
     return sellPrice;
   }
 

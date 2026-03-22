@@ -32,6 +32,7 @@
         market: 0,
         helper: false,
         helperPlanting: false,
+        helperGloves: false,
       },
       progression: {
         completedGoalIds: [],
@@ -76,6 +77,7 @@
         readyAt: null,
         rottenAt: null,
         growthDurationMs: null,
+        spoilDurationMs: null,
       })),
     };
   }

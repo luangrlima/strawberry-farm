@@ -25,22 +25,33 @@
     return Math.max(3000, Math.floor(growthTime));
   }
 
+  function getSpoilTimeMs(game) {
+    if (game.state.upgrades.helperGloves) {
+      return 10000;
+    }
+    return SF.config.crop.spoilTimeMs;
+  }
+
   function updatePlotsByTime(game, now = Date.now()) {
     let becameReady = false;
     let becameRotten = false;
 
     getVisiblePlots(game).forEach((plot) => {
       if (plot.state === SF.config.plotStates.ready && !Number.isFinite(plot.rottenAt)) {
-        plot.rottenAt = now + SF.config.crop.spoilTimeMs;
+        const spoilTime = getSpoilTimeMs(game);
+        plot.rottenAt = now + spoilTime;
+        plot.spoilDurationMs = spoilTime;
         becameReady = true;
         return;
       }
 
       if (plot.state === SF.config.plotStates.growing && Number.isFinite(plot.readyAt) && now >= plot.readyAt) {
+        const spoilTime = getSpoilTimeMs(game);
         plot.state = SF.config.plotStates.ready;
         plot.plantedAt = null;
         plot.readyAt = null;
-        plot.rottenAt = now + SF.config.crop.spoilTimeMs;
+        plot.rottenAt = now + spoilTime;
+        plot.spoilDurationMs = spoilTime;
         plot.growthDurationMs = null;
         becameReady = true;
         return;
@@ -118,6 +129,7 @@
     plot.readyAt = null;
     plot.rottenAt = null;
     plot.growthDurationMs = null;
+    plot.spoilDurationMs = null;
     game.state.strawberries += SF.config.crop.harvestYield;
     game.state.stats.harvestedTotal += SF.config.crop.harvestYield;
     markPlotHarvested(game, plot.id, source, now);
@@ -137,12 +149,23 @@
   }
 
   function clearRottenPlot(game, plot, now = Date.now()) {
+    clearRottenPlotWithSource(game, plot, "manual", now);
+  }
+
+  function clearRottenPlotWithSource(game, plot, source, now = Date.now()) {
     plot.state = SF.config.plotStates.empty;
     plot.plantedAt = null;
     plot.readyAt = null;
     plot.rottenAt = null;
     plot.growthDurationMs = null;
-    game.setMessage("Morangos estragados removidos.");
+    plot.spoilDurationMs = null;
+
+    if (source === "helper") {
+      SF.helper.noteHelperClean(game, plot.id, now);
+    } else {
+      game.setMessage("Morangos estragados removidos.");
+    }
+
     game.commit({ now });
   }
 
@@ -172,6 +195,15 @@
     const duration = plot.growthDurationMs || SF.config.crop.growthTimeMs;
     const elapsed = now - plot.plantedAt;
     return Math.max(0, Math.min(100, (elapsed / duration) * 100));
+  }
+
+  function getSpoilProgress(plot, now = Date.now()) {
+    if (plot.state !== SF.config.plotStates.ready || !Number.isFinite(plot.rottenAt)) {
+      return 0;
+    }
+    const duration = plot.spoilDurationMs || SF.config.crop.spoilTimeMs;
+    const remaining = Math.max(0, plot.rottenAt - now);
+    return Math.max(0, Math.min(100, (remaining / duration) * 100));
   }
 
   function getPlotEmoji(plot) {
@@ -273,6 +305,7 @@
     getVisiblePlots,
     getSeedPrice,
     getGrowthTimeMs,
+    getSpoilTimeMs,
     updatePlotsByTime,
     markPlotHarvested,
     syncHarvestEffects,
@@ -281,8 +314,10 @@
     harvestPlot,
     harvestPlotWithSource,
     clearRottenPlot,
+    clearRottenPlotWithSource,
     getFarmMetrics,
     getPlotProgress,
+    getSpoilProgress,
     getPlotEmoji,
     getPlotName,
     getPlotBadge,

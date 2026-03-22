@@ -758,6 +758,11 @@ h1 {
   transition: width 180ms linear;
 }
 
+.plot__progress-fill--spoil {
+  background: linear-gradient(90deg, #d94545, #e8a03e);
+  transition: width 180ms linear;
+}
+
 .plot--empty {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 35%),
@@ -821,6 +826,10 @@ h1 {
 
 .event-banner--market {
   background: linear-gradient(135deg, rgba(255, 243, 228, 0.95), rgba(227, 129, 81, 0.32));
+}
+
+.event-banner--pest {
+  background: linear-gradient(135deg, rgba(255, 230, 230, 0.95), rgba(180, 60, 60, 0.28));
 }
 
 .market-banner--up {

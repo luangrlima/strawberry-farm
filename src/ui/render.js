@@ -113,6 +113,17 @@
         ? `Comprar · ${SF.config.upgrades.helperPlanting.cost}`
         : `Exige ajudante · ${SF.config.upgrades.helperPlanting.cost}`;
 
+    elements.helperGlovesButton.disabled =
+      !state.upgrades.helper ||
+      state.upgrades.helperGloves ||
+      state.money < SF.config.upgrades.helperGloves.cost;
+    elements.helperGlovesButton.textContent = state.upgrades.helperGloves
+      ? "Luvas ativas"
+      : state.upgrades.helper
+        ? `Comprar · ${SF.config.upgrades.helperGloves.cost}`
+        : `Exige ajudante · ${SF.config.upgrades.helperGloves.cost}`;
+    elements.helperGlovesButton.classList.toggle("action-btn--highlight", state.upgrades.helperGloves);
+
     elements.buySeedButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.seedPriceDiscount));
     elements.sellButton.classList.toggle(
       "action-btn--highlight",
@@ -161,6 +172,9 @@
     game.elements.helperPlantingDescription.textContent = game.state.upgrades.helperPlanting
       ? "Ativo: usa 1 semente quando sobra um ciclo sem colheita."
       : SF.config.upgrades.helperPlanting.description;
+    game.elements.helperGlovesDescription.textContent = game.state.upgrades.helperGloves
+      ? `Limpeza automática. Apodrecimento em ${SF.utils.formatSeconds(10000)}.`
+      : SF.config.upgrades.helperGloves.description;
   }
 
   function renderEventBanner(game, now = getRenderNow(game)) {
@@ -202,9 +216,11 @@
     game.elements.marketSummary.textContent = SF.market.getMarketDescription(game);
     game.elements.marketEffect.textContent = activeEvent?.sellPriceBonus
       ? `Base ${marketBasePrice}. Venda ${finalSellPrice}${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : "."}`
-      : game.state.prestige.level > 0
-        ? `Base ${marketBasePrice}. Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.`
-        : `Base ${marketBasePrice}.`;
+      : activeEvent?.sellPricePenalty
+        ? `Base ${marketBasePrice}. Venda ${finalSellPrice}${game.state.prestige.level > 0 ? ` +${SF.prestige.getPrestigeBonusPercent(game)}%.` : ". Praga ativa."}`
+        : game.state.prestige.level > 0
+          ? `Base ${marketBasePrice}. Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.`
+          : `Base ${marketBasePrice}.`;
     game.elements.marketPriceValue.textContent = `${marketBasePrice} moedas`;
     game.elements.marketChangeIndicator.textContent = SF.market.getMarketChangeText(game);
     game.elements.marketTimer.textContent = `${SF.utils.formatSeconds(remainingMs)}`;
@@ -237,10 +253,14 @@
     const nextHarvestAt = game.state.systems.helper.nextHarvestAt;
 
     game.elements.helperStatusValue.textContent = isActive ? "On" : "Off";
+    const cycleExtras = [
+      game.state.upgrades.helperGloves ? "limpeza" : "",
+      game.state.upgrades.helperPlanting ? "plantio" : "",
+    ].filter(Boolean).join(" + ");
     game.elements.helperStatusHint.textContent =
       isActive && Number.isFinite(nextHarvestAt)
-        ? game.state.upgrades.helperPlanting
-          ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))} + plantio`
+        ? cycleExtras
+          ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))} + ${cycleExtras}`
           : `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))}`
         : "Inativo";
     game.elements.helperCard.classList.toggle("stat--highlight", isActive);
@@ -284,9 +304,13 @@
       ? Math.max(0, helper.nextHarvestAt - now)
       : SF.config.upgrades.helper.harvestIntervalMs;
     const recentAction = Number.isFinite(helper.lastActionAt) && now - helper.lastActionAt < 2800;
-    game.elements.helperStripTitle.textContent = game.state.upgrades.helperPlanting
-      ? "Auto-colheita + plantio"
-      : "Auto-colheita";
+    game.elements.helperStripTitle.textContent = game.state.upgrades.helperGloves
+      ? game.state.upgrades.helperPlanting
+        ? "Auto-colheita + limpeza + plantio"
+        : "Auto-colheita + limpeza"
+      : game.state.upgrades.helperPlanting
+        ? "Auto-colheita + plantio"
+        : "Auto-colheita";
 
     game.elements.helperStripText.textContent =
       recentAction && helper.lastActionText
@@ -407,10 +431,16 @@
       return `${currentValue}/${goal.targetValue} colhidos`;
     }
     if (goal.targetType === "upgradesPurchased") {
-      return `${currentValue}/${goal.targetValue} upgrades`;
+      return `${currentValue}/${goal.targetValue} melhorias`;
     }
     if (goal.targetType === "expandedFarm") {
       return game.state.hasExpandedFarm ? "4x4 liberado" : "4x4 pendente";
+    }
+    if (goal.targetType === "soldTotal") {
+      return `${currentValue}/${goal.targetValue} vendidos`;
+    }
+    if (goal.targetType === "prestigeLevel") {
+      return currentValue >= goal.targetValue ? "Prestígio feito" : "Prestígio pendente";
     }
 
     return `${currentValue}/${goal.targetValue}`;
@@ -429,12 +459,21 @@
     if (goal.targetType === "expandedFarm") {
       return game.state.hasExpandedFarm ? 1 : 0;
     }
+    if (goal.targetType === "soldTotal") {
+      return game.state.stats.soldTotal;
+    }
+    if (goal.targetType === "prestigeLevel") {
+      return game.state.prestige.level;
+    }
     return 0;
   }
 
   function getGoalPercent(game, goal) {
     if (goal.targetType === "expandedFarm") {
       return game.state.hasExpandedFarm ? 100 : 0;
+    }
+    if (goal.targetType === "prestigeLevel") {
+      return game.state.prestige.level >= goal.targetValue ? 100 : 0;
     }
 
     const current = getGoalCurrentValue(game, goal);

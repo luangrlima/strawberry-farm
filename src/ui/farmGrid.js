@@ -66,7 +66,6 @@
         return;
       }
 
-      const progress = SF.plots.getPlotProgress(plot, now);
       plotElement.button.className = `plot plot--${plot.state}`;
       plotElement.button.setAttribute("aria-label", SF.plots.getPlotLabel(plot, index, now));
       plotElement.badge.textContent = SF.plots.getPlotBadge(plot);
@@ -75,8 +74,23 @@
       plotElement.stage.textContent = SF.plots.getPlotStageText(plot, now);
       plotElement.timer.textContent = SF.plots.getPlotTimerText(plot, now);
       plotElement.hint.textContent = SF.plots.getPlotHint(plot, now);
-      plotElement.progressFill.style.width = `${progress}%`;
-      plotElement.progressTrack.hidden = plot.state !== SF.config.plotStates.growing;
+
+      if (plot.state === SF.config.plotStates.growing) {
+        const progress = SF.plots.getPlotProgress(plot, now);
+        plotElement.progressFill.style.width = `${progress}%`;
+        plotElement.progressFill.className = "plot__progress-fill";
+      } else if (plot.state === SF.config.plotStates.ready) {
+        const spoilProgress = SF.plots.getSpoilProgress(plot, now);
+        plotElement.progressFill.style.width = `${spoilProgress}%`;
+        plotElement.progressFill.className = "plot__progress-fill plot__progress-fill--spoil";
+      } else {
+        plotElement.progressFill.style.width = "0%";
+        plotElement.progressFill.className = "plot__progress-fill";
+      }
+
+      plotElement.progressTrack.hidden =
+        plot.state !== SF.config.plotStates.growing &&
+        plot.state !== SF.config.plotStates.ready;
       plotElement.name.hidden = true;
       plotElement.stage.hidden = true;
       plotElement.hint.hidden = true;

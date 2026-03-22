@@ -86,6 +86,10 @@
       tags.push("Acelera canteiros já plantados");
     }
 
+    if (activeEvent.sellPricePenalty) {
+      tags.push("Reduz preço de venda");
+    }
+
     return tags;
   }
 
@@ -108,6 +112,10 @@
 
     if (activeEvent.growthMultiplier) {
       return `Crescimento em ${SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game))}.`;
+    }
+
+    if (activeEvent.sellPricePenalty) {
+      return `-${activeEvent.sellPricePenalty} por morango.`;
     }
 
     return "Sem bônus.";

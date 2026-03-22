@@ -85,6 +85,8 @@
       expansionDescription: document.querySelector("#expansionDescription"),
       helperDescription: document.querySelector("#helperDescription"),
       helperPlantingDescription: document.querySelector("#helperPlantingDescription"),
+      helperGlovesButton: document.querySelector("#helperGlovesButton"),
+      helperGlovesDescription: document.querySelector("#helperGlovesDescription"),
     };
   }
 

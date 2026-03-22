@@ -117,6 +117,7 @@
       );
       nextState.upgrades.helper = Boolean(savedState.upgrades.helper);
       nextState.upgrades.helperPlanting = Boolean(savedState.upgrades.helperPlanting);
+      nextState.upgrades.helperGloves = Boolean(savedState.upgrades.helperGloves);
     }
 
     if (savedState.progression && Array.isArray(savedState.progression.completedGoalIds)) {
@@ -198,6 +199,7 @@
           readyAt: Number.isFinite(savedPlot.readyAt) ? savedPlot.readyAt : null,
           rottenAt: Number.isFinite(savedPlot.rottenAt) ? savedPlot.rottenAt : null,
           growthDurationMs: Number.isFinite(savedPlot.growthDurationMs) ? savedPlot.growthDurationMs : null,
+          spoilDurationMs: Number.isFinite(savedPlot.spoilDurationMs) ? savedPlot.spoilDurationMs : null,
         };
       });
     }
