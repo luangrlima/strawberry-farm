@@ -29,7 +29,7 @@
       SF.runtime.setNow(game, now);
       const plot = game.state.plots[plotIndex];
 
-      if (!plot || plotIndex >= game.state.unlockedPlotCount) {
+      if (!plot || !SF.plots.isPlotUnlocked(game, plotIndex)) {
         return;
       }
 
@@ -315,21 +315,24 @@
   function expandFarm() {
     const now = Date.now();
     SF.runtime.setNow(game, now);
+    const currentFarmLevel = SF.plots.getFarmLevelConfig(game);
+    const nextFarmLevel = SF.plots.getFarmLevelConfigByLevel(currentFarmLevel.level + 1);
 
-    if (game.state.hasExpandedFarm) {
+    if (currentFarmLevel.level >= SF.config.farmLevels.length - 1) {
       SF.runtime.showMessage(game, "Fazenda já expandida.", { now });
       return;
     }
 
-    if (game.state.money < SF.config.expansion.cost) {
+    if (game.state.money < nextFarmLevel.expansionCost) {
       SF.runtime.showMessage(game, "Moedas insuficientes.", { now });
       return;
     }
 
-    game.state.money -= SF.config.expansion.cost;
-    game.state.unlockedPlotCount = SF.config.maxPlotCount;
-    game.state.hasExpandedFarm = true;
-    game.setMessage("Fazenda 6x4 liberada.");
+    game.state.money -= nextFarmLevel.expansionCost;
+    game.state.farmLevel = nextFarmLevel.level;
+    game.state.unlockedPlotCount = nextFarmLevel.unlockedPlotCount;
+    game.state.hasExpandedFarm = nextFarmLevel.level > 0;
+    game.setMessage(`Fazenda ${nextFarmLevel.label} liberada.`);
     game.commit({ now });
   }
 

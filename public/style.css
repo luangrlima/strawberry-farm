@@ -659,7 +659,7 @@ h1 {
 
 .farm-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
   padding: 6px;
   border-radius: 22px;
@@ -669,10 +669,6 @@ h1 {
   box-shadow:
     inset 0 1px 0 rgba(255, 235, 205, 0.22),
     0 12px 24px rgba(78, 48, 30, 0.14);
-}
-
-.farm-grid--expanded {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .plot {
@@ -693,6 +689,11 @@ h1 {
 
 .plot--attention {
   filter: saturate(1.06);
+}
+
+.plot--locked {
+  cursor: default;
+  filter: grayscale(0.18) brightness(0.92);
 }
 
 .plot__visual {
@@ -811,7 +812,15 @@ h1 {
   bottom: 22px;
 }
 
-.plot__visual[data-crop="strawberry-growing-3"] .plot__crop,
+.plot__visual[data-crop="strawberry-growing-3"] .plot__crop {
+  bottom: 20px;
+}
+
+.plot__visual[data-crop="strawberry-growing-4"] .plot__crop {
+  bottom: 18px;
+}
+
+.plot__visual[data-crop="strawberry-growing-5"] .plot__crop,
 .plot__visual[data-crop="strawberry-ready"] .plot__crop,
 .plot__visual[data-crop="strawberry-rotten"] .plot__crop {
   bottom: 16px;
@@ -844,6 +853,14 @@ h1 {
     linear-gradient(90deg, transparent 44%, rgba(255, 239, 215, 0.32) 44% 56%, transparent 56%),
     linear-gradient(180deg, transparent 44%, rgba(255, 239, 215, 0.32) 44% 56%, transparent 56%);
   opacity: 0.8;
+}
+
+.plot__visual[data-state="locked"] .plot__overlay::before {
+  inset: 14px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, transparent 46%, rgba(255, 233, 208, 0.1) 46% 54%, transparent 54%),
+    linear-gradient(45deg, transparent 46%, rgba(255, 233, 208, 0.08) 46% 54%, transparent 54%);
 }
 
 .plot__visual[data-overlay="ready-glint"] .plot__overlay::before {
@@ -901,17 +918,17 @@ h1 {
   top: 5px;
   left: 5px;
   z-index: 2;
-  min-height: 16px;
-  padding: 2px 5px;
+  min-height: 20px;
+  padding: 3px 6px;
   border-radius: 999px;
   background: rgba(66, 44, 28, 0.18);
   border: 1px solid rgba(255, 236, 205, 0.1);
   font-family: "Trebuchet MS", "Gill Sans", sans-serif;
-  font-size: 0.45rem;
+  font-size: 0.56rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  opacity: 0.72;
+  opacity: 0.84;
 }
 
 .plot__timer {
@@ -919,16 +936,16 @@ h1 {
   bottom: 5px;
   z-index: 2;
   max-width: calc(100% - 10px);
-  padding: 2px 5px;
+  padding: 3px 6px;
   border-radius: 999px;
   background: rgba(66, 44, 28, 0.18);
   border: 1px solid rgba(255, 236, 205, 0.08);
   text-align: right;
   font-family: "Trebuchet MS", "Gill Sans", sans-serif;
-  font-size: 0.46rem;
+  font-size: 0.58rem;
   line-height: 1.1;
   letter-spacing: 0.01em;
-  opacity: 0.74;
+  opacity: 0.86;
 }
 
 .plot__progress {
@@ -1451,11 +1468,7 @@ h1 {
   }
 
   .farm-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .farm-grid--expanded {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .overview-card__head,
@@ -1570,12 +1583,12 @@ h1 {
   }
 
   .plot__chip {
-    font-size: 0.42rem;
-    padding: 2px 4px;
+    font-size: 0.5rem;
+    padding: 2px 5px;
   }
 
   .plot__timer {
-    font-size: 0.44rem;
+    font-size: 0.52rem;
   }
 
   .plot__progress {

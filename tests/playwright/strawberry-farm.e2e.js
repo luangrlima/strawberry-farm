@@ -70,6 +70,10 @@ async function numberOf(page, selector) {
   return Number(await textOf(page, selector));
 }
 
+async function unlockedPlotCount(page) {
+  return page.locator(".plot:not([disabled])").count();
+}
+
 async function plotVisualState(page, index = 0) {
   return page.locator(".plot__visual").nth(index).evaluate((element) => ({
     ground: element.dataset.ground,
@@ -283,8 +287,9 @@ async function preparePostPrestigeProgression(page) {
     currentState.money = 80;
     currentState.seeds = 3;
     currentState.strawberries = 0;
+    currentState.farmLevel = 0;
     currentState.hasExpandedFarm = false;
-    currentState.unlockedPlotCount = 15;
+    currentState.unlockedPlotCount = 6;
     currentState.stats.harvestedTotal = 51;
     currentState.stats.upgradesPurchased = 3;
     currentState.stats.soldTotal = 20;
@@ -430,8 +435,9 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 1: renderização inicial e HUD");
     await waitForText(page, "h1", "Fazenda de Morangos");
-    assert((await page.locator(".plot").count()) === 15, "A fazenda deveria iniciar com 15 canteiros.");
-    assert((await textOf(page, "#plotCountValue")) === "15/24", "HUD inicial da fazenda incorreto.");
+    assert((await page.locator(".plot").count()) === 16, "A fazenda deveria manter 16 slots visuais.");
+    assert((await unlockedPlotCount(page)) === 6, "A fazenda deveria iniciar com 6 canteiros liberados.");
+    assert((await textOf(page, "#plotCountValue")) === "6/16", "HUD inicial da fazenda incorreto.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "Preço de venda inicial incorreto.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "Tempo de crescimento inicial incorreto.");
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
@@ -519,7 +525,7 @@ async function reachMoneyTarget(page, target) {
       const plot = document.querySelector(".plot");
       return plot && plot.textContent && plot.textContent.includes("Crescendo");
     });
-    assert((await textOf(page, "#plotCountValue")) === "15/24", "O save/load corrompeu o tamanho base da fazenda.");
+    assert((await textOf(page, "#plotCountValue")) === "6/16", "O save/load corrompeu o tamanho base da fazenda.");
     assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O preço de mercado não persistiu após reload.");
     assert(
       (await plotVisualState(page, 0)).crop?.startsWith("strawberry-growing-"),
@@ -622,8 +628,8 @@ async function reachMoneyTarget(page, target) {
       return plot && plot.textContent && plot.textContent.includes("Crescendo");
     });
 
-    console.log("Cenário 3: expansão da fazenda para 6x4");
-    await reachMoneyTarget(page, 10);
+    console.log("Cenário 3: expansão da fazenda por níveis até 4x4");
+    await reachMoneyTarget(page, 40);
     await openUpgradesTab(page);
     await page.click("#expandFarmButton");
     await page.waitForFunction(() => {
@@ -632,17 +638,43 @@ async function reachMoneyTarget(page, target) {
       return (
         expansionButton &&
         expansionButton.textContent &&
-        expansionButton.textContent.includes("6x4 ativa") &&
+        expansionButton.textContent.includes("Comprar 4x3") &&
         plotCount &&
-        plotCount.textContent === "24/24"
+        plotCount.textContent === "9/16"
       );
     });
-    assert((await page.locator(".plot").count()) === 24, "A expansão não liberou 24 canteiros.");
-    assert((await textOf(page, "#plotCountValue")) === "24/24", "HUD não refletiu a fazenda expandida.");
+    assert((await unlockedPlotCount(page)) === 9, "A primeira expansão não liberou 9 canteiros.");
+    await page.click("#expandFarmButton");
+    await page.waitForFunction(() => {
+      const expansionButton = document.querySelector("#expandFarmButton");
+      const plotCount = document.querySelector("#plotCountValue");
+      return (
+        expansionButton &&
+        expansionButton.textContent &&
+        expansionButton.textContent.includes("Comprar 4x4") &&
+        plotCount &&
+        plotCount.textContent === "12/16"
+      );
+    });
+    assert((await unlockedPlotCount(page)) === 12, "A segunda expansão não liberou 12 canteiros.");
+    await page.click("#expandFarmButton");
+    await page.waitForFunction(() => {
+      const expansionButton = document.querySelector("#expandFarmButton");
+      const plotCount = document.querySelector("#plotCountValue");
+      return (
+        expansionButton &&
+        expansionButton.textContent &&
+        expansionButton.textContent.includes("4x4 ativa") &&
+        plotCount &&
+        plotCount.textContent === "16/16"
+      );
+    });
+    assert((await unlockedPlotCount(page)) === 16, "A expansão final não liberou 16 canteiros.");
+    assert((await textOf(page, "#plotCountValue")) === "16/16", "HUD não refletiu a fazenda expandida.");
     assert(!(await page.locator("#milestoneToast").isHidden()), "A conclusão de meta deveria exibir feedback visual.");
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
-    assert((await page.locator(".plot").count()) === 24, "A expansão não persistiu após reload.");
+    assert((await unlockedPlotCount(page)) === 16, "A expansão não persistiu após reload.");
 
     console.log("Cenário 4: evento Feira local e economia de sementes");
     await forceEvent(page, "market-day", 5000);
@@ -977,7 +1009,7 @@ async function reachMoneyTarget(page, target) {
     await waitForText(page, "#statusMessage", "Conhecimento nível 1");
     assert((await textOf(page, "#moneyCount")) === "6", "O prestígio deveria reiniciar o dinheiro.");
     assert((await textOf(page, "#seedCount")) === "3", "O prestígio deveria reiniciar as sementes.");
-    assert((await textOf(page, "#plotCountValue")) === "15/24", "O prestígio deveria reiniciar a fazenda base.");
+    assert((await textOf(page, "#plotCountValue")) === "6/16", "O prestígio deveria reiniciar a fazenda base.");
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O prestígio deveria remover o helper.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 1", "O nível de prestígio não subiu após o reset.");
     assert((await textOf(page, "#prestigeBonusHint")).includes("+20%"), "O bônus permanente não foi aplicado após o prestígio.");
@@ -1017,8 +1049,8 @@ async function reachMoneyTarget(page, target) {
     });
     await page.click("#resetButton");
     await waitForText(page, "#statusMessage", "Comece plantando.");
-    assert((await page.locator(".plot").count()) === 15, "O reset não voltou a fazenda base.");
-    assert((await textOf(page, "#plotCountValue")) === "15/24", "O HUD não restaurou o tamanho inicial da fazenda.");
+    assert((await unlockedPlotCount(page)) === 6, "O reset não voltou a fazenda base.");
+    assert((await textOf(page, "#plotCountValue")) === "6/16", "O HUD não restaurou o tamanho inicial da fazenda.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O reset não restaurou o preço base de venda.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "O reset não restaurou o tempo base.");
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O reset não limpou o evento ativo.");
@@ -1030,7 +1062,7 @@ async function reachMoneyTarget(page, target) {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
-    assert((await page.locator(".plot").count()) === 15, "O mobile deveria continuar exibindo a fazenda.");
+    assert((await page.locator(".plot").count()) === 16, "O mobile deveria continuar exibindo a grade completa.");
     assert(await page.locator("#buySeedButton").isVisible(), "A ação de comprar semente deveria continuar visível no mobile.");
     assert(await page.locator("#goalStatus").isVisible(), "A meta principal deveria continuar visível no mobile.");
 

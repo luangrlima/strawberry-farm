@@ -74,6 +74,9 @@
     const marketBasePrice = SF.market.getMarketBasePrice(game);
     const fertilizerLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
     const marketLevel = SF.upgrades.getUpgradeLevel(game, "market");
+    const currentFarmLevel = SF.plots.getFarmLevelConfig(game);
+    const nextFarmLevel = SF.plots.getFarmLevelConfigByLevel(currentFarmLevel.level + 1);
+    const farmAtMaxLevel = currentFarmLevel.level >= SF.config.farmLevels.length - 1;
     const nextFertilizerCost = SF.upgrades.getUpgradeCost("fertilizer", fertilizerLevel);
     const nextMarketCost = SF.upgrades.getUpgradeCost("market", marketLevel);
 
@@ -84,7 +87,7 @@
     elements.fertilizerButton.disabled =
       SF.upgrades.isMaxLevel(game, "fertilizer") || state.money < nextFertilizerCost;
     elements.marketButton.disabled = SF.upgrades.isMaxLevel(game, "market") || state.money < nextMarketCost;
-    elements.expandFarmButton.disabled = state.hasExpandedFarm || state.money < SF.config.expansion.cost;
+    elements.expandFarmButton.disabled = farmAtMaxLevel || state.money < nextFarmLevel.expansionCost;
     elements.helperButton.disabled = state.upgrades.helper || state.money < SF.config.upgrades.helper.cost;
     elements.helperPlantingButton.disabled =
       !state.upgrades.helper ||
@@ -101,9 +104,9 @@
       : marketLevel > 0
         ? `Nível ${marketLevel + 1} · ${nextMarketCost}`
         : `Comprar · ${nextMarketCost}`;
-    elements.expandFarmButton.textContent = state.hasExpandedFarm
-      ? "6x4 ativa"
-      : `Comprar · ${SF.config.expansion.cost}`;
+    elements.expandFarmButton.textContent = farmAtMaxLevel
+      ? `${currentFarmLevel.label} ativa`
+      : `Comprar ${nextFarmLevel.label} · ${nextFarmLevel.expansionCost}`;
     elements.helperButton.textContent = state.upgrades.helper
       ? "Ajudante ativo"
       : `Comprar · ${SF.config.upgrades.helper.cost}`;
@@ -138,6 +141,9 @@
     const activeEvent = SF.events.getActiveEventDefinition(game);
     const fertilizerLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
     const marketLevel = SF.upgrades.getUpgradeLevel(game, "market");
+    const currentFarmLevel = SF.plots.getFarmLevelConfig(game);
+    const nextFarmLevel = SF.plots.getFarmLevelConfigByLevel(currentFarmLevel.level + 1);
+    const farmAtMaxLevel = currentFarmLevel.level >= SF.config.farmLevels.length - 1;
     const maxFertilizerLevel = SF.config.upgrades.fertilizer.maxLevel;
     const maxMarketLevel = SF.config.upgrades.market.maxLevel;
     const currentGrowthTime = SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game));
@@ -161,9 +167,9 @@
           ? `${SF.market.getSellPrice(game)} moedas por venda. Bônus total +${currentMarketBonus}.${game.state.prestige.level > 0 ? ` Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " Evento somado." : ""}`
           : `${SF.market.getSellPrice(game)} moedas por venda. Bônus atual +${currentMarketBonus}; próximo nível vai para +${nextMarketBonus}.`
         : SF.config.upgrades.market.description;
-    game.elements.expansionDescription.textContent = game.state.hasExpandedFarm
-      ? "24 lotes liberados."
-      : SF.config.expansion.description;
+    game.elements.expansionDescription.textContent = farmAtMaxLevel
+      ? "16 lotes liberados."
+      : `Atual ${currentFarmLevel.label} (${currentFarmLevel.unlockedPlotCount}/16). Próximo ${nextFarmLevel.label} por ${nextFarmLevel.expansionCost} moedas.`;
     game.elements.helperDescription.textContent = game.state.upgrades.helper
       ? game.state.upgrades.helperPlanting
         ? `Colhe 1 pronto e planta se sobrar ciclo a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
@@ -432,7 +438,7 @@
       return `${currentValue}/${goal.targetValue} melhorias`;
     }
     if (goal.targetType === "expandedFarm") {
-      return game.state.hasExpandedFarm ? "6x4 liberado" : "6x4 pendente";
+      return game.state.farmLevel > 0 ? "Expansão liberada" : "Expansão pendente";
     }
     if (goal.targetType === "soldTotal") {
       return `${currentValue}/${goal.targetValue} vendidos`;
@@ -455,7 +461,7 @@
       return game.state.money;
     }
     if (goal.targetType === "expandedFarm") {
-      return game.state.hasExpandedFarm ? 1 : 0;
+      return game.state.farmLevel > 0 ? 1 : 0;
     }
     if (goal.targetType === "soldTotal") {
       return game.state.stats.soldTotal;
@@ -468,7 +474,7 @@
 
   function getGoalPercent(game, goal) {
     if (goal.targetType === "expandedFarm") {
-      return game.state.hasExpandedFarm ? 100 : 0;
+      return game.state.farmLevel > 0 ? 100 : 0;
     }
     if (goal.targetType === "prestigeLevel") {
       return game.state.prestige.level >= goal.targetValue ? 100 : 0;

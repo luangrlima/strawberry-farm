@@ -13,7 +13,7 @@
     }
 
     if (goal.targetType === "expandedFarm") {
-      return game.state.hasExpandedFarm;
+      return game.state.farmLevel > 0;
     }
 
     if (goal.targetType === "soldTotal") {

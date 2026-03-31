@@ -67,7 +67,7 @@ function loadLegacyFixture() {
 }
 
 function materializeLegacySave(template, now) {
-  const plots = Array.from({ length: 24 }, (_, index) => {
+  const plots = Array.from({ length: 16 }, (_, index) => {
     const templatePlot = template.plots[index];
 
     if (!templatePlot) {
@@ -137,6 +137,10 @@ async function textOf(page, selector) {
 
 async function numberOf(page, selector) {
   return Number(await textOf(page, selector));
+}
+
+async function unlockedPlotCount(page) {
+  return page.locator(".plot:not([disabled])").count();
 }
 
 async function plotVisualState(page, index = 0) {
@@ -223,7 +227,8 @@ async function setExpiredComboScenario(page) {
 
     console.log("Smoke 1: HUD inicial");
     await waitForText(page, "h1", "Fazenda de Morangos");
-    assert((await page.locator(".plot").count()) === 15, "A fazenda inicial deveria exibir 15 canteiros.");
+    assert((await page.locator(".plot").count()) === 16, "A grade da fazenda deveria manter 16 slots.");
+    assert((await unlockedPlotCount(page)) === 6, "A fazenda inicial deveria liberar 6 canteiros.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O preço inicial deveria ser 3 moedas.");
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
     const initialPlot = await plotVisualState(page, 0);
@@ -315,7 +320,7 @@ async function setExpiredComboScenario(page) {
     });
     await page.click("#resetButton");
     await waitForText(page, "#prestigeLevelValue", "Nível 0");
-    assert((await textOf(page, "#plotCountValue")) === "15/24", "O reset deveria restaurar a fazenda base.");
+    assert((await textOf(page, "#plotCountValue")) === "6/16", "O reset deveria restaurar a fazenda base.");
 
     await page.screenshot({
       path: SUCCESS_SCREENSHOT_PATH,

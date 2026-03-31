@@ -1,6 +1,51 @@
 (function (SF) {
+  function getFarmLevelConfigByLevel(level = 0) {
+    const farmLevels = SF.config.farmLevels || [];
+    return farmLevels[Math.max(0, Math.min(farmLevels.length - 1, level))] || {
+      level: 0,
+      label: "4x4",
+      cols: 4,
+      rows: 4,
+      unlockedPlotCount: SF.config.maxPlotCount,
+      expansionCost: 0,
+    };
+  }
+
+  function getFarmLevelIndexByUnlockedPlotCount(unlockedPlotCount = SF.config.initialPlotCount) {
+    const farmLevels = SF.config.farmLevels || [];
+    let levelIndex = 0;
+
+    farmLevels.forEach((farmLevel, index) => {
+      if (unlockedPlotCount >= farmLevel.unlockedPlotCount) {
+        levelIndex = index;
+      }
+    });
+
+    return levelIndex;
+  }
+
+  function getFarmLevelConfig(game) {
+    const level = Number.isFinite(game?.state?.farmLevel)
+      ? game.state.farmLevel
+      : getFarmLevelIndexByUnlockedPlotCount(game?.state?.unlockedPlotCount);
+    return getFarmLevelConfigByLevel(level);
+  }
+
+  function isPlotUnlocked(game, plotIndex) {
+    const farmLevel = getFarmLevelConfig(game);
+    const row = Math.floor(plotIndex / 4);
+    const col = plotIndex % 4;
+    return row < farmLevel.rows && col < farmLevel.cols;
+  }
+
+  function getUnlockedPlotIndexes(game) {
+    return game.state.plots
+      .map((_, index) => index)
+      .filter((index) => isPlotUnlocked(game, index));
+  }
+
   function getVisiblePlots(game) {
-    return game.state.plots.slice(0, game.state.unlockedPlotCount);
+    return getUnlockedPlotIndexes(game).map((index) => game.state.plots[index]);
   }
 
   function getSeedPrice(game) {
@@ -234,7 +279,7 @@
         cropVariant: "strawberry-ready",
         overlayVariant: "ready-glint",
         progressVariant: "spoil-ring",
-        cropFrameX: 16,
+        cropFrameX: 0,
         cropFrameY: strawberryRowY,
       };
     }
@@ -246,14 +291,14 @@
         tilledVariant: "tilled-weary",
         cropVariant: "strawberry-rotten",
         overlayVariant: "rotten-flies",
-        cropFrameX: 16,
+        cropFrameX: 0,
         cropFrameY: strawberryRowY,
       };
     }
 
     const progress = getPlotProgress(plot, now);
 
-    if (progress < 34) {
+    if (progress < 20) {
       return {
         ...visualModel,
         tilledVariant: "tilled-active",
@@ -264,7 +309,7 @@
       };
     }
 
-    if (progress < 67) {
+    if (progress < 40) {
       return {
         ...visualModel,
         tilledVariant: "tilled-active",
@@ -275,12 +320,34 @@
       };
     }
 
+    if (progress < 60) {
+      return {
+        ...visualModel,
+        tilledVariant: "tilled-active",
+        cropVariant: "strawberry-growing-3",
+        progressVariant: "grow-ring",
+        cropFrameX: 48,
+        cropFrameY: strawberryRowY,
+      };
+    }
+
+    if (progress < 80) {
+      return {
+        ...visualModel,
+        tilledVariant: "tilled-active",
+        cropVariant: "strawberry-growing-4",
+        progressVariant: "grow-ring",
+        cropFrameX: 32,
+        cropFrameY: strawberryRowY,
+      };
+    }
+
     return {
       ...visualModel,
       tilledVariant: "tilled-active",
-      cropVariant: "strawberry-growing-3",
+      cropVariant: "strawberry-growing-5",
       progressVariant: "grow-ring",
-      cropFrameX: 32,
+      cropFrameX: 16,
       cropFrameY: strawberryRowY,
     };
   }
@@ -354,11 +421,17 @@
     }
 
     const progress = getPlotProgress(plot, now);
-    if (progress < 34) {
-      return "Brotando";
+    if (progress < 20) {
+      return "Semente";
     }
-    if (progress < 67) {
-      return "Crescendo";
+    if (progress < 40) {
+      return "Broto";
+    }
+    if (progress < 60) {
+      return "Folhas";
+    }
+    if (progress < 80) {
+      return "Florindo";
     }
     return "Quase pronto";
   }
@@ -400,6 +473,11 @@
 
   SF.plots = {
     getVisiblePlots,
+    getFarmLevelConfigByLevel,
+    getFarmLevelIndexByUnlockedPlotCount,
+    getFarmLevelConfig,
+    getUnlockedPlotIndexes,
+    isPlotUnlocked,
     getSeedPrice,
     getGrowthTimeMs,
     getSpoilTimeMs,

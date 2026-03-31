@@ -5,7 +5,7 @@
     game.elements.farmGrid.innerHTML = "";
     game.plotElements.length = 0;
 
-    game.state.plots.slice(0, game.state.unlockedPlotCount).forEach((_, index) => {
+    game.state.plots.slice(0, SF.config.maxPlotCount).forEach((_, index) => {
       const plotButton = document.createElement("button");
       plotButton.type = "button";
       plotButton.className = "plot";
@@ -71,33 +71,50 @@
   }
 
   function renderFarmGrid(game, farmMetrics, now = Number.isFinite(game?.runtime?.now) ? game.runtime.now : 0) {
-    if (game.plotElements.length !== game.state.unlockedPlotCount) {
+    if (game.plotElements.length !== SF.config.maxPlotCount) {
       createFarmGrid(game);
     }
 
-    game.elements.farmGrid.classList.toggle("farm-grid--expanded", game.state.hasExpandedFarm);
+    const farmLevel = SF.plots.getFarmLevelConfig(game);
+    game.elements.farmGrid.dataset.level = farmLevel.label;
 
-    game.state.plots.slice(0, game.state.unlockedPlotCount).forEach((plot, index) => {
+    game.state.plots.slice(0, SF.config.maxPlotCount).forEach((plot, index) => {
       const plotElement = game.plotElements[index];
 
       if (!plotElement) {
         return;
       }
 
-      const visualModel = SF.plots.getPlotVisualModel(plot, now);
+      const plotUnlocked = SF.plots.isPlotUnlocked(game, index);
+      const visualModel = plotUnlocked
+        ? SF.plots.getPlotVisualModel(plot, now)
+        : {
+            groundVariant: "field-dim",
+            tilledVariant: "idle-soil",
+            cropVariant: "none",
+            overlayVariant: "none",
+            progressVariant: "none",
+            accentVariant: "none",
+            cropFrameX: null,
+            cropFrameY: null,
+          };
       const harvestSource = game.uiState.harvestedPlots[plot.id]?.source;
       const overlayVariant =
-        plot.state === SF.config.plotStates.empty && harvestSource === "manual"
+        plotUnlocked && plot.state === SF.config.plotStates.empty && harvestSource === "manual"
           ? "manual-harvest-flash"
-          : plot.state === SF.config.plotStates.empty && harvestSource === "helper"
+          : plotUnlocked && plot.state === SF.config.plotStates.empty && harvestSource === "helper"
             ? "helper-harvest-flash"
             : visualModel.overlayVariant;
 
-      plotElement.button.className = `plot plot--${plot.state}`;
-      plotElement.button.dataset.state = plot.state;
-      plotElement.button.setAttribute("aria-label", SF.plots.getPlotLabel(plot, index, now));
-      plotElement.badge.textContent = SF.plots.getPlotBadge(plot);
-      plotElement.visual.dataset.state = plot.state;
+      plotElement.button.className = `plot plot--${plotUnlocked ? plot.state : "locked"}`;
+      plotElement.button.dataset.state = plotUnlocked ? plot.state : "locked";
+      plotElement.button.disabled = !plotUnlocked;
+      plotElement.button.setAttribute(
+        "aria-label",
+        plotUnlocked ? SF.plots.getPlotLabel(plot, index, now) : `Canteiro ${index + 1}: bloqueado para o próximo tamanho da fazenda.`,
+      );
+      plotElement.badge.textContent = plotUnlocked ? SF.plots.getPlotBadge(plot) : "Fechado";
+      plotElement.visual.dataset.state = plotUnlocked ? plot.state : "locked";
       plotElement.visual.dataset.ground = visualModel.groundVariant;
       plotElement.visual.dataset.tilled = visualModel.tilledVariant;
       plotElement.visual.dataset.crop = visualModel.cropVariant;
@@ -134,18 +151,20 @@
         plotElement.progressFill.className = "plot__progress-fill";
       }
 
-      plotElement.progressTrack.hidden = visualModel.progressVariant === "none";
+      plotElement.progressTrack.hidden = !plotUnlocked || visualModel.progressVariant === "none";
       plotElement.name.hidden = true;
       plotElement.stage.hidden = true;
       plotElement.hint.hidden = true;
-      plotElement.timer.hidden = plot.state === SF.config.plotStates.empty;
+      plotElement.timer.hidden = !plotUnlocked || plot.state === SF.config.plotStates.empty;
+      plotElement.badge.hidden = false;
       plotElement.button.classList.toggle(
         "plot--attention",
-        (plot.state === SF.config.plotStates.ready && farmMetrics.readyPlots > 0) ||
-          (plot.state === SF.config.plotStates.rotten && farmMetrics.rottenPlots > 0),
+        plotUnlocked &&
+          ((plot.state === SF.config.plotStates.ready && farmMetrics.readyPlots > 0) ||
+            (plot.state === SF.config.plotStates.rotten && farmMetrics.rottenPlots > 0)),
       );
-      plotElement.button.classList.toggle("plot--harvested", harvestSource === "manual");
-      plotElement.button.classList.toggle("plot--harvested-auto", harvestSource === "helper");
+      plotElement.button.classList.toggle("plot--harvested", plotUnlocked && harvestSource === "manual");
+      plotElement.button.classList.toggle("plot--harvested-auto", plotUnlocked && harvestSource === "helper");
     });
   }
 

@@ -61,10 +61,20 @@
       : Number.isFinite(savedState.lastSavedAt)
         ? savedState.lastSavedAt
         : null;
-    nextState.unlockedPlotCount = Number.isFinite(savedState.unlockedPlotCount)
+    const savedUnlockedPlotCount = Number.isFinite(savedState.unlockedPlotCount)
       ? Math.max(config.initialPlotCount, Math.min(config.maxPlotCount, savedState.unlockedPlotCount))
       : nextState.unlockedPlotCount;
-    nextState.hasExpandedFarm = Boolean(savedState.hasExpandedFarm) || nextState.unlockedPlotCount === config.maxPlotCount;
+    const derivedFarmLevel = Number.isFinite(savedState.farmLevel)
+      ? Math.max(0, Math.min(config.farmLevels.length - 1, savedState.farmLevel))
+      : SF.plots.getFarmLevelIndexByUnlockedPlotCount(
+          Boolean(savedState.hasExpandedFarm) && savedUnlockedPlotCount < config.maxPlotCount
+            ? config.farmLevels[1].unlockedPlotCount
+            : savedUnlockedPlotCount,
+        );
+    const farmLevelConfig = config.farmLevels[derivedFarmLevel];
+    nextState.farmLevel = derivedFarmLevel;
+    nextState.unlockedPlotCount = farmLevelConfig.unlockedPlotCount;
+    nextState.hasExpandedFarm = derivedFarmLevel > 0;
 
     const savedActiveEvent = savedSystems?.activeEvent || savedState.activeEvent;
     if (savedActiveEvent && typeof savedActiveEvent === "object") {

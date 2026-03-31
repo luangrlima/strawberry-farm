@@ -3,8 +3,8 @@ window.StrawberryFarm = window.StrawberryFarm || {};
 window.StrawberryFarm.config = {
   title: "Fazenda de Morangos",
   storageKey: "strawberry-farm-save",
-  initialPlotCount: 15,
-  maxPlotCount: 24,
+  initialPlotCount: 6,
+  maxPlotCount: 16,
   winMoney: 35,
   autosaveIntervalMs: 4000,
   prestige: {
@@ -69,10 +69,15 @@ window.StrawberryFarm.config = {
       description: "O ajudante limpa 1 canteiro apodrecido por ciclo.",
     },
   },
+  farmLevels: [
+    { level: 0, label: "3x2", cols: 3, rows: 2, unlockedPlotCount: 6, expansionCost: 0 },
+    { level: 1, label: "3x3", cols: 3, rows: 3, unlockedPlotCount: 9, expansionCost: 8 },
+    { level: 2, label: "4x3", cols: 4, rows: 3, unlockedPlotCount: 12, expansionCost: 10 },
+    { level: 3, label: "4x4", cols: 4, rows: 4, unlockedPlotCount: 16, expansionCost: 12 },
+  ],
   expansion: {
-    cost: 10,
     label: "Expandir fazenda",
-    description: "+9 canteiros.",
+    description: "Desbloqueie o próximo tamanho da fazenda.",
   },
   events: {
     durationMs: 12000,
@@ -127,7 +132,7 @@ window.StrawberryFarm.config = {
     {
       id: "expand-farm",
       title: "Fazenda maior",
-      description: "Expanda a fazenda para 6x4.",
+      description: "Expanda a fazenda pelo menos uma vez.",
       targetType: "expandedFarm",
       targetValue: 1,
       reward: {

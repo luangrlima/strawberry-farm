@@ -26,6 +26,7 @@
       seeds: config.startingState.seeds,
       strawberries: config.startingState.strawberries,
       unlockedPlotCount: config.initialPlotCount,
+      farmLevel: 0,
       hasExpandedFarm: false,
       upgrades: {
         fertilizer: 0,
