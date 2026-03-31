@@ -34,6 +34,7 @@
     renderPrimaryActions(game);
     renderHelperCard(game, now);
     renderPrestigePanel(game);
+    renderPriorityGoal(game);
     renderHelpPanel(game);
     renderSidebarTabs(game);
     renderUpgradeCards(game);
@@ -316,10 +317,17 @@
 
   function renderProgression(game) {
     const completedCount = game.state.progression.completedGoalIds.length;
+    const priorityGoal = SF.progression.getPriorityGoal(game);
     game.elements.progressSummary.textContent = `${completedCount}/${SF.config.progressionGoals.length} metas`;
     game.elements.goalList.innerHTML = "";
 
+    renderFeaturedGoal(game, priorityGoal);
+
     SF.config.progressionGoals.forEach((goal) => {
+      if (priorityGoal && goal.id === priorityGoal.id) {
+        return;
+      }
+
       const item = document.createElement("li");
       const isDone = game.state.progression.completedGoalIds.includes(goal.id);
       item.className = `goal-item${isDone ? " goal-item--done" : ""}`;
@@ -350,21 +358,18 @@
   }
 
   function renderHelpPanel(game) {
-    const isGuideTabActive = game.state.ui.activeSidebarTab === "guide";
-    game.state.ui.helpOpen = isGuideTabActive;
-    game.elements.helpPanel.hidden = !isGuideTabActive;
-    game.elements.helpToggleButton.textContent = isGuideTabActive ? "Fechar guia" : "Guia";
-    game.elements.helpToggleButton.setAttribute("aria-expanded", String(isGuideTabActive));
+    game.elements.helpPanel.hidden = !game.state.ui.helpOpen;
+    game.elements.helpToggleButton.textContent = game.state.ui.helpOpen ? "Fechar guia" : "Guia";
+    game.elements.helpToggleButton.setAttribute("aria-expanded", String(game.state.ui.helpOpen));
   }
 
   function renderSidebarTabs(game) {
-    const activeTab = ["goals", "upgrades", "guide"].includes(game.state.ui.activeSidebarTab)
+    const activeTab = ["goals", "upgrades"].includes(game.state.ui.activeSidebarTab)
       ? game.state.ui.activeSidebarTab
       : "goals";
     const tabs = [
       { button: game.elements.sidebarGoalsTab, panel: game.elements.progressionPanel, id: "goals" },
       { button: game.elements.sidebarUpgradesTab, panel: game.elements.upgradesPanel, id: "upgrades" },
-      { button: game.elements.sidebarGuideTab, panel: game.elements.helpPanel, id: "guide" },
     ];
 
     tabs.forEach(({ button, panel, id }) => {
@@ -386,6 +391,39 @@
     }
 
     game.elements.milestoneToastText.textContent = toast.message;
+  }
+
+  function renderPriorityGoal(game) {
+    const priorityGoal = SF.progression.getPriorityGoal(game);
+    const completedCount = game.state.progression.completedGoalIds.length;
+
+    if (!priorityGoal) {
+      game.elements.priorityGoalCard.classList.add("priority-goal-card--done");
+      game.elements.priorityGoalTitle.textContent = "Todas as metas concluídas";
+      game.elements.priorityGoalProgressText.textContent = "Fazenda pronta para prestigiar ou otimizar.";
+      game.elements.priorityGoalProgressBar.style.width = "100%";
+      game.elements.priorityGoalRewardText.textContent = `${completedCount}/${SF.config.progressionGoals.length} metas concluídas`;
+      return;
+    }
+
+    game.elements.priorityGoalCard.classList.remove("priority-goal-card--done");
+    game.elements.priorityGoalTitle.textContent = priorityGoal.title;
+    game.elements.priorityGoalProgressText.textContent = getGoalProgressText(game, priorityGoal);
+    game.elements.priorityGoalProgressBar.style.width = `${getGoalPercent(game, priorityGoal)}%`;
+    game.elements.priorityGoalRewardText.textContent = getGoalRewardText(priorityGoal);
+  }
+
+  function renderFeaturedGoal(game, priorityGoal) {
+    if (!priorityGoal) {
+      game.elements.featuredGoalCard.hidden = true;
+      return;
+    }
+
+    game.elements.featuredGoalCard.hidden = false;
+    game.elements.featuredGoalTitle.textContent = priorityGoal.title;
+    game.elements.featuredGoalProgressText.textContent = getGoalProgressText(game, priorityGoal);
+    game.elements.featuredGoalProgressBar.style.width = `${getGoalPercent(game, priorityGoal)}%`;
+    game.elements.featuredGoalRewardText.textContent = getGoalRewardText(priorityGoal);
   }
 
   function getGoalProgressText(game, goal) {
@@ -445,6 +483,22 @@
 
     const current = getGoalCurrentValue(game, goal);
     return Math.max(0, Math.min(100, (current / goal.targetValue) * 100));
+  }
+
+  function getGoalRewardText(goal) {
+    if (!goal.reward) {
+      return "Sem recompensa extra";
+    }
+
+    if (Number.isFinite(goal.reward.money) && goal.reward.money > 0) {
+      return `Recompensa: +${goal.reward.money} moedas`;
+    }
+
+    if (Number.isFinite(goal.reward.seeds) && goal.reward.seeds > 0) {
+      return `Recompensa: +${goal.reward.seeds} sementes`;
+    }
+
+    return "Sem recompensa extra";
   }
 
   function getSaveStatusText(game) {

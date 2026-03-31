@@ -82,10 +82,15 @@
     return `Conhecimento do Morango disponível. Prestigie para ganhar +${SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1)}% permanente nas vendas.`;
   }
 
+  function getPriorityGoal(game) {
+    return SF.config.progressionGoals.find((goal) => !game.state.progression.completedGoalIds.includes(goal.id)) || null;
+  }
+
   SF.progression = {
     hasReachedGoal,
     grantGoalReward,
     applyProgressionGoals,
     maybeNotifyPrestigeUnlocked,
+    getPriorityGoal,
   };
 })(window.StrawberryFarm = window.StrawberryFarm || {});

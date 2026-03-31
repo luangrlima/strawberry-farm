@@ -148,11 +148,9 @@
 
     if (savedState.ui && typeof savedState.ui === "object") {
       nextState.ui.helpOpen = typeof savedState.ui.helpOpen === "boolean" ? savedState.ui.helpOpen : nextState.ui.helpOpen;
-      nextState.ui.activeSidebarTab = nextState.ui.helpOpen
-        ? "guide"
-        : ["goals", "upgrades", "guide"].includes(savedState.ui.activeSidebarTab)
-          ? savedState.ui.activeSidebarTab
-          : nextState.ui.activeSidebarTab;
+      nextState.ui.activeSidebarTab = ["goals", "upgrades"].includes(savedState.ui.activeSidebarTab)
+        ? savedState.ui.activeSidebarTab
+        : nextState.ui.activeSidebarTab;
     }
 
     if (savedState.stats && typeof savedState.stats === "object") {

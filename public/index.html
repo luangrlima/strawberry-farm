@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fazenda de Morangos</title>
-    <link rel="stylesheet" href="style.css?v=20260331-0110" />
+    <link rel="stylesheet" href="style.css?v=20260331-0120" />
   </head>
   <body>
     <main class="app">
@@ -165,13 +165,27 @@
               </section>
             </section>
 
+            <section class="priority-goal-card" id="priorityGoalCard" aria-live="polite">
+              <div class="priority-goal-card__head">
+                <div>
+                  <p class="progression__eyebrow">Meta atual</p>
+                  <h2 id="priorityGoalTitle">Primeira venda</h2>
+                </div>
+                <div class="progression__summary" id="progressSummary">0/8 metas</div>
+              </div>
+              <p class="priority-goal-card__progress" id="priorityGoalProgressText">0/20 vendidos</p>
+              <div class="priority-goal-card__bar">
+                <div class="priority-goal-card__fill" id="priorityGoalProgressBar"></div>
+              </div>
+              <div class="priority-goal-card__reward" id="priorityGoalRewardText">Recompensa: +4 moedas</div>
+            </section>
+
             <section class="management-deck" aria-label="Gestão compacta">
               <div class="management-deck__header">
                 <div>
-                  <p class="progression__eyebrow">Progresso</p>
-                  <h2>Gestão da fazenda</h2>
+                  <p class="progression__eyebrow">Gestão</p>
+                  <h2>Metas e melhorias</h2>
                 </div>
-                <div class="progression__summary" id="progressSummary">0 de 4 metas concluídas</div>
               </div>
               <div class="management-tabs" role="tablist" aria-label="Seções da gestão">
                 <button
@@ -194,19 +208,17 @@
                 >
                   Melhorias
                 </button>
-                <button
-                  class="management-tab"
-                  id="sidebarGuideTab"
-                  type="button"
-                  role="tab"
-                  aria-controls="helpPanel"
-                  aria-selected="false"
-                >
-                  Guia
-                </button>
               </div>
 
               <section class="progression management-panel" id="progressionPanel" aria-label="Progresso">
+                <article class="goal-item goal-item--featured" id="featuredGoalCard">
+                  <div class="goal-item__title" id="featuredGoalTitle">Primeira venda</div>
+                  <div class="goal-item__meta" id="featuredGoalProgressText">0/20 vendidos</div>
+                  <div class="goal-item__reward" id="featuredGoalRewardText">Recompensa: +4 moedas</div>
+                  <div class="goal-item__bar">
+                    <div class="goal-item__fill" id="featuredGoalProgressBar"></div>
+                  </div>
+                </article>
                 <ul class="goal-list goal-list--compact" id="goalList" aria-live="polite"></ul>
               </section>
 
@@ -247,43 +259,44 @@
                 </article>
               </section>
 
-              <section class="help-panel management-panel" id="helpPanel" aria-label="Ajuda inicial" hidden>
-                <div class="help-panel__header">
-                  <div>
-                    <p class="help-panel__eyebrow">Guia</p>
-                    <h2>Loop rápido</h2>
-                  </div>
-                  <button class="helper-btn helper-btn--ghost" id="helpDismissButton" type="button">Ocultar</button>
+            </section>
+
+            <section class="help-panel" id="helpPanel" aria-label="Ajuda inicial" hidden>
+              <div class="help-panel__header">
+                <div>
+                  <p class="help-panel__eyebrow">Guia</p>
+                  <h2>Loop rápido</h2>
                 </div>
-                <div class="help-steps">
-                  <span class="help-step">1. Compre</span>
-                  <span class="help-step">2. Plante</span>
-                  <span class="help-step">3. Colha</span>
-                  <span class="help-step">4. Venda</span>
-                </div>
-              </section>
+                <button class="helper-btn helper-btn--ghost" id="helpDismissButton" type="button">Ocultar</button>
+              </div>
+              <div class="help-steps">
+                <span class="help-step">1. Compre</span>
+                <span class="help-step">2. Plante</span>
+                <span class="help-step">3. Colha</span>
+                <span class="help-step">4. Venda</span>
+              </div>
             </section>
           </aside>
         </section>
       </section>
     </main>
 
-    <script src="../src/config/gameConfig.js?v=20260331-0110"></script>
-    <script src="../src/utils/format.js?v=20260331-0110"></script>
-    <script src="../src/utils/dom.js?v=20260331-0110"></script>
-    <script src="../src/state/createGameState.js?v=20260331-0110"></script>
-    <script src="../src/systems/upgrades.js?v=20260331-0110"></script>
-    <script src="../src/systems/events.js?v=20260331-0110"></script>
-    <script src="../src/systems/market.js?v=20260331-0110"></script>
-    <script src="../src/systems/prestige.js?v=20260331-0110"></script>
-    <script src="../src/systems/combo.js?v=20260331-0110"></script>
-    <script src="../src/systems/helper.js?v=20260331-0110"></script>
-    <script src="../src/systems/progression.js?v=20260331-0110"></script>
-    <script src="../src/systems/plots.js?v=20260331-0110"></script>
-    <script src="../src/state/persistence.js?v=20260331-0110"></script>
-    <script src="../src/systems/runtime.js?v=20260331-0110"></script>
-    <script src="../src/ui/farmGrid.js?v=20260331-0110"></script>
-    <script src="../src/ui/render.js?v=20260331-0110"></script>
-    <script src="../src/main.js?v=20260331-0110"></script>
+    <script src="../src/config/gameConfig.js?v=20260331-0120"></script>
+    <script src="../src/utils/format.js?v=20260331-0120"></script>
+    <script src="../src/utils/dom.js?v=20260331-0120"></script>
+    <script src="../src/state/createGameState.js?v=20260331-0120"></script>
+    <script src="../src/systems/upgrades.js?v=20260331-0120"></script>
+    <script src="../src/systems/events.js?v=20260331-0120"></script>
+    <script src="../src/systems/market.js?v=20260331-0120"></script>
+    <script src="../src/systems/prestige.js?v=20260331-0120"></script>
+    <script src="../src/systems/combo.js?v=20260331-0120"></script>
+    <script src="../src/systems/helper.js?v=20260331-0120"></script>
+    <script src="../src/systems/progression.js?v=20260331-0120"></script>
+    <script src="../src/systems/plots.js?v=20260331-0120"></script>
+    <script src="../src/state/persistence.js?v=20260331-0120"></script>
+    <script src="../src/systems/runtime.js?v=20260331-0120"></script>
+    <script src="../src/ui/farmGrid.js?v=20260331-0120"></script>
+    <script src="../src/ui/render.js?v=20260331-0120"></script>
+    <script src="../src/main.js?v=20260331-0120"></script>
   </body>
 </html>

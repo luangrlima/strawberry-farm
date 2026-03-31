@@ -78,7 +78,6 @@
     bindElementEvent("helpDismissButton", "click", dismissHelpPanel);
     bindElementEvent("sidebarGoalsTab", "click", () => setSidebarTab("goals"));
     bindElementEvent("sidebarUpgradesTab", "click", () => setSidebarTab("upgrades"));
-    bindElementEvent("sidebarGuideTab", "click", () => setSidebarTab("guide"));
     window.addEventListener("pagehide", flushAutosave);
     window.addEventListener("beforeunload", flushAutosave);
     document.addEventListener("visibilitychange", () => {
@@ -355,18 +354,23 @@
   }
 
   function toggleHelpPanel() {
-    setSidebarTab(game.state.ui.activeSidebarTab === "guide" ? "goals" : "guide");
+    const now = Date.now();
+    SF.runtime.setNow(game, now);
+    game.state.ui.helpOpen = !game.state.ui.helpOpen;
+    SF.runtime.persistAndRender(game, "full", now);
   }
 
   function dismissHelpPanel() {
-    setSidebarTab("goals");
+    const now = Date.now();
+    SF.runtime.setNow(game, now);
+    game.state.ui.helpOpen = false;
+    SF.runtime.persistAndRender(game, "full", now);
   }
 
   function setSidebarTab(tabId) {
     const now = Date.now();
     SF.runtime.setNow(game, now);
-    game.state.ui.activeSidebarTab = ["goals", "upgrades", "guide"].includes(tabId) ? tabId : "goals";
-    game.state.ui.helpOpen = game.state.ui.activeSidebarTab === "guide";
+    game.state.ui.activeSidebarTab = ["goals", "upgrades"].includes(tabId) ? tabId : "goals";
     SF.runtime.persistAndRender(game, "full", now);
   }
 
