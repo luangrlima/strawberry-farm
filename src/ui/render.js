@@ -383,6 +383,7 @@
       : "goals";
     const tabs = [
       { button: game.elements.sidebarGoalsTab, panel: game.elements.progressionPanel, id: "goals" },
+      { button: game.elements.sidebarUpgradesTab, panel: game.elements.upgradesPanel, id: "upgrades" },
       { button: game.elements.sidebarGuideTab, panel: game.elements.helpPanel, id: "guide" },
     ];
 
@@ -393,9 +394,6 @@
       button.setAttribute("tabindex", isActive ? "0" : "-1");
       panel.hidden = !isActive;
     });
-
-    game.elements.sidebarUpgradesTab.classList.toggle("management-tab--active", activeTab === "upgrades");
-    game.elements.sidebarUpgradesTab.setAttribute("aria-selected", String(activeTab === "upgrades"));
   }
 
   function renderProgressIndicators(game, farmMetrics) {

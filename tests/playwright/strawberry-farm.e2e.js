@@ -102,6 +102,20 @@ async function clearEvent(page) {
   });
 }
 
+async function openUpgradesTab(page) {
+  await page.click("#sidebarUpgradesTab");
+  await page.waitForFunction(() => {
+    const upgradesTab = document.querySelector("#sidebarUpgradesTab");
+    const upgradesPanel = document.querySelector("#upgradesPanel");
+    return (
+      upgradesTab &&
+      upgradesTab.getAttribute("aria-selected") === "true" &&
+      upgradesPanel &&
+      !upgradesPanel.hidden
+    );
+  });
+}
+
 async function installLegacySaveFixture(page) {
   await page.evaluate((storageKey) => {
     const currentState = window.__strawberryFarmDebug.getState();
@@ -570,6 +584,7 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 3: expansão da fazenda para 4x4");
     await reachMoneyTarget(page, 10);
+    await openUpgradesTab(page);
     await page.click("#expandFarmButton");
     await page.waitForFunction(() => {
       const expansionButton = document.querySelector("#expandFarmButton");
@@ -616,6 +631,7 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 5: upgrade de crescimento e timing da chuva");
     await reachMoneyTarget(page, 10);
+    await openUpgradesTab(page);
     await page.click("#fertilizerButton");
     await page.waitForFunction(() => {
       const button = document.querySelector("#fertilizerButton");
@@ -654,6 +670,7 @@ async function reachMoneyTarget(page, target) {
       return title && title.textContent === "Sem evento" && growth && growth.textContent === "8s";
     }, { timeout: 9000 });
     await reachMoneyTarget(page, 18);
+    await openUpgradesTab(page);
     await page.click("#fertilizerButton");
     await page.waitForFunction(() => {
       const button = document.querySelector("#fertilizerButton");
@@ -668,6 +685,7 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 6: upgrade de venda e economia do evento Sol forte");
     await reachMoneyTarget(page, 14);
+    await openUpgradesTab(page);
     await page.click("#marketButton");
     await setMarketState(page, { currentPrice: 5, previousPrice: 4, nextUpdateInMs: 12000 });
     await page.waitForFunction(() => {
@@ -681,6 +699,7 @@ async function reachMoneyTarget(page, target) {
       "O card da caixa premium deveria mostrar o bonus atual apos o primeiro nivel.",
     );
     await reachMoneyTarget(page, 24);
+    await openUpgradesTab(page);
     await page.click("#marketButton");
     await setMarketState(page, { currentPrice: 5, previousPrice: 4, nextUpdateInMs: 12000 });
     await page.waitForFunction(() => {
@@ -740,6 +759,7 @@ async function reachMoneyTarget(page, target) {
     console.log("Cenário 7: Farm Helper, eventos e persistência");
     await resetHelperUpgradeState(page);
     await reachMoneyTarget(page, 18);
+    await openUpgradesTab(page);
     await page.click("#helperButton");
     await page.waitForFunction(() => {
       const button = document.querySelector("#helperButton");
@@ -752,6 +772,7 @@ async function reachMoneyTarget(page, target) {
     assert(comboBeforeHelper.count === 0, "O combo deveria estar zerado antes do helper colher.");
 
     await reachMoneyTarget(page, 22);
+    await openUpgradesTab(page);
     await page.click("#helperPlantingButton");
     await page.waitForFunction(() => {
       const button = document.querySelector("#helperPlantingButton");
@@ -940,6 +961,7 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 9: progressão após prestígio");
     await preparePostPrestigeProgression(page);
+    await openUpgradesTab(page);
     await page.click("#expandFarmButton");
     await page.click("#fertilizerButton");
     await page.click("#marketButton");

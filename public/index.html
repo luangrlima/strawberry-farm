@@ -233,8 +233,9 @@
                   class="management-tab"
                   id="sidebarUpgradesTab"
                   type="button"
-                  role="button"
+                  role="tab"
                   aria-controls="upgradesPanel"
+                  aria-selected="false"
                 >
                   Melhorias
                 </button>
@@ -254,7 +255,7 @@
                 <ul class="goal-list goal-list--compact" id="goalList" aria-live="polite"></ul>
               </section>
 
-              <section class="upgrades" id="upgradesPanel" aria-label="Melhorias">
+              <section class="upgrades management-panel" id="upgradesPanel" aria-label="Melhorias" hidden>
                 <article class="upgrade-card">
                   <p class="upgrade-card__eyebrow">Melhoria</p>
                   <h2>Adubo rápido</h2>
