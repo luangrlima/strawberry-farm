@@ -206,30 +206,48 @@
     return Math.max(0, Math.min(100, (remaining / duration) * 100));
   }
 
-  function getPlotSprite(plot, now = Date.now()) {
+  function getPlotVisualModel(plot, now = Date.now()) {
     const strawberryRowY = 96;
+    const visualModel = {
+      groundVariant: "field",
+      tilledVariant: "idle-soil",
+      cropVariant: "none",
+      overlayVariant: "none",
+      progressVariant: "none",
+      accentVariant: "none",
+      moisture: "dry",
+      soilBoost: "none",
+      quality: "none",
+      hazard: "none",
+      cropFrameX: null,
+      cropFrameY: null,
+    };
 
     if (plot.state === SF.config.plotStates.empty) {
-      return {
-        id: "soil",
-        frameX: null,
-        frameY: null,
-      };
+      return visualModel;
     }
 
     if (plot.state === SF.config.plotStates.ready) {
       return {
-        id: "strawberry-ready",
-        frameX: 16,
-        frameY: strawberryRowY,
+        ...visualModel,
+        tilledVariant: "tilled-active",
+        cropVariant: "strawberry-ready",
+        overlayVariant: "ready-glint",
+        progressVariant: "spoil-ring",
+        cropFrameX: 16,
+        cropFrameY: strawberryRowY,
       };
     }
 
     if (plot.state === SF.config.plotStates.rotten) {
       return {
-        id: "strawberry-rotten",
-        frameX: 16,
-        frameY: strawberryRowY,
+        ...visualModel,
+        groundVariant: "field-dim",
+        tilledVariant: "tilled-weary",
+        cropVariant: "strawberry-rotten",
+        overlayVariant: "rotten-flies",
+        cropFrameX: 16,
+        cropFrameY: strawberryRowY,
       };
     }
 
@@ -237,24 +255,51 @@
 
     if (progress < 34) {
       return {
-        id: "strawberry-growing-1",
-        frameX: 80,
-        frameY: strawberryRowY,
+        ...visualModel,
+        tilledVariant: "tilled-active",
+        cropVariant: "strawberry-growing-1",
+        progressVariant: "grow-ring",
+        cropFrameX: 80,
+        cropFrameY: strawberryRowY,
       };
     }
 
     if (progress < 67) {
       return {
-        id: "strawberry-growing-2",
-        frameX: 64,
-        frameY: strawberryRowY,
+        ...visualModel,
+        tilledVariant: "tilled-active",
+        cropVariant: "strawberry-growing-2",
+        progressVariant: "grow-ring",
+        cropFrameX: 64,
+        cropFrameY: strawberryRowY,
       };
     }
 
     return {
-      id: "strawberry-growing-3",
-      frameX: 32,
-      frameY: strawberryRowY,
+      ...visualModel,
+      tilledVariant: "tilled-active",
+      cropVariant: "strawberry-growing-3",
+      progressVariant: "grow-ring",
+      cropFrameX: 32,
+      cropFrameY: strawberryRowY,
+    };
+  }
+
+  function getPlotSprite(plot, now = Date.now()) {
+    const visualModel = getPlotVisualModel(plot, now);
+
+    if (visualModel.cropVariant === "none") {
+      return {
+        id: "soil",
+        frameX: null,
+        frameY: null,
+      };
+    }
+
+    return {
+      id: visualModel.cropVariant,
+      frameX: visualModel.cropFrameX,
+      frameY: visualModel.cropFrameY,
     };
   }
 
@@ -370,6 +415,7 @@
     getFarmMetrics,
     getPlotProgress,
     getSpoilProgress,
+    getPlotVisualModel,
     getPlotSprite,
     getPlotEmoji,
     getPlotName,

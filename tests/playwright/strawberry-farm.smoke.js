@@ -139,8 +139,14 @@ async function numberOf(page, selector) {
   return Number(await textOf(page, selector));
 }
 
-async function plotSpriteState(page, index = 0) {
-  return page.locator(".plot__emoji").nth(index).getAttribute("data-sprite");
+async function plotVisualState(page, index = 0) {
+  return page.locator(".plot__visual").nth(index).evaluate((element) => ({
+    ground: element.dataset.ground,
+    tilled: element.dataset.tilled,
+    crop: element.dataset.crop,
+    overlay: element.dataset.overlay,
+    progress: element.dataset.progress,
+  }));
 }
 
 async function waitForText(page, selector, expected, timeout = 5000) {
@@ -220,12 +226,16 @@ async function setExpiredComboScenario(page) {
     assert((await page.locator(".plot").count()) === 9, "A fazenda inicial deveria ser 3x3.");
     assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O preço inicial deveria ser 3 moedas.");
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
-    assert((await plotSpriteState(page, 0)) === "soil", "O primeiro canteiro deveria iniciar com sprite de terra.");
+    const initialPlot = await plotVisualState(page, 0);
+    assert(initialPlot.crop === "none", "O primeiro canteiro deveria iniciar sem planta.");
+    assert(initialPlot.tilled === "idle-soil", "O primeiro canteiro deveria iniciar com solo leve.");
 
     console.log("Smoke 2: plantio e reload");
     await page.locator(".plot").nth(0).click();
     await waitForText(page, "#statusMessage", "Plantado.");
-    assert((await plotSpriteState(page, 0)) === "strawberry-growing-1", "O plantio deveria ativar o sprite inicial de crescimento.");
+    const plantedPlot = await plotVisualState(page, 0);
+    assert(plantedPlot.crop === "strawberry-growing-1", "O plantio deveria ativar o sprite inicial de crescimento.");
+    assert(plantedPlot.progress === "grow-ring", "O canteiro em crescimento deveria expor o progresso embutido.");
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     await page.waitForFunction(() => {
@@ -233,7 +243,7 @@ async function setExpiredComboScenario(page) {
       return plot && plot.textContent && plot.textContent.includes("Crescendo");
     });
     assert(
-      (await plotSpriteState(page, 0))?.startsWith("strawberry-growing-"),
+      (await plotVisualState(page, 0)).crop?.startsWith("strawberry-growing-"),
       "O sprite de crescimento deveria persistir apos reload.",
     );
 
@@ -261,14 +271,16 @@ async function setExpiredComboScenario(page) {
       const plot = document.querySelector(".plot");
       return plot && plot.textContent && plot.textContent.includes("Estragado");
     }, { timeout: 4000 });
-    assert((await plotSpriteState(page, 0)) === "strawberry-rotten", "O sprite deveria refletir o estado estragado.");
+    const rottenPlot = await plotVisualState(page, 0);
+    assert(rottenPlot.crop === "strawberry-rotten", "O sprite deveria refletir o estado estragado.");
+    assert(rottenPlot.overlay === "rotten-flies", "O estado estragado deveria ativar o overlay diegético.");
     await page.locator(".plot").nth(0).click();
     await waitForText(page, "#statusMessage", "estragados removidos");
     await page.waitForFunction(() => {
       const plot = document.querySelector(".plot");
       return plot && plot.textContent && plot.textContent.includes("Terreno vazio");
     });
-    assert((await plotSpriteState(page, 0)) === "soil", "A limpeza deveria restaurar o sprite de terra.");
+    assert((await plotVisualState(page, 0)).crop === "none", "A limpeza deveria restaurar o tile vazio.");
 
     console.log("Smoke 5: save legado e timer edge");
     await injectLegacySave(page);

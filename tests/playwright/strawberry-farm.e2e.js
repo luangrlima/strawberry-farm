@@ -70,8 +70,14 @@ async function numberOf(page, selector) {
   return Number(await textOf(page, selector));
 }
 
-async function plotSpriteState(page, index = 0) {
-  return page.locator(".plot__emoji").nth(index).getAttribute("data-sprite");
+async function plotVisualState(page, index = 0) {
+  return page.locator(".plot__visual").nth(index).evaluate((element) => ({
+    ground: element.dataset.ground,
+    tilled: element.dataset.tilled,
+    crop: element.dataset.crop,
+    overlay: element.dataset.overlay,
+    progress: element.dataset.progress,
+  }));
 }
 
 async function waitForText(page, selector, expected, timeout = 30000) {
@@ -435,7 +441,9 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O banner de evento deveria iniciar vazio.");
     assert((await textOf(page, "#marketHeadline")).includes("Preço estável"), "O banner de mercado deveria iniciar estável.");
     assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda deveria iniciar recolhido.");
-    assert((await plotSpriteState(page, 0)) === "soil", "O canteiro vazio deveria usar o sprite de terra.");
+    const initialPlot = await plotVisualState(page, 0);
+    assert(initialPlot.crop === "none", "O canteiro vazio deveria iniciar sem planta.");
+    assert(initialPlot.tilled === "idle-soil", "O canteiro vazio deveria expor solo leve.");
     const desktopLayoutCheck = await page.evaluate(() => {
       const viewportHeight = window.innerHeight;
       const panel = document.querySelector(".panel");
@@ -498,8 +506,12 @@ async function reachMoneyTarget(page, target) {
     await firstPlot.click();
     await waitForText(page, "#statusMessage", "Plantado.");
     assert(
-      (await plotSpriteState(page, 0)) === "strawberry-growing-1",
+      (await plotVisualState(page, 0)).crop === "strawberry-growing-1",
       "O plantio inicial deveria trocar para o primeiro sprite de crescimento.",
+    );
+    assert(
+      (await plotVisualState(page, 0)).progress === "grow-ring",
+      "O canteiro em crescimento deveria usar o indicador embutido de progresso.",
     );
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
@@ -510,7 +522,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#plotCountValue")) === "9/16", "O save/load corrompeu o tamanho base da fazenda.");
     assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O preço de mercado não persistiu após reload.");
     assert(
-      (await plotSpriteState(page, 0))?.startsWith("strawberry-growing-"),
+      (await plotVisualState(page, 0)).crop?.startsWith("strawberry-growing-"),
       "O canteiro salvo deveria continuar usando um sprite de crescimento após reload.",
     );
 
@@ -588,7 +600,9 @@ async function reachMoneyTarget(page, target) {
       const plot = document.querySelector(".plot");
       return plot && plot.textContent && plot.textContent.includes("Estragado");
     }, { timeout: 4000 });
-    assert((await plotSpriteState(page, 0)) === "strawberry-rotten", "O canteiro estragado deveria trocar para o sprite podre.");
+    const rottenPlot = await plotVisualState(page, 0);
+    assert(rottenPlot.crop === "strawberry-rotten", "O canteiro estragado deveria trocar para o sprite podre.");
+    assert(rottenPlot.overlay === "rotten-flies", "O canteiro estragado deveria ativar o overlay de deterioração.");
     assert(
       (await page.locator(".plot").nth(0).getAttribute("aria-label"))?.includes("Clique para limpar"),
       "O canteiro estragado deveria instruir a limpeza manual.",
@@ -596,7 +610,7 @@ async function reachMoneyTarget(page, target) {
     const berriesBeforeRottenClear = await numberOf(page, "#berryCount");
     await page.locator(".plot").nth(0).click();
     await waitForText(page, "#statusMessage", "estragados removidos");
-    assert((await plotSpriteState(page, 0)) === "soil", "Limpar o canteiro deveria restaurar o sprite de terra.");
+    assert((await plotVisualState(page, 0)).crop === "none", "Limpar o canteiro deveria restaurar o tile vazio.");
     assert(
       (await numberOf(page, "#berryCount")) === berriesBeforeRottenClear,
       "Limpar o morango estragado não deveria conceder morangos.",
