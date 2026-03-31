@@ -659,7 +659,7 @@ h1 {
 
 .farm-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 4px;
   padding: 6px;
   border-radius: 22px;
@@ -672,7 +672,7 @@ h1 {
 }
 
 .farm-grid--expanded {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .plot {
@@ -1444,16 +1444,18 @@ h1 {
   .quick-status,
   .actions--compact,
   .progress-strip,
-  .farm-grid,
-  .farm-grid--expanded,
   .upgrades,
   .insight-stack,
   .goal-list {
     grid-template-columns: 1fr;
   }
 
+  .farm-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .farm-grid--expanded {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .overview-card__head,

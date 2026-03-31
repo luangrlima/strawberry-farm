@@ -3,8 +3,8 @@ window.StrawberryFarm = window.StrawberryFarm || {};
 window.StrawberryFarm.config = {
   title: "Fazenda de Morangos",
   storageKey: "strawberry-farm-save",
-  initialPlotCount: 9,
-  maxPlotCount: 16,
+  initialPlotCount: 15,
+  maxPlotCount: 24,
   winMoney: 35,
   autosaveIntervalMs: 4000,
   prestige: {
@@ -72,7 +72,7 @@ window.StrawberryFarm.config = {
   expansion: {
     cost: 10,
     label: "Expandir fazenda",
-    description: "+7 canteiros.",
+    description: "+9 canteiros.",
   },
   events: {
     durationMs: 12000,
@@ -127,7 +127,7 @@ window.StrawberryFarm.config = {
     {
       id: "expand-farm",
       title: "Fazenda maior",
-      description: "Expanda a fazenda para 4x4.",
+      description: "Expanda a fazenda para 6x4.",
       targetType: "expandedFarm",
       targetValue: 1,
       reward: {

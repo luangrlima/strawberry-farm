@@ -102,7 +102,7 @@
         ? `Nível ${marketLevel + 1} · ${nextMarketCost}`
         : `Comprar · ${nextMarketCost}`;
     elements.expandFarmButton.textContent = state.hasExpandedFarm
-      ? "4x4 ativa"
+      ? "6x4 ativa"
       : `Comprar · ${SF.config.expansion.cost}`;
     elements.helperButton.textContent = state.upgrades.helper
       ? "Ajudante ativo"
@@ -162,7 +162,7 @@
           : `${SF.market.getSellPrice(game)} moedas por venda. Bônus atual +${currentMarketBonus}; próximo nível vai para +${nextMarketBonus}.`
         : SF.config.upgrades.market.description;
     game.elements.expansionDescription.textContent = game.state.hasExpandedFarm
-      ? "16 lotes liberados."
+      ? "24 lotes liberados."
       : SF.config.expansion.description;
     game.elements.helperDescription.textContent = game.state.upgrades.helper
       ? game.state.upgrades.helperPlanting
@@ -432,7 +432,7 @@
       return `${currentValue}/${goal.targetValue} melhorias`;
     }
     if (goal.targetType === "expandedFarm") {
-      return game.state.hasExpandedFarm ? "4x4 liberado" : "4x4 pendente";
+      return game.state.hasExpandedFarm ? "6x4 liberado" : "6x4 pendente";
     }
     if (goal.targetType === "soldTotal") {
       return `${currentValue}/${goal.targetValue} vendidos`;

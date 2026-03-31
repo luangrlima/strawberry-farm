@@ -329,7 +329,7 @@
     game.state.money -= SF.config.expansion.cost;
     game.state.unlockedPlotCount = SF.config.maxPlotCount;
     game.state.hasExpandedFarm = true;
-    game.setMessage("Fazenda 4x4 liberada.");
+    game.setMessage("Fazenda 6x4 liberada.");
     game.commit({ now });
   }
 
