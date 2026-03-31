@@ -79,7 +79,7 @@ Execução repo-native de QA:
 
 Relatório mais recente:
 - [tests/reports/QA_REPORT.md](tests/reports/QA_REPORT.md)
-- vigente em 2026-03-30: [tests/reports/QA_REPORT_SPRINT_21.md](tests/reports/QA_REPORT_SPRINT_21.md)
+- vigente em 2026-03-30: [tests/reports/QA_REPORT_SPRINT_22.md](tests/reports/QA_REPORT_SPRINT_22.md)
 
 Regra:
 - `tests/reports/QA_REPORT_SPRINT_<N>.md` é o artefato versionado do sprint

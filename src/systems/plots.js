@@ -206,6 +206,58 @@
     return Math.max(0, Math.min(100, (remaining / duration) * 100));
   }
 
+  function getPlotSprite(plot, now = Date.now()) {
+    const strawberryRowY = 96;
+
+    if (plot.state === SF.config.plotStates.empty) {
+      return {
+        id: "soil",
+        frameX: null,
+        frameY: null,
+      };
+    }
+
+    if (plot.state === SF.config.plotStates.ready) {
+      return {
+        id: "strawberry-ready",
+        frameX: 16,
+        frameY: strawberryRowY,
+      };
+    }
+
+    if (plot.state === SF.config.plotStates.rotten) {
+      return {
+        id: "strawberry-rotten",
+        frameX: 16,
+        frameY: strawberryRowY,
+      };
+    }
+
+    const progress = getPlotProgress(plot, now);
+
+    if (progress < 34) {
+      return {
+        id: "strawberry-growing-1",
+        frameX: 80,
+        frameY: strawberryRowY,
+      };
+    }
+
+    if (progress < 67) {
+      return {
+        id: "strawberry-growing-2",
+        frameX: 64,
+        frameY: strawberryRowY,
+      };
+    }
+
+    return {
+      id: "strawberry-growing-3",
+      frameX: 32,
+      frameY: strawberryRowY,
+    };
+  }
+
   function getPlotEmoji(plot) {
     if (plot.state === SF.config.plotStates.growing) {
       return "🌱";
@@ -318,6 +370,7 @@
     getFarmMetrics,
     getPlotProgress,
     getSpoilProgress,
+    getPlotSprite,
     getPlotEmoji,
     getPlotName,
     getPlotBadge,

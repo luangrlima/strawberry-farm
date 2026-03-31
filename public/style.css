@@ -95,7 +95,7 @@ button {
     var(--shell);
   box-shadow: var(--shadow);
   backdrop-filter: blur(12px);
-  overflow: hidden;
+  overflow: auto;
 }
 
 .panel::before {
@@ -232,18 +232,14 @@ h1 {
   grid-template-columns: minmax(290px, 340px) minmax(0, 1.45fr) minmax(320px, 360px);
   gap: 16px;
   margin-top: 14px;
-  min-height: calc(100vh - 170px);
-  max-height: calc(100vh - 170px);
   align-items: start;
 }
 
 .zone {
   min-width: 0;
-  min-height: 0;
   display: grid;
   gap: 12px;
   align-content: start;
-  max-height: 100%;
 }
 
 .zone--left,
@@ -252,21 +248,7 @@ h1 {
 }
 
 .zone--right {
-  height: calc(100vh - 170px);
   align-self: stretch;
-  max-height: 100%;
-  overflow: auto;
-  padding-right: 4px;
-  padding-bottom: 6px;
-}
-
-.zone--right::-webkit-scrollbar {
-  width: 10px;
-}
-
-.zone--right::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(124, 69, 44, 0.18);
 }
 
 .overview-card,
@@ -730,8 +712,80 @@ h1 {
 }
 
 .plot__emoji {
-  font-size: 2.5rem;
-  line-height: 1;
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+}
+
+.plot__emoji::before,
+.plot__emoji::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.plot__emoji::after {
+  bottom: 5px;
+  width: 42px;
+  height: 16px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 28% 35%, rgba(255, 236, 205, 0.32), transparent 24%),
+    linear-gradient(180deg, #8a5a3d, #5f351f);
+  box-shadow:
+    0 4px 0 rgba(75, 42, 26, 0.2),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08);
+}
+
+.plot__emoji::before {
+  bottom: 8px;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  background-image: url("./assets/farming-crops-16x16.png");
+  background-repeat: no-repeat;
+  background-size: 576px 480px;
+  background-position: calc(var(--plot-sprite-x, 0px) * -1) calc(var(--plot-sprite-y, 0px) * -1);
+  filter: drop-shadow(0 3px 0 rgba(75, 42, 26, 0.28));
+}
+
+.plot__emoji[data-sprite="soil"]::before {
+  width: 34px;
+  height: 18px;
+  bottom: 10px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(255, 243, 220, 0.2), transparent 22%),
+    radial-gradient(circle at 68% 55%, rgba(72, 38, 22, 0.3), transparent 28%),
+    linear-gradient(180deg, #8a5a3d, #6a3b24);
+  box-shadow:
+    0 2px 0 rgba(75, 42, 26, 0.18),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08);
+}
+
+.plot__emoji[data-sprite="strawberry-growing-1"]::before {
+  bottom: 12px;
+}
+
+.plot__emoji[data-sprite="strawberry-growing-2"]::before {
+  bottom: 10px;
+}
+
+.plot__emoji[data-sprite="strawberry-growing-3"]::before,
+.plot__emoji[data-sprite="strawberry-ready"]::before,
+.plot__emoji[data-sprite="strawberry-rotten"]::before {
+  bottom: 7px;
+}
+
+.plot__emoji[data-sprite="strawberry-rotten"]::before {
+  filter:
+    saturate(0.4)
+    hue-rotate(-26deg)
+    brightness(0.8)
+    drop-shadow(0 3px 0 rgba(75, 42, 26, 0.28));
 }
 
 .plot__name,

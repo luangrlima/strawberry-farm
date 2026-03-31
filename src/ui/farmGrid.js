@@ -13,6 +13,7 @@
 
       const emoji = document.createElement("div");
       emoji.className = "plot__emoji";
+      emoji.setAttribute("aria-hidden", "true");
 
       const badge = document.createElement("div");
       badge.className = "plot__badge";
@@ -66,10 +67,21 @@
         return;
       }
 
+      const sprite = SF.plots.getPlotSprite(plot, now);
+
       plotElement.button.className = `plot plot--${plot.state}`;
       plotElement.button.setAttribute("aria-label", SF.plots.getPlotLabel(plot, index, now));
       plotElement.badge.textContent = SF.plots.getPlotBadge(plot);
-      plotElement.emoji.textContent = SF.plots.getPlotEmoji(plot);
+      plotElement.emoji.textContent = "";
+      plotElement.emoji.dataset.sprite = sprite.id;
+      plotElement.emoji.dataset.state = plot.state;
+      if (Number.isFinite(sprite.frameX) && Number.isFinite(sprite.frameY)) {
+        plotElement.emoji.style.setProperty("--plot-sprite-x", `${sprite.frameX * 3}px`);
+        plotElement.emoji.style.setProperty("--plot-sprite-y", `${sprite.frameY * 3}px`);
+      } else {
+        plotElement.emoji.style.removeProperty("--plot-sprite-x");
+        plotElement.emoji.style.removeProperty("--plot-sprite-y");
+      }
       plotElement.name.textContent = SF.plots.getPlotName(plot);
       plotElement.stage.textContent = SF.plots.getPlotStageText(plot, now);
       plotElement.timer.textContent = SF.plots.getPlotTimerText(plot, now);

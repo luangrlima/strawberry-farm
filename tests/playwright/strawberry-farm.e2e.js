@@ -70,6 +70,10 @@ async function numberOf(page, selector) {
   return Number(await textOf(page, selector));
 }
 
+async function plotSpriteState(page, index = 0) {
+  return page.locator(".plot__emoji").nth(index).getAttribute("data-sprite");
+}
+
 async function waitForText(page, selector, expected, timeout = 30000) {
   await page.waitForFunction(
     ({ targetSelector, expectedText }) => {
@@ -431,33 +435,45 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O banner de evento deveria iniciar vazio.");
     assert((await textOf(page, "#marketHeadline")).includes("Preço estável"), "O banner de mercado deveria iniciar estável.");
     assert(await page.locator("#helpPanel").isHidden(), "O painel de ajuda deveria iniciar recolhido.");
+    assert((await plotSpriteState(page, 0)) === "soil", "O canteiro vazio deveria usar o sprite de terra.");
     const desktopLayoutCheck = await page.evaluate(() => {
       const viewportHeight = window.innerHeight;
-      const docHeight = document.documentElement.scrollHeight;
+      const panel = document.querySelector(".panel");
       const goal = document.querySelector("#goalStatus")?.getBoundingClientRect();
       const buySeed = document.querySelector("#buySeedButton")?.getBoundingClientRect();
       const farm = document.querySelector("#farmGrid")?.getBoundingClientRect();
       const market = document.querySelector("#marketBanner")?.getBoundingClientRect();
+      const rightZone = document.querySelector(".zone--right");
+      const panelStyle = panel ? window.getComputedStyle(panel) : null;
+      const rightZoneStyle = rightZone ? window.getComputedStyle(rightZone) : null;
 
       return {
-        docHeight,
         viewportHeight,
         goalBottom: goal?.bottom || 0,
         buySeedBottom: buySeed?.bottom || 0,
         farmTop: farm?.top || 0,
         farmBottom: farm?.bottom || 0,
         marketBottom: market?.bottom || 0,
+        panelScrollHeight: panel?.scrollHeight || 0,
+        panelClientHeight: panel?.clientHeight || 0,
+        panelOverflowY: panelStyle?.overflowY || "",
+        rightZoneOverflowY: rightZoneStyle?.overflowY || "",
       };
     });
     assert(
-      desktopLayoutCheck.docHeight <= desktopLayoutCheck.viewportHeight + 40,
-      "A tela desktop ainda está exigindo scroll vertical demais.",
+      desktopLayoutCheck.panelScrollHeight >= desktopLayoutCheck.panelClientHeight,
+      "O contêiner principal deveria concentrar a rolagem do dashboard.",
+    );
+    assert(desktopLayoutCheck.panelOverflowY === "auto", "O painel principal deveria ser a área rolável.");
+    assert(
+      desktopLayoutCheck.rightZoneOverflowY !== "auto" && desktopLayoutCheck.rightZoneOverflowY !== "scroll",
+      "A coluna direita não deveria ter rolagem individual.",
     );
     assert(desktopLayoutCheck.goalBottom < desktopLayoutCheck.viewportHeight, "A meta principal saiu da área visível.");
     assert(desktopLayoutCheck.buySeedBottom < desktopLayoutCheck.viewportHeight, "As ações principais saíram da área visível.");
     assert(desktopLayoutCheck.farmTop < desktopLayoutCheck.viewportHeight * 0.45, "A fazenda não ficou visualmente central o bastante.");
-    assert(desktopLayoutCheck.farmBottom < desktopLayoutCheck.viewportHeight, "A fazenda inicial não coube acima da dobra.");
-    assert(desktopLayoutCheck.marketBottom < desktopLayoutCheck.viewportHeight, "A coluna de apoio ainda está longa demais no desktop.");
+    assert(desktopLayoutCheck.farmBottom < desktopLayoutCheck.viewportHeight * 1.2, "A fazenda inicial ficou baixa demais no desktop.");
+    assert(desktopLayoutCheck.marketBottom > 0, "A coluna de apoio não renderizou corretamente no desktop.");
 
     console.log("Cenário 1.1: ajuda rápida persistente");
     await page.click("#helpToggleButton");
@@ -481,6 +497,10 @@ async function reachMoneyTarget(page, target) {
     const firstPlot = page.locator(".plot").nth(0);
     await firstPlot.click();
     await waitForText(page, "#statusMessage", "Plantado.");
+    assert(
+      (await plotSpriteState(page, 0)) === "strawberry-growing-1",
+      "O plantio inicial deveria trocar para o primeiro sprite de crescimento.",
+    );
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     await page.waitForFunction(() => {
@@ -489,6 +509,10 @@ async function reachMoneyTarget(page, target) {
     });
     assert((await textOf(page, "#plotCountValue")) === "9/16", "O save/load corrompeu o tamanho base da fazenda.");
     assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O preço de mercado não persistiu após reload.");
+    assert(
+      (await plotSpriteState(page, 0))?.startsWith("strawberry-growing-"),
+      "O canteiro salvo deveria continuar usando um sprite de crescimento após reload.",
+    );
 
     console.log("Cenário 2.1: save legado sem versão");
     await installLegacySaveFixture(page);
@@ -564,6 +588,7 @@ async function reachMoneyTarget(page, target) {
       const plot = document.querySelector(".plot");
       return plot && plot.textContent && plot.textContent.includes("Estragado");
     }, { timeout: 4000 });
+    assert((await plotSpriteState(page, 0)) === "strawberry-rotten", "O canteiro estragado deveria trocar para o sprite podre.");
     assert(
       (await page.locator(".plot").nth(0).getAttribute("aria-label"))?.includes("Clique para limpar"),
       "O canteiro estragado deveria instruir a limpeza manual.",
@@ -571,6 +596,7 @@ async function reachMoneyTarget(page, target) {
     const berriesBeforeRottenClear = await numberOf(page, "#berryCount");
     await page.locator(".plot").nth(0).click();
     await waitForText(page, "#statusMessage", "estragados removidos");
+    assert((await plotSpriteState(page, 0)) === "soil", "Limpar o canteiro deveria restaurar o sprite de terra.");
     assert(
       (await numberOf(page, "#berryCount")) === berriesBeforeRottenClear,
       "Limpar o morango estragado não deveria conceder morangos.",

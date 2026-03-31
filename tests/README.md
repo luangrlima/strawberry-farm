@@ -10,7 +10,7 @@
 
 Relatório mais recente:
 - `reports/QA_REPORT.md`
-- vigente em 2026-03-30: `reports/QA_REPORT_SPRINT_21.md`
+- vigente em 2026-03-30: `reports/QA_REPORT_SPRINT_22.md`
 
 ## Execução
 Instalação mínima:

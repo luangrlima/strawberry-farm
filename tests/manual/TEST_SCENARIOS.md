@@ -215,7 +215,7 @@ Validações:
 - Canteiro vazio tem aparência distinta.
 - Canteiro crescendo tem aparência distinta.
 - Canteiro pronto para colher tem aparência distinta.
-- O texto e o emoji refletem corretamente o estado do canteiro.
+- O texto e o sprite refletem corretamente o estado do canteiro.
 
 ### UI-02: Responsividade básica
 Validações:
