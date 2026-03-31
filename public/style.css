@@ -250,7 +250,6 @@ h1 {
 }
 
 .overview-card,
-.board-stage,
 .event-banner,
 .market-banner,
 .prestige-panel,
@@ -624,15 +623,17 @@ h1 {
 }
 
 .board-stage {
-  padding: 9px;
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.56), transparent 22%),
-    radial-gradient(circle at bottom right, rgba(217, 65, 103, 0.08), transparent 26%),
-    var(--card-strong);
+  display: grid;
+  gap: 10px;
+  padding: 10px 11px 8px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  backdrop-filter: none;
 }
 
 .milestone-toast {
-  margin-top: 10px;
+  margin-top: 0;
   padding: 10px 12px;
   background: linear-gradient(135deg, rgba(235, 248, 235, 0.98), rgba(186, 229, 195, 0.72));
   border: 1px solid rgba(69, 157, 87, 0.18);
@@ -643,22 +644,13 @@ h1 {
   color: #296338;
 }
 
-.farm-section {
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 30px;
-  background:
-    linear-gradient(180deg, rgba(196, 138, 101, 0.15), rgba(131, 80, 54, 0.12)),
-    rgba(255, 248, 241, 0.9);
-  border: 1px solid rgba(124, 69, 44, 0.22);
-}
-
 .farm-stage__header {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   align-items: flex-start;
-  margin-bottom: 6px;
+  padding: 0 2px;
+  margin-bottom: 8px;
 }
 
 .legend {
@@ -1650,10 +1642,6 @@ h1 {
     padding: 4px;
     border-radius: 18px;
     backdrop-filter: blur(8px);
-  }
-
-  .farm-section {
-    margin-top: 12px;
   }
 
   .legend {
