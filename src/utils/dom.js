@@ -76,17 +76,14 @@
       marketButton: document.querySelector("#marketButton"),
       expandFarmButton: document.querySelector("#expandFarmButton"),
       helperButton: document.querySelector("#helperButton"),
-      helperPlantingButton: document.querySelector("#helperPlantingButton"),
       prestigeButton: document.querySelector("#prestigeButton"),
       fertilizerDescription: document.querySelector("#fertilizerDescription"),
       fertilizerLevelMeta: document.querySelector("#fertilizerLevelMeta"),
       marketDescription: document.querySelector("#marketDescription"),
       marketLevelMeta: document.querySelector("#marketLevelMeta"),
       expansionDescription: document.querySelector("#expansionDescription"),
+      helperLevelMeta: document.querySelector("#helperLevelMeta"),
       helperDescription: document.querySelector("#helperDescription"),
-      helperPlantingDescription: document.querySelector("#helperPlantingDescription"),
-      helperGlovesButton: document.querySelector("#helperGlovesButton"),
-      helperGlovesDescription: document.querySelector("#helperGlovesDescription"),
     };
   }
 

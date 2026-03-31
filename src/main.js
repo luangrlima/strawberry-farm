@@ -73,8 +73,6 @@
     game.elements.marketButton.addEventListener("click", buyMarketUpgrade);
     game.elements.expandFarmButton.addEventListener("click", expandFarm);
     game.elements.helperButton.addEventListener("click", buyHelperUpgrade);
-    game.elements.helperPlantingButton.addEventListener("click", buyHelperPlantingUpgrade);
-    game.elements.helperGlovesButton.addEventListener("click", buyHelperGlovesUpgrade);
     game.elements.prestigeButton.addEventListener("click", prestigeFarm);
     game.elements.helpToggleButton.addEventListener("click", toggleHelpPanel);
     game.elements.helpDismissButton.addEventListener("click", dismissHelpPanel);
@@ -232,83 +230,34 @@
   function buyHelperUpgrade() {
     const now = Date.now();
     SF.runtime.setNow(game, now);
-    const upgrade = SF.config.upgrades.helper;
+    const currentLevel = SF.upgrades.getUpgradeLevel(game, "helper");
+    const nextCost = SF.upgrades.getUpgradeCost("helper", currentLevel);
+    const nextLevel = currentLevel + 1;
 
-    if (game.state.upgrades.helper) {
-      SF.runtime.showMessage(game, "Ajudante já ativo.", { now });
+    if (SF.upgrades.isMaxLevel(game, "helper")) {
+      SF.runtime.showMessage(game, "Ajudante já está no nível máximo.", { now });
       return;
     }
 
-    if (game.state.money < upgrade.cost) {
+    if (game.state.money < nextCost) {
       SF.runtime.showMessage(game, "Moedas insuficientes.", { now });
       return;
     }
 
-    game.state.money -= upgrade.cost;
-    game.state.upgrades.helper = true;
+    game.state.money -= nextCost;
+    game.state.upgrades.helper = nextLevel;
     game.state.stats.upgradesPurchased += 1;
-    game.state.systems.helper.nextHarvestAt = now + upgrade.harvestIntervalMs;
+    game.state.systems.helper.nextHarvestAt = now + SF.upgrades.getHelperHarvestInterval(nextLevel);
     game.state.systems.helper.lastActionAt = now;
-    game.state.systems.helper.lastActionText = "Ajudante ativado.";
-    game.setMessage("Ajudante comprado.");
-    game.commit({ now });
-  }
-
-  function buyHelperPlantingUpgrade() {
-    const now = Date.now();
-    SF.runtime.setNow(game, now);
-    const upgrade = SF.config.upgrades.helperPlanting;
-
-    if (!game.state.upgrades.helper) {
-      SF.runtime.showMessage(game, "Compre o ajudante primeiro.", { now });
-      return;
-    }
-
-    if (game.state.upgrades.helperPlanting) {
-      SF.runtime.showMessage(game, "Plantio assistido já ativo.", { now });
-      return;
-    }
-
-    if (game.state.money < upgrade.cost) {
-      SF.runtime.showMessage(game, "Moedas insuficientes.", { now });
-      return;
-    }
-
-    game.state.money -= upgrade.cost;
-    game.state.upgrades.helperPlanting = true;
-    game.state.stats.upgradesPurchased += 1;
-    game.state.systems.helper.lastActionAt = now;
-    game.state.systems.helper.lastActionText = "Plantio assistido ativado.";
-    game.setMessage("Plantio assistido comprado.");
-    game.commit({ now });
-  }
-
-  function buyHelperGlovesUpgrade() {
-    const now = Date.now();
-    SF.runtime.setNow(game, now);
-    const upgrade = SF.config.upgrades.helperGloves;
-
-    if (!game.state.upgrades.helper) {
-      SF.runtime.showMessage(game, "Compre o ajudante primeiro.", { now });
-      return;
-    }
-
-    if (game.state.upgrades.helperGloves) {
-      SF.runtime.showMessage(game, "Luvas já ativas.", { now });
-      return;
-    }
-
-    if (game.state.money < upgrade.cost) {
-      SF.runtime.showMessage(game, "Moedas insuficientes.", { now });
-      return;
-    }
-
-    game.state.money -= upgrade.cost;
-    game.state.upgrades.helperGloves = true;
-    game.state.stats.upgradesPurchased += 1;
-    game.state.systems.helper.lastActionAt = now;
-    game.state.systems.helper.lastActionText = "Luvas Resistentes equipadas.";
-    game.setMessage("Luvas Resistentes compradas.");
+    game.state.systems.helper.lastActionText =
+      nextLevel === 1
+        ? "Ajudante ativado."
+        : nextLevel === 2
+          ? "Bolsa de sementes integrada."
+          : nextLevel === 3
+            ? "Luvas Resistentes integradas."
+            : `Ajudante mais rápido no nível ${nextLevel}.`;
+    game.setMessage(`Ajudante nível ${nextLevel}.`);
     game.commit({ now });
   }
 

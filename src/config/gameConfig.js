@@ -54,19 +54,11 @@ window.StrawberryFarm.config = {
     },
     helper: {
       label: "Ajudante",
-      cost: 18,
-      harvestIntervalMs: 3500,
-      description: "Colhe 1 pronto por ciclo.",
-    },
-    helperPlanting: {
-      label: "Bolsa de sementes",
-      cost: 22,
-      description: "O ajudante planta 1 vazio por ciclo se não houver colheita. Consome sementes.",
-    },
-    helperGloves: {
-      label: "Luvas Resistentes",
-      cost: 25,
-      description: "O ajudante limpa 1 canteiro apodrecido por ciclo.",
+      baseCost: 18,
+      costStep: 4,
+      maxLevel: 6,
+      cycleIntervalMsByLevel: [3500, 3500, 3500, 3000, 2500, 2000],
+      description: "Nível 1 colhe. Nível 2 planta. Nível 3 limpa. Níveis 4-6 aceleram o ciclo.",
     },
   },
   farmLevels: [

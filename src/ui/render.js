@@ -74,11 +74,13 @@
     const marketBasePrice = SF.market.getMarketBasePrice(game);
     const fertilizerLevel = SF.upgrades.getUpgradeLevel(game, "fertilizer");
     const marketLevel = SF.upgrades.getUpgradeLevel(game, "market");
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
     const currentFarmLevel = SF.plots.getFarmLevelConfig(game);
     const nextFarmLevel = SF.plots.getFarmLevelConfigByLevel(currentFarmLevel.level + 1);
     const farmAtMaxLevel = currentFarmLevel.level >= SF.config.farmLevels.length - 1;
     const nextFertilizerCost = SF.upgrades.getUpgradeCost("fertilizer", fertilizerLevel);
     const nextMarketCost = SF.upgrades.getUpgradeCost("market", marketLevel);
+    const nextHelperCost = SF.upgrades.getUpgradeCost("helper", helperLevel);
 
     elements.buySeedButton.disabled = state.money < seedPrice;
     elements.buySeedButton.textContent = `Semente (${seedPrice})`;
@@ -88,11 +90,7 @@
       SF.upgrades.isMaxLevel(game, "fertilizer") || state.money < nextFertilizerCost;
     elements.marketButton.disabled = SF.upgrades.isMaxLevel(game, "market") || state.money < nextMarketCost;
     elements.expandFarmButton.disabled = farmAtMaxLevel || state.money < nextFarmLevel.expansionCost;
-    elements.helperButton.disabled = state.upgrades.helper || state.money < SF.config.upgrades.helper.cost;
-    elements.helperPlantingButton.disabled =
-      !state.upgrades.helper ||
-      state.upgrades.helperPlanting ||
-      state.money < SF.config.upgrades.helperPlanting.cost;
+    elements.helperButton.disabled = SF.upgrades.isMaxLevel(game, "helper") || state.money < nextHelperCost;
 
     elements.fertilizerButton.textContent = SF.upgrades.isMaxLevel(game, "fertilizer")
       ? "Nível máximo"
@@ -107,25 +105,11 @@
     elements.expandFarmButton.textContent = farmAtMaxLevel
       ? `${currentFarmLevel.label} ativa`
       : `Comprar ${nextFarmLevel.label} · ${nextFarmLevel.expansionCost}`;
-    elements.helperButton.textContent = state.upgrades.helper
-      ? "Ajudante ativo"
-      : `Comprar · ${SF.config.upgrades.helper.cost}`;
-    elements.helperPlantingButton.textContent = state.upgrades.helperPlanting
-      ? "Suporte ativo"
-      : state.upgrades.helper
-        ? `Comprar · ${SF.config.upgrades.helperPlanting.cost}`
-        : `Exige ajudante · ${SF.config.upgrades.helperPlanting.cost}`;
-
-    elements.helperGlovesButton.disabled =
-      !state.upgrades.helper ||
-      state.upgrades.helperGloves ||
-      state.money < SF.config.upgrades.helperGloves.cost;
-    elements.helperGlovesButton.textContent = state.upgrades.helperGloves
-      ? "Luvas ativas"
-      : state.upgrades.helper
-        ? `Comprar · ${SF.config.upgrades.helperGloves.cost}`
-        : `Exige ajudante · ${SF.config.upgrades.helperGloves.cost}`;
-    elements.helperGlovesButton.classList.toggle("action-btn--highlight", state.upgrades.helperGloves);
+    elements.helperButton.textContent = SF.upgrades.isMaxLevel(game, "helper")
+      ? "Nível máximo"
+      : helperLevel > 0
+        ? `Nível ${helperLevel + 1} · ${nextHelperCost}`
+        : `Comprar · ${nextHelperCost}`;
 
     elements.buySeedButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.seedPriceDiscount));
     elements.sellButton.classList.toggle(
@@ -133,8 +117,7 @@
       Boolean(activeEvent?.sellPriceBonus) || marketBasePrice >= SF.config.market.maxPrice,
     );
     elements.fertilizerButton.classList.toggle("action-btn--highlight", Boolean(activeEvent?.growthMultiplier));
-    elements.helperButton.classList.toggle("action-btn--highlight", state.upgrades.helper);
-    elements.helperPlantingButton.classList.toggle("action-btn--highlight", state.upgrades.helperPlanting);
+    elements.helperButton.classList.toggle("action-btn--highlight", helperLevel > 0);
   }
 
   function renderUpgradeCards(game) {
@@ -144,17 +127,25 @@
     const currentFarmLevel = SF.plots.getFarmLevelConfig(game);
     const nextFarmLevel = SF.plots.getFarmLevelConfigByLevel(currentFarmLevel.level + 1);
     const farmAtMaxLevel = currentFarmLevel.level >= SF.config.farmLevels.length - 1;
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
     const maxFertilizerLevel = SF.config.upgrades.fertilizer.maxLevel;
     const maxMarketLevel = SF.config.upgrades.market.maxLevel;
+    const maxHelperLevel = SF.config.upgrades.helper.maxLevel;
     const currentGrowthTime = SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game));
+    const currentHelperTime = helperLevel > 0
+      ? SF.utils.formatSeconds(SF.upgrades.getHelperHarvestInterval(helperLevel))
+      : SF.utils.formatSeconds(SF.upgrades.getHelperHarvestInterval(1));
     const nextFertilizerLevel = Math.min(maxFertilizerLevel, fertilizerLevel + 1);
     const nextFertilizerReduction = SF.upgrades.getFertilizerReductionPercent(nextFertilizerLevel);
     const currentMarketBonus = SF.upgrades.getMarketSellBonus(marketLevel);
     const nextMarketLevel = Math.min(maxMarketLevel, marketLevel + 1);
     const nextMarketBonus = SF.upgrades.getMarketSellBonus(nextMarketLevel);
+    const nextHelperLevel = Math.min(maxHelperLevel, helperLevel + 1);
+    const nextHelperTime = SF.utils.formatSeconds(SF.upgrades.getHelperHarvestInterval(nextHelperLevel));
 
     game.elements.fertilizerLevelMeta.textContent = `Nível ${fertilizerLevel}/${maxFertilizerLevel}`;
     game.elements.marketLevelMeta.textContent = `Nível ${marketLevel}/${maxMarketLevel}`;
+    game.elements.helperLevelMeta.textContent = `Nível ${helperLevel}/${maxHelperLevel}`;
     game.elements.fertilizerDescription.textContent =
       fertilizerLevel > 0
         ? SF.upgrades.isMaxLevel(game, "fertilizer")
@@ -170,17 +161,12 @@
     game.elements.expansionDescription.textContent = farmAtMaxLevel
       ? "16 lotes liberados."
       : `Atual ${currentFarmLevel.label} (${currentFarmLevel.unlockedPlotCount}/16). Próximo ${nextFarmLevel.label} por ${nextFarmLevel.expansionCost} moedas.`;
-    game.elements.helperDescription.textContent = game.state.upgrades.helper
-      ? game.state.upgrades.helperPlanting
-        ? `Colhe 1 pronto e planta se sobrar ciclo a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
-        : `Colhe 1 pronto a cada ${SF.utils.formatSeconds(SF.config.upgrades.helper.harvestIntervalMs)}.`
-      : SF.config.upgrades.helper.description;
-    game.elements.helperPlantingDescription.textContent = game.state.upgrades.helperPlanting
-      ? "Ativo: usa 1 semente quando sobra um ciclo sem colheita."
-      : SF.config.upgrades.helperPlanting.description;
-    game.elements.helperGlovesDescription.textContent = game.state.upgrades.helperGloves
-      ? `Limpeza automática. Apodrecimento em ${SF.utils.formatSeconds(10000)}.`
-      : SF.config.upgrades.helperGloves.description;
+    game.elements.helperDescription.textContent =
+      helperLevel <= 0
+        ? SF.config.upgrades.helper.description
+        : helperLevel >= maxHelperLevel
+          ? `Ciclo atual ${currentHelperTime}. Colhe, planta, limpa e opera na velocidade máxima.`
+          : `Ciclo atual ${currentHelperTime}. Próximo nível ${nextHelperLevel} reduz para ${nextHelperTime}${nextHelperLevel >= 2 ? ", planta" : ""}${nextHelperLevel >= 3 ? " e limpa" : ""}.`;
   }
 
   function renderEventBanner(game, now = getRenderNow(game)) {
@@ -255,19 +241,20 @@
   }
 
   function renderHelperCard(game, now = getRenderNow(game)) {
-    const isActive = game.state.upgrades.helper;
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
+    const isActive = helperLevel > 0;
     const nextHarvestAt = game.state.systems.helper.nextHarvestAt;
 
     game.elements.helperStatusValue.textContent = isActive ? "On" : "Off";
     const cycleExtras = [
-      game.state.upgrades.helperGloves ? "limpeza" : "",
-      game.state.upgrades.helperPlanting ? "plantio" : "",
+      SF.upgrades.hasHelperGloves(game) ? "limpeza" : "",
+      SF.upgrades.hasHelperPlanting(game) ? "plantio" : "",
     ].filter(Boolean).join(" + ");
     game.elements.helperStatusHint.textContent =
       isActive && Number.isFinite(nextHarvestAt)
         ? cycleExtras
-          ? `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))} + ${cycleExtras}`
-          : `Ciclo ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))}`
+          ? `Nv.${helperLevel} · ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))} + ${cycleExtras}`
+          : `Nv.${helperLevel} · ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))}`
         : "Inativo";
     game.elements.helperCard.classList.toggle("stat--highlight", isActive);
   }
@@ -298,7 +285,8 @@
   }
 
   function renderHelperStrip(game, now = getRenderNow(game)) {
-    const isActive = game.state.upgrades.helper;
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
+    const isActive = helperLevel > 0;
     game.elements.helperStrip.hidden = !isActive;
 
     if (!isActive) {
@@ -308,20 +296,20 @@
     const helper = game.state.systems.helper;
     const nextHarvestAt = Number.isFinite(helper.nextHarvestAt)
       ? Math.max(0, helper.nextHarvestAt - now)
-      : SF.config.upgrades.helper.harvestIntervalMs;
+      : SF.upgrades.getHelperHarvestInterval(Math.max(1, helperLevel));
     const recentAction = Number.isFinite(helper.lastActionAt) && now - helper.lastActionAt < 2800;
-    game.elements.helperStripTitle.textContent = game.state.upgrades.helperGloves
-      ? game.state.upgrades.helperPlanting
+    game.elements.helperStripTitle.textContent = SF.upgrades.hasHelperGloves(game)
+      ? SF.upgrades.hasHelperPlanting(game)
         ? "Auto-colheita + limpeza + plantio"
         : "Auto-colheita + limpeza"
-      : game.state.upgrades.helperPlanting
+      : SF.upgrades.hasHelperPlanting(game)
         ? "Auto-colheita + plantio"
         : "Auto-colheita";
 
     game.elements.helperStripText.textContent =
       recentAction && helper.lastActionText
         ? helper.lastActionText
-        : game.state.upgrades.helperPlanting
+        : SF.upgrades.hasHelperPlanting(game)
           ? "Colhe 1 pronto. Sem colheita, planta 1 vazio."
           : "Colhe 1 pronto por ciclo.";
     game.elements.helperStripTimer.textContent = `${SF.utils.formatSeconds(nextHarvestAt)}`;

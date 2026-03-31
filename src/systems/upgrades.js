@@ -47,6 +47,24 @@
     return Math.max(0, level) * getUpgradeConfig("market").sellPriceBonusPerLevel;
   }
 
+  function isHelperActive(gameOrState) {
+    return getUpgradeLevel(gameOrState, "helper") >= 1;
+  }
+
+  function hasHelperPlanting(gameOrState) {
+    return getUpgradeLevel(gameOrState, "helper") >= 2;
+  }
+
+  function hasHelperGloves(gameOrState) {
+    return getUpgradeLevel(gameOrState, "helper") >= 3;
+  }
+
+  function getHelperHarvestInterval(level) {
+    const config = getUpgradeConfig("helper");
+    const clampedLevel = Math.max(1, Math.min(config.maxLevel, Math.floor(level || 1)));
+    return config.cycleIntervalMsByLevel[clampedLevel - 1];
+  }
+
   SF.upgrades = {
     getUpgradeConfig,
     normalizeLeveledUpgradeValue,
@@ -56,5 +74,9 @@
     getFertilizerGrowthMultiplier,
     getFertilizerReductionPercent,
     getMarketSellBonus,
+    isHelperActive,
+    hasHelperPlanting,
+    hasHelperGloves,
+    getHelperHarvestInterval,
   };
 })(window.StrawberryFarm = window.StrawberryFarm || {});

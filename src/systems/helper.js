@@ -1,18 +1,19 @@
 (function (SF) {
   function updateHelperState(game, now = Date.now()) {
     const helper = game.state.systems.helper;
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
 
     if (!helper) {
       return false;
     }
 
-    if (!game.state.upgrades.helper) {
+    if (helperLevel < 1) {
       game.state.systems.helper = SF.state.getInitialHelperState();
       return false;
     }
 
     if (!Number.isFinite(helper.nextHarvestAt)) {
-      helper.nextHarvestAt = now + SF.config.upgrades.helper.harvestIntervalMs;
+      helper.nextHarvestAt = now + SF.upgrades.getHelperHarvestInterval(helperLevel);
       return true;
     }
 
@@ -37,7 +38,9 @@
   }
 
   function runFarmHelper(game, now = Date.now()) {
-    if (!game.state.upgrades.helper) {
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
+
+    if (helperLevel < 1) {
       return false;
     }
 
@@ -47,12 +50,12 @@
       return false;
     }
 
-    helper.nextHarvestAt = now + SF.config.upgrades.helper.harvestIntervalMs;
+    helper.nextHarvestAt = now + SF.upgrades.getHelperHarvestInterval(helperLevel);
 
     const readyPlot = SF.plots.getVisiblePlots(game).find((plot) => plot.state === SF.config.plotStates.ready);
 
     if (!readyPlot) {
-      if (game.state.upgrades.helperGloves) {
+      if (SF.upgrades.hasHelperGloves(game)) {
         const rottenPlot = SF.plots.getVisiblePlots(game).find((plot) => plot.state === SF.config.plotStates.rotten);
         if (rottenPlot) {
           SF.plots.clearRottenPlotWithSource(game, rottenPlot, "helper", now);
@@ -60,7 +63,7 @@
         }
       }
 
-      if (!game.state.upgrades.helperPlanting || game.state.seeds <= 0) {
+      if (!SF.upgrades.hasHelperPlanting(game) || game.state.seeds <= 0) {
         return false;
       }
 

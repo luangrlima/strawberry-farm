@@ -71,7 +71,7 @@
   }
 
   function getSpoilTimeMs(game) {
-    if (game.state.upgrades.helperGloves) {
+    if (SF.upgrades.hasHelperGloves(game)) {
       return 10000;
     }
     return SF.config.crop.spoilTimeMs;

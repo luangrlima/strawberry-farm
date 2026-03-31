@@ -125,9 +125,19 @@
         savedState.upgrades.market,
         config.upgrades.market.maxLevel,
       );
-      nextState.upgrades.helper = Boolean(savedState.upgrades.helper);
-      nextState.upgrades.helperPlanting = Boolean(savedState.upgrades.helperPlanting);
-      nextState.upgrades.helperGloves = Boolean(savedState.upgrades.helperGloves);
+      const savedHelperLevel = savedState.upgrades.helper;
+      const legacyHelperActive = Boolean(savedState.upgrades.helper);
+      const legacyHelperPlanting = Boolean(savedState.upgrades.helperPlanting);
+      const legacyHelperGloves = Boolean(savedState.upgrades.helperGloves);
+      nextState.upgrades.helper = Number.isFinite(savedHelperLevel)
+        ? SF.upgrades.normalizeLeveledUpgradeValue(savedHelperLevel, config.upgrades.helper.maxLevel)
+        : legacyHelperGloves
+          ? 3
+          : legacyHelperPlanting
+            ? 2
+            : legacyHelperActive
+              ? 1
+              : 0;
     }
 
     if (savedState.progression && Array.isArray(savedState.progression.completedGoalIds)) {

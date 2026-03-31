@@ -157,8 +157,7 @@ async function installLegacySaveFixture(page) {
       direction: "up",
       nextUpdateAt: now + 6000,
     };
-    currentState.upgrades.helper = true;
-    currentState.upgrades.helperPlanting = false;
+    currentState.upgrades.helper = 1;
     currentState.systems.helper = {
       nextHarvestAt: now + 4000,
       lastHarvestAt: null,
@@ -230,8 +229,7 @@ async function resetComboState(page) {
 async function resetHelperUpgradeState(page) {
   await page.evaluate(() => {
     const currentState = window.__strawberryFarmDebug.getState();
-    currentState.upgrades.helper = false;
-    currentState.upgrades.helperPlanting = false;
+    currentState.upgrades.helper = 0;
     currentState.systems.helper = {
       nextHarvestAt: null,
       lastHarvestAt: null,
@@ -296,8 +294,7 @@ async function preparePostPrestigeProgression(page) {
     currentState.progression.completedGoalIds = ["harvest-3", "sell-20", "harvest-50", "prestige-1", "buy-upgrade", "reach-35"];
     currentState.upgrades.fertilizer = 0;
     currentState.upgrades.market = 0;
-    currentState.upgrades.helper = false;
-    currentState.upgrades.helperPlanting = false;
+    currentState.upgrades.helper = 0;
     currentState.systems.helper = {
       nextHarvestAt: null,
       lastHarvestAt: null,
@@ -836,7 +833,7 @@ async function reachMoneyTarget(page, target) {
     await page.waitForFunction(() => {
       const button = document.querySelector("#helperButton");
       const status = document.querySelector("#helperStatusValue");
-      return button && button.textContent.includes("Ajudante ativo") && status && status.textContent === "On";
+      return button && button.textContent.includes("Nível 2") && status && status.textContent === "On";
     });
     assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper deveria aparecer quando ativo.");
     await resetComboState(page);
@@ -845,14 +842,15 @@ async function reachMoneyTarget(page, target) {
 
     await reachMoneyTarget(page, 22);
     await openUpgradesTab(page);
-    await page.click("#helperPlantingButton");
+    await page.click("#helperButton");
     await page.waitForFunction(() => {
-      const button = document.querySelector("#helperPlantingButton");
-      return button && button.textContent.includes("ativo");
+      const button = document.querySelector("#helperButton");
+      const meta = document.querySelector("#helperLevelMeta");
+      return button && button.textContent.includes("Nível 3") && meta && meta.textContent.includes("2/6");
     });
     assert(
-      (await textOf(page, "#helperPlantingDescription")).includes("usa 1 semente"),
-      "A melhoria de plantio assistido deveria deixar claro o consumo de sementes.",
+      (await textOf(page, "#helperDescription")).includes("planta"),
+      "O nível 2 do ajudante deveria deixar claro o plantio assistido.",
     );
 
     await clearEvent(page);
@@ -929,8 +927,8 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#helperStatusValue")) === "On", "O estado do helper não persistiu após reload.");
     assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper não persistiu após reload.");
     assert(
-      (await textOf(page, "#helperPlantingButton")).includes("ativo"),
-      "A melhoria de plantio assistido nao persistiu apos reload.",
+      (await textOf(page, "#helperLevelMeta")).includes("2/6"),
+      "O nível 2 do ajudante nao persistiu apos reload.",
     );
 
     await page.evaluate(() => {

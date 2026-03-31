@@ -31,9 +31,7 @@
       upgrades: {
         fertilizer: 0,
         market: 0,
-        helper: false,
-        helperPlanting: false,
-        helperGloves: false,
+        helper: 0,
       },
       progression: {
         completedGoalIds: [],
