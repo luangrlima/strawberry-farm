@@ -292,7 +292,7 @@ async function setExpiredComboScenario(page) {
     await page.reload({ waitUntil: "load" });
     await waitForText(page, "#eventTitle", "Feira local");
     assert((await textOf(page, "#helperStatusValue")) === "On", "O helper legado deveria carregar ligado.");
-    assert(!(await page.locator("#comboStrip").isHidden()), "O combo legado deveria permanecer visível após load.");
+    assert(!(await page.locator("#focusStrip").isHidden()), "O combo legado deveria permanecer visível após load.");
     const berriesBeforeHelper = await numberOf(page, "#berryCount");
     await page.waitForFunction(
       (currentBerries) => Number(document.querySelector("#berryCount")?.textContent || "0") >= currentBerries + 1,

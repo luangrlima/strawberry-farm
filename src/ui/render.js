@@ -42,8 +42,7 @@
 
   function renderLiveState(game, farmMetrics = SF.plots.getFarmMetrics(game), now = getRenderNow(game)) {
     renderHelperCard(game, now);
-    renderComboStrip(game, now);
-    renderHelperStrip(game, now);
+    renderFocusStrip(game, now);
     renderMilestoneToast(game, now);
     renderEventBanner(game, now);
     renderMarketBanner(game, now);
@@ -136,24 +135,24 @@
     game.elements.fertilizerDescription.textContent =
       fertilizerLevel > 0
         ? SF.upgrades.isMaxLevel(game, "fertilizer")
-          ? `Tempo atual ${currentGrowthTime}. Redução total de ${SF.upgrades.getFertilizerReductionPercent(fertilizerLevel)}%.`
-          : `Tempo atual ${currentGrowthTime}. Próximo nível deixa em -${nextFertilizerReduction}% do tempo base.`
+          ? `Atual ${currentGrowthTime}. Redução total ${SF.upgrades.getFertilizerReductionPercent(fertilizerLevel)}%.`
+          : `Atual ${currentGrowthTime}. Próx. -${nextFertilizerReduction}% do tempo base.`
         : SF.config.upgrades.fertilizer.description;
     game.elements.marketDescription.textContent =
       marketLevel > 0
         ? SF.upgrades.isMaxLevel(game, "market")
-          ? `${SF.market.getSellPrice(game)} moedas por venda. Bônus total +${currentMarketBonus}.${game.state.prestige.level > 0 ? ` Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? " Evento somado." : ""}`
-          : `${SF.market.getSellPrice(game)} moedas por venda. Bônus atual +${currentMarketBonus}; próximo nível vai para +${nextMarketBonus}.`
+          ? `Atual ${SF.market.getSellPrice(game)} moedas. Bônus +${currentMarketBonus}${game.state.prestige.level > 0 ? `, prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.` : activeEvent?.sellPriceBonus ? ", evento somado." : "."}`
+          : `Atual +${currentMarketBonus}. Próx. +${nextMarketBonus}.`
         : SF.config.upgrades.market.description;
     game.elements.expansionDescription.textContent = farmAtMaxLevel
-      ? "16 lotes liberados."
-      : `Atual ${currentFarmLevel.label} (${currentFarmLevel.unlockedPlotCount}/16). Próximo ${nextFarmLevel.label} por ${nextFarmLevel.expansionCost} moedas.`;
+      ? "Atual 4x4. Todos os 16 lotes liberados."
+      : `Atual ${currentFarmLevel.label} (${currentFarmLevel.unlockedPlotCount}/16). Próx. ${nextFarmLevel.label} por ${nextFarmLevel.expansionCost}.`;
     game.elements.helperDescription.textContent =
       helperLevel <= 0
         ? SF.config.upgrades.helper.description
         : helperLevel >= maxHelperLevel
-          ? `Ciclo atual ${currentHelperTime}. Colhe, planta, limpa e opera na velocidade máxima.`
-          : `Ciclo atual ${currentHelperTime}. Próximo nível ${nextHelperLevel} reduz para ${nextHelperTime}${nextHelperLevel >= 2 ? ", planta" : ""}${nextHelperLevel >= 3 ? " e limpa" : ""}.`;
+          ? `Atual ${currentHelperTime}. Colhe, planta e limpa no máximo.`
+          : `Atual ${currentHelperTime}. Próx. ${nextHelperTime}${nextHelperLevel >= 2 ? " + plantio" : ""}${nextHelperLevel >= 3 ? " + limpeza" : ""}.`;
   }
 
   function renderEventBanner(game, now = getRenderNow(game)) {
@@ -205,26 +204,62 @@
     game.elements.marketTimer.textContent = `${SF.utils.formatSeconds(remainingMs)}`;
   }
 
-  function renderComboStrip(game, now = getRenderNow(game)) {
+  function renderFocusStrip(game, now = getRenderNow(game)) {
     const combo = game.state.systems.combo;
-    const isActive = combo.count >= 2 && Number.isFinite(combo.expiresAt) && now < combo.expiresAt;
+    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
+    const helperActive = helperLevel > 0;
+    const helper = game.state.systems.helper;
+    const comboActive = combo.count >= 2 && Number.isFinite(combo.expiresAt) && now < combo.expiresAt;
 
-    game.elements.comboStrip.hidden = !isActive;
-    if (!isActive) {
+    game.elements.focusStrip.hidden = !comboActive && !helperActive;
+
+    if (comboActive) {
+      const remainingMs = Math.max(0, combo.expiresAt - now);
+      const progressPercent = (remainingMs / SF.config.combo.windowMs) * 100;
+      const nextThreshold = SF.combo.getNextComboThreshold(combo.count);
+      const rewardText = combo.rewardMoney > 0 ? ` +${combo.rewardMoney} moeda bônus` : "";
+
+      game.elements.focusStrip.className = "focus-strip status-module focus-strip--combo";
+      game.elements.focusStripEyebrow.textContent = "Combo";
+      game.elements.focusStripTitle.textContent = `Combo x${combo.count}${rewardText}`;
+      game.elements.focusStripText.textContent = nextThreshold
+        ? `Mais 1 colheita para x${nextThreshold.count}.`
+        : "Combo no máximo.";
+      game.elements.focusStripTimer.textContent = `${SF.utils.formatSeconds(remainingMs)}`;
+      game.elements.focusStripProgress.hidden = false;
+      game.elements.focusStripProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
       return;
     }
 
-    const remainingMs = Math.max(0, combo.expiresAt - now);
-    const progressPercent = (remainingMs / SF.config.combo.windowMs) * 100;
-    const nextThreshold = SF.combo.getNextComboThreshold(combo.count);
-    const rewardText = combo.rewardMoney > 0 ? ` +${combo.rewardMoney} moeda bônus` : "";
+    if (!helperActive) {
+      return;
+    }
 
-    game.elements.comboTitle.textContent = `Combo x${combo.count}${rewardText}`;
-    game.elements.comboText.textContent = nextThreshold
-      ? `Mais 1 para x${nextThreshold.count}.`
-      : "Combo no máximo.";
-    game.elements.comboTimer.textContent = `${SF.utils.formatSeconds(remainingMs)}`;
-    game.elements.comboProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+    const nextHarvestAt = Number.isFinite(helper.nextHarvestAt)
+      ? Math.max(0, helper.nextHarvestAt - now)
+      : SF.upgrades.getHelperHarvestInterval(Math.max(1, helperLevel));
+    const helperInterval = SF.upgrades.getHelperHarvestInterval(Math.max(1, helperLevel));
+    const progressPercent = helperInterval > 0 ? 100 - (nextHarvestAt / helperInterval) * 100 : 0;
+    const recentAction = Number.isFinite(helper.lastActionAt) && now - helper.lastActionAt < 2800;
+
+    game.elements.focusStrip.className = "focus-strip status-module focus-strip--helper";
+    game.elements.focusStripEyebrow.textContent = "Ajudante";
+    game.elements.focusStripTitle.textContent = SF.upgrades.hasHelperGloves(game)
+      ? SF.upgrades.hasHelperPlanting(game)
+        ? "Colhe, planta e limpa"
+        : "Colhe e limpa"
+      : SF.upgrades.hasHelperPlanting(game)
+        ? "Colhe e planta"
+        : "Auto-colheita";
+    game.elements.focusStripText.textContent =
+      recentAction && helper.lastActionText
+        ? helper.lastActionText
+        : SF.upgrades.hasHelperPlanting(game)
+          ? "Age sozinho no próximo ciclo."
+          : "Colhe 1 pronto por ciclo.";
+    game.elements.focusStripTimer.textContent = `${SF.utils.formatSeconds(nextHarvestAt)}`;
+    game.elements.focusStripProgress.hidden = false;
+    game.elements.focusStripProgressBar.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
   }
 
   function renderHelperCard(game, now = getRenderNow(game)) {
@@ -264,37 +299,6 @@
     game.elements.prestigeButton.textContent = isAvailable
       ? `Prestigiar (+${nextBonusPercent}%)`
       : `Bloqueado · ${currentThreshold}`;
-  }
-
-  function renderHelperStrip(game, now = getRenderNow(game)) {
-    const helperLevel = SF.upgrades.getUpgradeLevel(game, "helper");
-    const isActive = helperLevel > 0;
-    game.elements.helperStrip.hidden = !isActive;
-
-    if (!isActive) {
-      return;
-    }
-
-    const helper = game.state.systems.helper;
-    const nextHarvestAt = Number.isFinite(helper.nextHarvestAt)
-      ? Math.max(0, helper.nextHarvestAt - now)
-      : SF.upgrades.getHelperHarvestInterval(Math.max(1, helperLevel));
-    const recentAction = Number.isFinite(helper.lastActionAt) && now - helper.lastActionAt < 2800;
-    game.elements.helperStripTitle.textContent = SF.upgrades.hasHelperGloves(game)
-      ? SF.upgrades.hasHelperPlanting(game)
-        ? "Auto-colheita + limpeza + plantio"
-        : "Auto-colheita + limpeza"
-      : SF.upgrades.hasHelperPlanting(game)
-        ? "Auto-colheita + plantio"
-        : "Auto-colheita";
-
-    game.elements.helperStripText.textContent =
-      recentAction && helper.lastActionText
-        ? helper.lastActionText
-        : SF.upgrades.hasHelperPlanting(game)
-          ? "Colhe 1 pronto. Sem colheita, planta 1 vazio."
-          : "Colhe 1 pronto por ciclo.";
-    game.elements.helperStripTimer.textContent = `${SF.utils.formatSeconds(nextHarvestAt)}`;
   }
 
   function renderEventTags(game, activeEvent) {

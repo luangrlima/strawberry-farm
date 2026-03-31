@@ -221,7 +221,7 @@ async function resetComboState(page) {
   });
 
   await page.waitForFunction(() => {
-    const comboStrip = document.querySelector("#comboStrip");
+    const comboStrip = document.querySelector("#focusStrip");
     return !comboStrip || comboStrip.hidden;
   });
 }
@@ -539,7 +539,7 @@ async function reachMoneyTarget(page, target) {
     assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O mercado do save legado não foi hidratado.");
     assert((await textOf(page, "#buySeedButton")) === "Semente (1)", "O evento ativo do save legado não foi hidratado.");
     assert((await textOf(page, "#helperStatusValue")) === "On", "O helper do save legado não foi hidratado.");
-    assert(!(await page.locator("#comboStrip").isHidden()), "O combo ativo do save legado não foi hidratado.");
+    assert(!(await page.locator("#focusStrip").isHidden()), "O combo ativo do save legado não foi hidratado.");
     assert(!(await page.locator("#helpPanel").isHidden()), "O help panel do save legado não foi hidratado.");
 
     console.log("Cenário 2.2: combo de colheita e persistência curta");
@@ -569,11 +569,11 @@ async function reachMoneyTarget(page, target) {
     const moneyBeforeCombo = await numberOf(page, "#moneyCount");
     await harvestAllReadyPlots(page);
     await page.waitForFunction(() => {
-      const title = document.querySelector("#comboTitle")?.textContent || "";
+      const title = document.querySelector("#focusStripTitle")?.textContent || "";
       const match = title.match(/Combo x(\d+)/);
       return match && Number(match[1]) >= 3;
     });
-    assert(!(await page.locator("#comboStrip").isHidden()), "O combo ativo deveria aparecer na interface.");
+    assert(!(await page.locator("#focusStrip").isHidden()), "O combo ativo deveria aparecer na interface.");
     assert(
       (await numberOf(page, "#moneyCount")) >= moneyBeforeCombo + 1,
       "O combo de colheita não concedeu a moeda bônus esperada.",
@@ -581,7 +581,7 @@ async function reachMoneyTarget(page, target) {
     await extendComboWindow(page, 5000);
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
-    assert(!(await page.locator("#comboStrip").isHidden()), "O estado do combo ativo não persistiu após reload.");
+    assert(!(await page.locator("#focusStrip").isHidden()), "O estado do combo ativo não persistiu após reload.");
 
     console.log("Cenário 2.3: morango estraga e exige limpeza manual");
     await page.evaluate(() => {
@@ -835,7 +835,7 @@ async function reachMoneyTarget(page, target) {
       const status = document.querySelector("#helperStatusValue");
       return button && button.textContent.includes("Nível 2") && status && status.textContent === "On";
     });
-    assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper deveria aparecer quando ativo.");
+    assert(!(await page.locator("#focusStrip").isHidden()), "A faixa do helper deveria aparecer quando ativo.");
     await resetComboState(page);
     const comboBeforeHelper = await getComboSnapshot(page);
     assert(comboBeforeHelper.count === 0, "O combo deveria estar zerado antes do helper colher.");
@@ -877,7 +877,7 @@ async function reachMoneyTarget(page, target) {
       { timeout: 5000 },
     );
     assert(
-      (await textOf(page, "#helperStripText")).includes("colheu o canteiro"),
+      (await textOf(page, "#focusStripText")).includes("colheu o canteiro"),
       "A UI do helper deveria notificar a colheita automática.",
     );
     const comboAfterHelper = await getComboSnapshot(page);
@@ -916,7 +916,7 @@ async function reachMoneyTarget(page, target) {
       "O helper deveria plantar automaticamente em um canteiro vazio quando nao ha colheita.",
     );
     assert(
-      (await textOf(page, "#helperStripText")).includes("plantou no canteiro"),
+      (await textOf(page, "#focusStripText")).includes("plantou no canteiro"),
       "A UI do helper deveria notificar o plantio automatico.",
     );
     const comboAfterHelperPlant = await getComboSnapshot(page);
@@ -925,7 +925,7 @@ async function reachMoneyTarget(page, target) {
     await page.reload({ waitUntil: "load" });
     await disableRandomEvents(page);
     assert((await textOf(page, "#helperStatusValue")) === "On", "O estado do helper não persistiu após reload.");
-    assert(!(await page.locator("#helperStrip").isHidden()), "A faixa do helper não persistiu após reload.");
+    assert(!(await page.locator("#focusStrip").isHidden()), "A faixa do helper não persistiu após reload.");
     assert(
       (await textOf(page, "#helperLevelMeta")).includes("2/6"),
       "O nível 2 do ajudante nao persistiu apos reload.",

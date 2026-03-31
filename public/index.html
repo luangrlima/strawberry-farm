@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fazenda de Morangos</title>
-    <link rel="stylesheet" href="style.css?v=20260331-0100" />
+    <link rel="stylesheet" href="style.css?v=20260331-0110" />
   </head>
   <body>
     <main class="app">
@@ -76,27 +76,18 @@
                 <div class="save-status" id="saveStatus" aria-live="polite">Auto-save pendente</div>
               </section>
 
-              <section class="combo-strip status-module" id="comboStrip" aria-live="polite" hidden>
+              <section class="focus-strip status-module" id="focusStrip" aria-live="polite" hidden>
                 <div>
-                  <p class="combo-strip__eyebrow">Combo</p>
-                  <strong class="combo-strip__title" id="comboTitle">Combo x2</strong>
-                  <p class="combo-strip__text" id="comboText">Colha rápido para bônus.</p>
+                  <p class="focus-strip__eyebrow" id="focusStripEyebrow">Combo</p>
+                  <strong class="focus-strip__title" id="focusStripTitle">Combo x2</strong>
+                  <p class="focus-strip__text" id="focusStripText">Colha rápido para bônus.</p>
                 </div>
-                <div class="combo-strip__aside">
-                  <div class="combo-strip__timer" id="comboTimer">1s</div>
-                  <div class="combo-strip__progress">
-                    <div class="combo-strip__progress-fill" id="comboProgressBar"></div>
+                <div class="focus-strip__aside">
+                  <div class="focus-strip__timer" id="focusStripTimer">1s</div>
+                  <div class="focus-strip__progress" id="focusStripProgress">
+                    <div class="focus-strip__progress-fill" id="focusStripProgressBar"></div>
                   </div>
                 </div>
-              </section>
-
-              <section class="helper-strip status-module" id="helperStrip" aria-live="polite" hidden>
-                <div>
-                  <p class="helper-strip__eyebrow">Ajudante</p>
-                  <strong class="helper-strip__title" id="helperStripTitle">Auto-colheita</strong>
-                  <p class="helper-strip__text" id="helperStripText">Monitorando a fazenda.</p>
-                </div>
-                <div class="helper-strip__timer" id="helperStripTimer">3s</div>
               </section>
             </section>
           </aside>
@@ -277,22 +268,22 @@
       </section>
     </main>
 
-    <script src="../src/config/gameConfig.js?v=20260331-0100"></script>
-    <script src="../src/utils/format.js?v=20260331-0100"></script>
-    <script src="../src/utils/dom.js?v=20260331-0100"></script>
-    <script src="../src/state/createGameState.js?v=20260331-0100"></script>
-    <script src="../src/systems/upgrades.js?v=20260331-0100"></script>
-    <script src="../src/systems/events.js?v=20260331-0100"></script>
-    <script src="../src/systems/market.js?v=20260331-0100"></script>
-    <script src="../src/systems/prestige.js?v=20260331-0100"></script>
-    <script src="../src/systems/combo.js?v=20260331-0100"></script>
-    <script src="../src/systems/helper.js?v=20260331-0100"></script>
-    <script src="../src/systems/progression.js?v=20260331-0100"></script>
-    <script src="../src/systems/plots.js?v=20260331-0100"></script>
-    <script src="../src/state/persistence.js?v=20260331-0100"></script>
-    <script src="../src/systems/runtime.js?v=20260331-0100"></script>
-    <script src="../src/ui/farmGrid.js?v=20260331-0100"></script>
-    <script src="../src/ui/render.js?v=20260331-0100"></script>
-    <script src="../src/main.js?v=20260331-0100"></script>
+    <script src="../src/config/gameConfig.js?v=20260331-0110"></script>
+    <script src="../src/utils/format.js?v=20260331-0110"></script>
+    <script src="../src/utils/dom.js?v=20260331-0110"></script>
+    <script src="../src/state/createGameState.js?v=20260331-0110"></script>
+    <script src="../src/systems/upgrades.js?v=20260331-0110"></script>
+    <script src="../src/systems/events.js?v=20260331-0110"></script>
+    <script src="../src/systems/market.js?v=20260331-0110"></script>
+    <script src="../src/systems/prestige.js?v=20260331-0110"></script>
+    <script src="../src/systems/combo.js?v=20260331-0110"></script>
+    <script src="../src/systems/helper.js?v=20260331-0110"></script>
+    <script src="../src/systems/progression.js?v=20260331-0110"></script>
+    <script src="../src/systems/plots.js?v=20260331-0110"></script>
+    <script src="../src/state/persistence.js?v=20260331-0110"></script>
+    <script src="../src/systems/runtime.js?v=20260331-0110"></script>
+    <script src="../src/ui/farmGrid.js?v=20260331-0110"></script>
+    <script src="../src/ui/render.js?v=20260331-0110"></script>
+    <script src="../src/main.js?v=20260331-0110"></script>
   </body>
 </html>
