@@ -435,7 +435,7 @@ async function reachMoneyTarget(page, target) {
     assert((await page.locator(".plot").count()) === 16, "A fazenda deveria manter 16 slots visuais.");
     assert((await unlockedPlotCount(page)) === 6, "A fazenda deveria iniciar com 6 canteiros liberados.");
     assert((await textOf(page, "#plotCountValue")) === "6/16", "HUD inicial da fazenda incorreto.");
-    assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "Preço de venda inicial incorreto.");
+    assert((await textOf(page, "#marketPriceValue")) === "3 moedas", "Preço de venda inicial incorreto.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "Tempo de crescimento inicial incorreto.");
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
     assert((await textOf(page, "#prestigeLevelValue")) === "Nível 0", "O prestígio deveria iniciar no nível 0.");
@@ -450,7 +450,7 @@ async function reachMoneyTarget(page, target) {
     const desktopLayoutCheck = await page.evaluate(() => {
       const viewportHeight = window.innerHeight;
       const panel = document.querySelector(".panel");
-      const goal = document.querySelector("#goalStatus")?.getBoundingClientRect();
+      const overviewTitle = document.querySelector(".overview-card__title")?.getBoundingClientRect();
       const buySeed = document.querySelector("#buySeedButton")?.getBoundingClientRect();
       const farm = document.querySelector("#farmGrid")?.getBoundingClientRect();
       const market = document.querySelector("#marketBanner")?.getBoundingClientRect();
@@ -460,7 +460,7 @@ async function reachMoneyTarget(page, target) {
 
       return {
         viewportHeight,
-        goalBottom: goal?.bottom || 0,
+        overviewTitleBottom: overviewTitle?.bottom || 0,
         buySeedBottom: buySeed?.bottom || 0,
         farmTop: farm?.top || 0,
         farmBottom: farm?.bottom || 0,
@@ -480,7 +480,7 @@ async function reachMoneyTarget(page, target) {
       desktopLayoutCheck.rightZoneOverflowY !== "auto" && desktopLayoutCheck.rightZoneOverflowY !== "scroll",
       "A coluna direita não deveria ter rolagem individual.",
     );
-    assert(desktopLayoutCheck.goalBottom < desktopLayoutCheck.viewportHeight, "A meta principal saiu da área visível.");
+    assert(desktopLayoutCheck.overviewTitleBottom < desktopLayoutCheck.viewportHeight, "O topo do painel de recursos saiu da área visível.");
     assert(desktopLayoutCheck.buySeedBottom < desktopLayoutCheck.viewportHeight, "As ações principais saíram da área visível.");
     assert(desktopLayoutCheck.farmTop < desktopLayoutCheck.viewportHeight * 0.45, "A fazenda não ficou visualmente central o bastante.");
     assert(desktopLayoutCheck.farmBottom < desktopLayoutCheck.viewportHeight * 1.2, "A fazenda inicial ficou baixa demais no desktop.");
@@ -497,7 +497,7 @@ async function reachMoneyTarget(page, target) {
 
     console.log("Cenário 1.2: mercado dinâmico e clareza de preço");
     await setMarketState(page, { currentPrice: 4, previousPrice: 3, nextUpdateInMs: 700, forcedSteps: [1] });
-    assert((await textOf(page, "#sellPriceValue")) === "4 moedas", "O preço final deveria refletir o mercado atual.");
+    assert((await textOf(page, "#marketPriceValue")) === "4 moedas", "O preço final deveria refletir o mercado atual.");
     assert((await textOf(page, "#marketChangeIndicator")).includes("+1"), "O indicador de mercado deveria mostrar a alta.");
     await waitForText(page, "#marketPriceValue", "5 moedas", 4000);
     assert((await textOf(page, "#marketHeadline")).includes("alta"), "O banner deveria sinalizar mercado em alta.");
@@ -536,7 +536,7 @@ async function reachMoneyTarget(page, target) {
     await waitForText(page, "#eventTitle", "Feira local");
     assert((await textOf(page, "#moneyCount")) === "17", "O save legado sem versão não restaurou o dinheiro.");
     assert((await textOf(page, "#seedCount")) === "1", "O save legado sem versão não restaurou as sementes.");
-    assert((await textOf(page, "#sellPriceValue")) === "5 moedas", "O mercado do save legado não foi hidratado.");
+    assert((await textOf(page, "#marketPriceValue")) === "5 moedas", "O mercado do save legado não foi hidratado.");
     assert((await textOf(page, "#buySeedButton")) === "Semente (1)", "O evento ativo do save legado não foi hidratado.");
     assert((await textOf(page, "#helperStatusValue")) === "On", "O helper do save legado não foi hidratado.");
     assert(!(await page.locator("#comboStrip").isHidden()), "O combo ativo do save legado não foi hidratado.");
@@ -759,7 +759,7 @@ async function reachMoneyTarget(page, target) {
     await setMarketState(page, { currentPrice: 5, previousPrice: 4, nextUpdateInMs: 12000 });
     await page.waitForFunction(() => {
       const button = document.querySelector("#marketButton");
-      const sellValue = document.querySelector("#sellPriceValue");
+      const sellValue = document.querySelector("#marketPriceValue");
       const meta = document.querySelector("#marketLevelMeta");
       return button && button.textContent.includes("Nível 2") && sellValue.textContent === "7 moedas" && meta && meta.textContent.includes("1/3");
     });
@@ -773,7 +773,7 @@ async function reachMoneyTarget(page, target) {
     await setMarketState(page, { currentPrice: 5, previousPrice: 4, nextUpdateInMs: 12000 });
     await page.waitForFunction(() => {
       const button = document.querySelector("#marketButton");
-      const sellValue = document.querySelector("#sellPriceValue");
+      const sellValue = document.querySelector("#marketPriceValue");
       const meta = document.querySelector("#marketLevelMeta");
       return button && button.textContent.includes("Nível 3") && sellValue && sellValue.textContent === "9 moedas" && meta && meta.textContent.includes("2/3");
     });
@@ -794,7 +794,7 @@ async function reachMoneyTarget(page, target) {
     assert(!(await page.locator("#sellButton").isDisabled()), "Era esperado ter morangos para vender antes do Sol forte.");
     await forceEvent(page, "sunshine", 5000);
     await waitForText(page, "#eventTitle", "Sol forte");
-    assert((await textOf(page, "#sellPriceValue")) === "10 moedas", "O Sol forte não aumentou o preço de venda sobre o mercado atual.");
+    assert((await textOf(page, "#marketPriceValue")) === "10 moedas", "O Sol forte não aumentou o preço de venda sobre o mercado atual.");
     assert(
       (await textOf(page, "#eventEffect")).includes("+1 por morango"),
       "O efeito textual do Sol forte não ficou claro.",
@@ -1036,8 +1036,8 @@ async function reachMoneyTarget(page, target) {
     await page.click("#fertilizerButton");
     await page.click("#marketButton");
     assert(
-      (await textOf(page, "#goalStatus")) === "Meta concluída",
-      "A mensagem final de vitória não apareceu ao alcançar 35 moedas.",
+      (await textOf(page, "#progressSummary")) === "8/8 metas",
+      "A progressão lateral não refletiu a vitória ao alcançar 35 moedas.",
     );
     assert((await textOf(page, "#progressSummary")) === "8/8 metas", "As metas finais não foram concluídas.");
 
@@ -1049,7 +1049,7 @@ async function reachMoneyTarget(page, target) {
     await waitForText(page, "#statusMessage", "Comece plantando.");
     assert((await unlockedPlotCount(page)) === 6, "O reset não voltou a fazenda base.");
     assert((await textOf(page, "#plotCountValue")) === "6/16", "O HUD não restaurou o tamanho inicial da fazenda.");
-    assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O reset não restaurou o preço base de venda.");
+    assert((await textOf(page, "#marketPriceValue")) === "3 moedas", "O reset não restaurou o preço base de venda.");
     assert((await textOf(page, "#growthTimeValue")) === "10s", "O reset não restaurou o tempo base.");
     assert((await textOf(page, "#eventTitle")) === "Sem evento", "O reset não limpou o evento ativo.");
     assert((await textOf(page, "#progressSummary")) === "0/8 metas", "O reset não limpou as metas.");
@@ -1062,7 +1062,7 @@ async function reachMoneyTarget(page, target) {
     await disableRandomEvents(page);
     assert((await page.locator(".plot").count()) === 16, "O mobile deveria continuar exibindo a grade completa.");
     assert(await page.locator("#buySeedButton").isVisible(), "A ação de comprar semente deveria continuar visível no mobile.");
-    assert(await page.locator("#goalStatus").isVisible(), "A meta principal deveria continuar visível no mobile.");
+    assert(await page.locator("#progressSummary").isVisible(), "O resumo de metas deveria continuar visível no mobile.");
 
     await page.screenshot({
       path: SUCCESS_SCREENSHOT_PATH,

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fazenda de Morangos</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260331-0040" />
   </head>
   <body>
     <main class="app">
@@ -31,7 +31,6 @@
                   <p class="section-kicker">Visão geral</p>
                   <h2 class="overview-card__title">Painel de recursos</h2>
                 </div>
-                <div class="goal" id="goalStatus" aria-live="polite">Meta 35</div>
               </div>
 
               <section class="stats stats--compact" aria-label="Recursos">
@@ -50,12 +49,6 @@
                   <span class="stat__label">Morangos</span>
                   <strong class="stat__value" id="berryCount">0</strong>
                 </article>
-                <article class="stat" id="sellPriceCard">
-                  <span class="stat__icon" aria-hidden="true">📊</span>
-                  <span class="stat__label">Venda</span>
-                  <strong class="stat__value stat__value--small" id="sellPriceValue">3 moedas</strong>
-                  <span class="stat__hint" id="sellPriceHint">Estável</span>
-                </article>
               </section>
 
               <section class="quick-status" aria-label="Status compactos">
@@ -66,16 +59,6 @@
                 <article class="mini-stat" id="plotCountCard">
                   <span class="mini-stat__label">Lotes</span>
                   <strong class="mini-stat__value" id="plotCountValue">6/16</strong>
-                </article>
-                <article class="mini-stat" id="helperCard">
-                  <span class="mini-stat__label">Ajudante</span>
-                  <strong class="mini-stat__value" id="helperStatusValue">Off</strong>
-                  <span class="mini-stat__hint" id="helperStatusHint">Inativo</span>
-                </article>
-                <article class="mini-stat" id="prestigeCard">
-                  <span class="mini-stat__label">Prestígio</span>
-                  <strong class="mini-stat__value" id="prestigeLevelValue">Nível 0</strong>
-                  <span class="mini-stat__hint" id="prestigeBonusHint">+0% venda</span>
                 </article>
               </section>
             </section>
@@ -90,9 +73,6 @@
               <section class="status-module status-module--message">
                 <p class="status-module__label">Status</p>
                 <p id="statusMessage" aria-live="polite">Comece plantando.</p>
-              </section>
-
-              <section class="status-module status-module--save">
                 <div class="save-status" id="saveStatus" aria-live="polite">Auto-save pendente</div>
               </section>
 
@@ -123,27 +103,6 @@
 
           <section class="zone zone--center">
             <section class="board-stage">
-              <section class="progress-strip progress-strip--compact" aria-label="Indicadores de progresso">
-                <article class="progress-card">
-                  <div class="progress-card__head">
-                    <span>Meta</span>
-                    <strong id="moneyGoalProgressLabel">0 / 35 moedas</strong>
-                  </div>
-                  <div class="progress-card__bar">
-                    <div class="progress-card__fill" id="moneyGoalProgressBar"></div>
-                  </div>
-                </article>
-                <article class="progress-card">
-                  <div class="progress-card__head">
-                    <span>Prontos</span>
-                    <strong id="readyPlotProgressLabel">0 / 9</strong>
-                  </div>
-                  <div class="progress-card__bar">
-                    <div class="progress-card__fill progress-card__fill--ready" id="readyPlotProgressBar"></div>
-                  </div>
-                </article>
-              </section>
-
               <section class="milestone-toast" id="milestoneToast" aria-live="polite" hidden>
                 <strong class="milestone-toast__title">Meta concluída</strong>
                 <p class="milestone-toast__text" id="milestoneToastText"></p>
@@ -204,6 +163,10 @@
                 <div>
                   <p class="prestige-panel__eyebrow">Prestígio</p>
                   <h2 id="prestigePanelTitle">Conhecimento do Morango</h2>
+                  <div class="system-summary system-summary--prestige">
+                    <strong class="system-summary__value" id="prestigeLevelValue">Nível 0</strong>
+                    <span class="system-summary__hint" id="prestigeBonusHint">+0% venda</span>
+                  </div>
                   <p class="prestige-panel__text" id="prestigePanelDescription">Reinicie para ganhar bônus permanente.</p>
                   <p class="prestige-panel__meta" id="prestigeThresholdText">Próximo em 120 moedas.</p>
                 </div>
@@ -283,6 +246,10 @@
                 <article class="upgrade-card">
                   <p class="upgrade-card__eyebrow">Automação leve</p>
                   <h2>Ajudante</h2>
+                  <div class="system-summary system-summary--helper">
+                    <strong class="system-summary__value" id="helperStatusValue">Off</strong>
+                    <span class="system-summary__hint" id="helperStatusHint">Inativo</span>
+                  </div>
                   <p class="upgrade-card__meta" id="helperLevelMeta">Nível 0/6</p>
                   <p class="upgrade-card__text" id="helperDescription">Colhe 1 pronto por ciclo.</p>
                   <button class="action-btn" id="helperButton" type="button">Comprar ajudante · 18</button>

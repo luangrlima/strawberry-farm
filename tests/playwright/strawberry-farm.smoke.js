@@ -229,7 +229,7 @@ async function setExpiredComboScenario(page) {
     await waitForText(page, "h1", "Fazenda de Morangos");
     assert((await page.locator(".plot").count()) === 16, "A grade da fazenda deveria manter 16 slots.");
     assert((await unlockedPlotCount(page)) === 6, "A fazenda inicial deveria liberar 6 canteiros.");
-    assert((await textOf(page, "#sellPriceValue")) === "3 moedas", "O preço inicial deveria ser 3 moedas.");
+    assert((await textOf(page, "#marketPriceValue")) === "3 moedas", "O preço inicial deveria ser 3 moedas.");
     assert((await textOf(page, "#helperStatusValue")) === "Off", "O helper deveria iniciar desligado.");
     const initialPlot = await plotVisualState(page, 0);
     assert(initialPlot.crop === "none", "O primeiro canteiro deveria iniciar sem planta.");

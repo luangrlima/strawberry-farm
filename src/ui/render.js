@@ -26,17 +26,13 @@
     elements.moneyCount.textContent = String(state.money);
     elements.seedCount.textContent = String(state.seeds);
     elements.berryCount.textContent = String(state.strawberries);
-    elements.sellPriceValue.textContent = `${SF.market.getSellPrice(game)} moedas`;
-    elements.sellPriceHint.textContent = SF.market.getSellPriceHint(game);
     elements.growthTimeValue.textContent = SF.utils.formatSeconds(SF.plots.getGrowthTimeMs(game));
     elements.plotCountValue.textContent = `${state.unlockedPlotCount}/${SF.config.maxPlotCount}`;
     elements.statusMessage.textContent = state.message;
     renderSaveStatus(game);
-    renderGoalStatus(game);
     renderStatHighlights(game);
     renderPrimaryActions(game);
     renderHelperCard(game, now);
-    renderPrestigeCard(game);
     renderPrestigePanel(game);
     renderHelpPanel(game);
     renderSidebarTabs(game);
@@ -46,21 +42,12 @@
 
   function renderLiveState(game, farmMetrics = SF.plots.getFarmMetrics(game), now = getRenderNow(game)) {
     renderHelperCard(game, now);
-    renderProgressIndicators(game, farmMetrics);
     renderComboStrip(game, now);
     renderHelperStrip(game, now);
     renderMilestoneToast(game, now);
     renderEventBanner(game, now);
     renderMarketBanner(game, now);
     SF.ui.renderFarmGrid(game, farmMetrics, now);
-  }
-
-  function renderGoalStatus(game) {
-    const hasWon = game.state.progression.completedGoalIds.includes("reach-35");
-    game.elements.goalStatus.textContent = hasWon
-      ? "Meta concluída"
-      : `Meta ${SF.config.winMoney}`;
-    game.elements.goalStatus.classList.toggle("goal--won", hasWon);
   }
 
   function renderSaveStatus(game) {
@@ -213,7 +200,7 @@
         : game.state.prestige.level > 0
           ? `Base ${marketBasePrice}. Prestígio +${SF.prestige.getPrestigeBonusPercent(game)}%.`
           : `Base ${marketBasePrice}.`;
-    game.elements.marketPriceValue.textContent = `${marketBasePrice} moedas`;
+    game.elements.marketPriceValue.textContent = `${finalSellPrice} moedas`;
     game.elements.marketChangeIndicator.textContent = SF.market.getMarketChangeText(game);
     game.elements.marketTimer.textContent = `${SF.utils.formatSeconds(remainingMs)}`;
   }
@@ -256,13 +243,6 @@
           ? `Nv.${helperLevel} · ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))} + ${cycleExtras}`
           : `Nv.${helperLevel} · ${SF.utils.formatSeconds(Math.max(0, nextHarvestAt - now))}`
         : "Inativo";
-    game.elements.helperCard.classList.toggle("stat--highlight", isActive);
-  }
-
-  function renderPrestigeCard(game) {
-    game.elements.prestigeLevelValue.textContent = `Nível ${game.state.prestige.level}`;
-    game.elements.prestigeBonusHint.textContent = `+${SF.prestige.getPrestigeBonusPercent(game)}% venda`;
-    game.elements.prestigeCard.classList.toggle("stat--highlight", SF.prestige.isPrestigeAvailable(game));
   }
 
   function renderPrestigePanel(game) {
@@ -271,6 +251,8 @@
     const nextBonusPercent = SF.prestige.getPrestigeBonusPercent(game, game.state.prestige.level + 1);
 
     game.elements.prestigePanel.classList.toggle("prestige-panel--available", isAvailable);
+    game.elements.prestigeLevelValue.textContent = `Nível ${game.state.prestige.level}`;
+    game.elements.prestigeBonusHint.textContent = `+${SF.prestige.getPrestigeBonusPercent(game)}% venda`;
     game.elements.prestigePanelTitle.textContent = "Conhecimento do Morango";
     game.elements.prestigePanelDescription.textContent = isAvailable
       ? `Disponível: nível ${game.state.prestige.level + 1} com +${nextBonusPercent}% venda.`
@@ -390,17 +372,6 @@
     });
   }
 
-  function renderProgressIndicators(game, farmMetrics) {
-    const moneyProgressPercent = (Math.min(game.state.money, SF.config.winMoney) / SF.config.winMoney) * 100;
-    const readyProgressPercent =
-      farmMetrics.unlockedPlots > 0 ? (farmMetrics.readyPlots / farmMetrics.unlockedPlots) * 100 : 0;
-
-    game.elements.moneyGoalProgressLabel.textContent = `${game.state.money} / ${SF.config.winMoney}`;
-    game.elements.moneyGoalProgressBar.style.width = `${Math.max(0, Math.min(100, moneyProgressPercent))}%`;
-    game.elements.readyPlotProgressLabel.textContent = `${farmMetrics.readyPlots} / ${farmMetrics.unlockedPlots}`;
-    game.elements.readyPlotProgressBar.style.width = `${Math.max(0, Math.min(100, readyProgressPercent))}%`;
-  }
-
   function renderMilestoneToast(game, now = getRenderNow(game)) {
     const toast = game.uiState.milestoneToast;
     const isVisible = Boolean(toast && toast.visibleUntil > now);
@@ -491,7 +462,7 @@
     const activeEvent = SF.events.getActiveEventDefinition(game);
 
     if (SF.prestige.isPrestigeAvailable(game)) {
-      game.elements.prestigeCard.classList.add("stat--highlight");
+      game.elements.prestigePanel.classList.add("prestige-panel--available");
       game.elements.moneyCard.classList.add("stat--highlight");
     }
 
@@ -500,7 +471,7 @@
     }
 
     if (activeEvent.sellPriceBonus) {
-      game.elements.sellPriceCard.classList.add("stat--highlight");
+      game.elements.marketBanner.classList.add("market-banner--highlight");
       game.elements.moneyCard.classList.add("stat--highlight");
     }
 
@@ -519,12 +490,12 @@
       game.elements.moneyCard,
       game.elements.seedCard,
       game.elements.berryCard,
-      game.elements.sellPriceCard,
       game.elements.growthTimeCard,
       game.elements.plotCountCard,
-      game.elements.helperCard,
-      game.elements.prestigeCard,
     ].forEach((element) => element.classList.remove("stat--highlight"));
+
+    game.elements.prestigePanel.classList.remove("prestige-panel--available");
+    game.elements.marketBanner.classList.remove("market-banner--highlight");
   }
 
   SF.render.render = render;
