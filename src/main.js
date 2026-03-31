@@ -66,19 +66,19 @@
   }
 
   function attachEvents() {
-    game.elements.buySeedButton.addEventListener("click", buySeed);
-    game.elements.sellButton.addEventListener("click", sellStrawberries);
-    game.elements.resetButton.addEventListener("click", resetGame);
-    game.elements.fertilizerButton.addEventListener("click", buyFertilizerUpgrade);
-    game.elements.marketButton.addEventListener("click", buyMarketUpgrade);
-    game.elements.expandFarmButton.addEventListener("click", expandFarm);
-    game.elements.helperButton.addEventListener("click", buyHelperUpgrade);
-    game.elements.prestigeButton.addEventListener("click", prestigeFarm);
-    game.elements.helpToggleButton.addEventListener("click", toggleHelpPanel);
-    game.elements.helpDismissButton.addEventListener("click", dismissHelpPanel);
-    game.elements.sidebarGoalsTab.addEventListener("click", () => setSidebarTab("goals"));
-    game.elements.sidebarUpgradesTab.addEventListener("click", () => setSidebarTab("upgrades"));
-    game.elements.sidebarGuideTab.addEventListener("click", () => setSidebarTab("guide"));
+    bindElementEvent("buySeedButton", "click", buySeed);
+    bindElementEvent("sellButton", "click", sellStrawberries);
+    bindElementEvent("resetButton", "click", resetGame);
+    bindElementEvent("fertilizerButton", "click", buyFertilizerUpgrade);
+    bindElementEvent("marketButton", "click", buyMarketUpgrade);
+    bindElementEvent("expandFarmButton", "click", expandFarm);
+    bindElementEvent("helperButton", "click", buyHelperUpgrade);
+    bindElementEvent("prestigeButton", "click", prestigeFarm);
+    bindElementEvent("helpToggleButton", "click", toggleHelpPanel);
+    bindElementEvent("helpDismissButton", "click", dismissHelpPanel);
+    bindElementEvent("sidebarGoalsTab", "click", () => setSidebarTab("goals"));
+    bindElementEvent("sidebarUpgradesTab", "click", () => setSidebarTab("upgrades"));
+    bindElementEvent("sidebarGuideTab", "click", () => setSidebarTab("guide"));
     window.addEventListener("pagehide", flushAutosave);
     window.addEventListener("beforeunload", flushAutosave);
     document.addEventListener("visibilitychange", () => {
@@ -86,6 +86,17 @@
         flushAutosave();
       }
     });
+  }
+
+  function bindElementEvent(elementKey, eventName, handler) {
+    const element = game.elements[elementKey];
+
+    if (!element) {
+      console.warn(`[Strawberry Farm] Elemento ausente durante bind: ${elementKey}`);
+      return;
+    }
+
+    element.addEventListener(eventName, handler);
   }
 
   function attachDebugHelpers() {
